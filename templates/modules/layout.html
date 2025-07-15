@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title
       th:text="${#strings.isEmpty(title)} ?
-                     (|${site.title} - ${site.subtitle}| ?: '默认标题') :
-                     ${title}"
+        (${#strings.isEmpty(site.subtitle)} ? ${site.title} : (${site.title} + ' - ' + ${site.subtitle}))
+        : ${title}"
     >
       默认标题
     </title>
