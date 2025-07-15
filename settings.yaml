@@ -75,14 +75,16 @@ spec:
           children:
             - $formkit: text
               name: label
-              label: 网站名称（非必填）
+              label: 网站名称
               placeholder: 如：GOTAB百宝箱
               value: ""
+              validation: "required"
             - $formkit: text
               name: url
               label: 网站地址
               placeholder: 如：https://www.gotab.cn
               value: ""
+              validation: "required"
             - $formkit: attachment
               name: icon
               id: friendship_link_icon
@@ -134,6 +136,7 @@ spec:
               label: 网站地址
               placeholder: 如：https://www.gotab.cn
               value: ""
+              validation: "required"
             - $formkit: attachment
               name: icon
               id: author_info_other_homepage_icon

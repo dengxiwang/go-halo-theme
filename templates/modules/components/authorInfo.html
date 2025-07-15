@@ -59,6 +59,7 @@
     >
       <th:block th:each="link : ${links}">
         <a
+          th:if="${!#strings.isEmpty(link.label) or !#strings.isEmpty(link.icon)}"
           th:href="@{${link.url.startsWith('http') ? link.url : 'https://' + link.url}}"
           target="_blank"
           class="flex items-center gap-[6px] text-sm font-medium transition-all hover:scale-110"

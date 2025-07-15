@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
   <div
     th:fragment="friendshipLinks"
-    class="max-container-width mx-auto mt-auto flex w-full flex-col gap-3 px-2 py-3"
+    class="max-container-width mx-auto mt-auto flex w-full flex-col gap-3 px-2 py-3 text-sm"
     th:if="${theme.config.friendshipLink.showFriendshipLinks == true}"
   >
     <!-- 标题 -->
@@ -23,7 +23,7 @@
           target="_blank"
           class="flex items-center gap-[6px] transition-all hover:text-blue-500"
         >
-          <img th:src="@{${link.icon}}" class="h-4 w-4" />
+          <img th:if="${!#strings.isEmpty(link.icon)}" th:src="@{${link.icon}}" class="h-4 w-4" />
           <span th:text="${link.label}"></span>
         </a>
       </th:block>
