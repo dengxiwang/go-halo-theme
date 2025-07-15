@@ -1,0 +1,62 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <footer th:fragment="footer" class="flex w-full px-4">
+    <div
+      class="max-container-width m-auto flex w-full flex-col items-center justify-between gap-2 border-t p-2 py-6 text-sm font-medium text-gray-500"
+    >
+      <!-- 版权说明 -->
+      <span class="line text-center">
+        <span>©</span>
+        <a
+          th:text="${site.title}"
+          th:href="${site.url}"
+          th:aria-label="${site.title}"
+          class="transition-all hover:text-blue-500"
+        >
+        </a>
+        <span>All Rights Reserved.</span>
+        <span th:unless="${#strings.isEmpty(theme.config.footer.subCopyright)}">
+          <span> ｜ </span>
+          <span th:text="${theme.config.footer.subCopyright}"></span>
+        </span>
+      </span>
+
+      <!-- 项目构建说明 -->
+      <span class="text-center">
+        <span>网站基于</span>
+        <a href="https://halo.run" class="transition-all hover:text-blue-500"> Halo </a>
+        <span>搭建 · 由</span>
+        <a href="https://www.gotab.cn" th:aria-label="go" target="_blank" class="transition-all hover:text-blue-500">
+          GOTAB
+        </a>
+        <span>主题实现增强</span>
+      </span>
+
+      <!-- 备案信息 -->
+      <div
+        th:if="${!#strings.isEmpty(theme.config.footer.icpNumber) || !#strings.isEmpty(theme.config.footer.psnNumber)}"
+        class="m-auto flex flex-wrap justify-center gap-x-3 gap-y-2"
+      >
+        <span th:unless="${#strings.isEmpty(theme.config.footer.icpNumber)}">
+          <a
+            href="https://beian.miit.gov.cn/ "
+            target="_blank"
+            rel="noopener noreferrer"
+            th:text="${theme.config.footer.icpNumber}"
+            class="transition-all hover:text-blue-500"
+          ></a>
+        </span>
+        <span th:unless="${#strings.isEmpty(theme.config.footer.psnNumber)}" class="flex items-center gap-1">
+          <img th:src="@{/assets/dist/icons/beian.png}" class="h-auto w-5" />
+          <a
+            href="http://www.beian.gov.cn/"
+            target="_blank"
+            rel="noopener noreferrer"
+            th:text="${theme.config.footer.psnNumber}"
+            class="transition-all hover:text-blue-500"
+          ></a>
+        </span>
+      </div>
+    </div>
+  </footer>
+</html>

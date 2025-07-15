@@ -1,21 +1,21 @@
 apiVersion: theme.halo.run/v1alpha1
 kind: Theme
 metadata:
-  name: theme-modern-starter
+  name: go-halo-theme
 spec:
-  displayName: Modern Starter
+  displayName: Go
   author:
-    name: Halo
-    website: https://github.com/halo-dev
-  description: A development starter theme with Vite Ecosystem for Halo
-  logo: https://www.halo.run/logo
-  homepage: https://github.com/halo-dev/theme-modern-starter#readme
-  repo: https://github.com/halo-dev/theme-modern-starter
-  issues: https://github.com/halo-dev/theme-modern-starter/issues
-  settingName: "theme-modern-starter-setting"
-  configMapName: "theme-modern-starter-configMap"
+    name: dengxiwang
+    website: https://www.gotab.cn
+  description: 一款简约的个人技术博客主题
+  logo: https://www.gotab.cn/icons/logo.svg
+  homepage: https://github.com/dengxiwang/go-halo-theme#readme
+  repo: https://github.com/dengxiwang/go-halo-theme
+  issues: https://github.com/dengxiwang/go-halo-theme/issues
+  settingName: "go-halo-theme-setting"
+  configMapName: "go-halo-theme-configMap"
   version: "1.0.0"
-  requires: "2.0.0"
+  requires: ">=2.0.0"
   license:
     - name: "GPL-3.0"
-      url: "https://github.com/halo-dev/theme-modern-starter/blob/main/LICENSE"
+      url: "https://github.com/dengxiwang/go-halo-theme/blob/main/LICENSE"

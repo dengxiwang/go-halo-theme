@@ -1,0 +1,25 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(title = '标签：' + ${tag.spec.displayName} + ' - ' + ${site.title},
+        content = ~{::content},
+        contentBefore= ~{::contentBefore}
+    )}"
+>
+  <th:block th:fragment="content">
+    <!-- 标签导航 -->
+    <th:block th:replace="~{modules/components/tags}"></th:block>
+
+    <!-- 标签下文章 -->
+    <div class="h-full">
+      <!-- 文章列表 -->
+      <th:block th:replace="~{modules/components/postList}"></th:block>
+
+      <!-- 空数据 -->
+      <th:block th:replace="~{modules/components/emptyData}"></th:block>
+
+      <!-- 分页选择器 -->
+      <th:block th:replace="~{modules/components/pagination}"></th:block>
+    </div>
+  </th:block>
+</html>

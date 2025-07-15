@@ -1,0 +1,34 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(title = '归档 - ' + ${site.title}, hero = null, content = ~{::content}, head = null, footer = null, sidebar = ~{::sidebar}, contentClass = '')}"
+>
+  <th:block th:fragment="content">
+    <div class="h-full">
+      <!-- 文章列表显示 -->
+      <div class="flex flex-col gap-4">
+        <th:block th:each="archive : ${archives.items}">
+          <th:block th:each="month : ${archive.months}">
+            <div class="border-l-4 border-blue-500 px-4">
+              <h2 class="sticky top-20 text-lg font-medium" th:text="|${archive.year} 年 ${month.month} 月|"></h2>
+            </div>
+            <div
+              class="grid gap-4"
+              th:classappend="${theme.config.post.column == 1} ? 'grid-cols-1' : (${theme.config.post.column == 2} ? 'grid-cols-2' : 'grid-cols-2')"
+            >
+              <th:block th:each="post : ${month.posts}">
+                <th:block th:replace="~{modules/components/postCard :: post-card(${post})}" />
+              </th:block>
+            </div>
+          </th:block>
+        </th:block>
+      </div>
+
+      <!-- 空数据 -->
+      <th:block th:replace="~{modules/archives/emptyDataForArchives}"></th:block>
+
+      <!-- 分页 -->
+      <th:block th:replace="~{modules/archives/paginationForArchives}"></th:block>
+    </div>
+  </th:block>
+</html>

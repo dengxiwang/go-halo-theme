@@ -1,14 +1,56 @@
-<!DOCTYPE html>
-<html lang="en" th:fragment="html (content)">
+<!doctype html>
+<html lang="zh" th:fragment="html (content)">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title th:text="${site.title}"></title>
-    <link rel="stylesheet" th:href="@{/assets/dist/style.css?v={version}(version=${theme.spec.version})}" />
-    <script th:src="@{/assets/dist/main.iife.js?v={version}(version=${theme.spec.version})}"></script>
+    <title
+      th:text="${#strings.isEmpty(title)} ?
+                     (${site.title} ?: '默认标题') :
+                     ${title}"
+    >
+      默认标题
+    </title>
+    <link rel="stylesheet" th:href="@{/assets/dist/main.css?v={version}(version=${theme.spec.version})}" />
+    <script th:src="@{/assets/dist/main.iife.js?v={version}(version=${theme.spec.version})}" defer></script>
   </head>
-  <body>
-    <th:block th:replace="${content}" />
+
+  <body class="flex h-full min-h-screen w-full flex-col bg-[#F9F8F7]">
+    <!-- 头部 -->
+    <th:block th:replace="~{modules/header/header}" />
+
+    <!-- 可选内容块 -->
+    <div th:if="${contentBefore != null}">
+      <th:block th:replace="${contentBefore}" />
+    </div>
+
+    <!-- 主体内容 -->
+    <div class="max-container-width m-auto flex w-full flex-1 flex-col gap-4 p-4">
+      <th:block th:replace="${content}" />
+    </div>
+
+    <!-- 底部 -->
+    <th:block th:replace="~{modules/footer}" />
+
+    <!-- 滚动到顶部按钮 -->
+    <button
+      type="button"
+      id="btn-scroll-to-top"
+      aria-label="回到顶部"
+      class="pointer-events-none fixed bottom-8 right-8 z-50 flex items-center justify-center rounded-full bg-gray-500 p-3 opacity-0 transition-all duration-300 hover:opacity-80 lg:bottom-10 lg:right-10"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="h-6 w-6 text-white"
+      >
+        <path d="M18 15 l-6-6-6 6" />
+      </svg>
+    </button>
   </body>
 </html>

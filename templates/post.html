@@ -1,12 +1,99 @@
-<!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org" th:replace="~{modules/layout :: html(content = ~{::content})}">
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(
+        title = ${post.spec.title} + ' - ' + ${site.title},
+        contentBefore = ~{::contentBefore},
+        content = ~{::content},
+        )}"
+>
+  <!-- 文章标题信息 -->
+  <th:block th:fragment="contentBefore">
+    <th:block th:replace="~{modules/components/postTitle}" />
+  </th:block>
+
+  <!-- 文章具体内容 -->
   <th:block th:fragment="content">
-    <article
-      class="prose !max-w-none p-4"
-      th:classappend="${theme.config.post.content_size} + ' ' + ${theme.config.post.content_theme}"
+    <div class="flex flex-1 gap-2">
+      <div class="h-auto flex-1 overflow-hidden rounded-lg border bg-white p-6 max-md:p-4">
+        <!-- 内容 -->
+        <article
+          id="content"
+          class="markdown-body !max-w-none break-words"
+          th:utext="${post.content.content}"
+        ></article>
+      </div>
+    </div>
+
+    <!-- 标签导航 -->
+    <th:block th:replace="~{modules/components/tags}"></th:block>
+
+    <!-- 切换文章 -->
+    <div
+      class="flex flex-col gap-3 sm:flex-row sm:justify-between"
+      th:with="postCursor = ${postFinder.cursor(post.metadata.name)}"
     >
-      <h1 th:text="${post.spec.title}"></h1>
-      <th:block th:utext="${post.content.content}"> </th:block>
-    </article>
+      <!-- 上一篇 -->
+      <div class="flex justify-start">
+        <a
+          th:if="${postCursor.hasPrevious()}"
+          role="navigation"
+          class="group inline-flex items-center gap-1 truncate text-sm text-gray-600 hover:text-gray-900 dark:text-slate-100 dark:hover:text-slate-200"
+          th:href="@{${postCursor.previous.status.permalink}}"
+          th:title="${postCursor.previous.spec.title}"
+        >
+          <!-- SVG 左箭头 -->
+          <svg
+            class="transition-transform duration-300 group-hover:-translate-x-0.5"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+
+          <span th:text="|上一篇：${#strings.abbreviate(postCursor.previous.spec.title,20)}|"></span>
+        </a>
+      </div>
+
+      <!-- 下一篇 -->
+      <div class="flex justify-end">
+        <a
+          th:if="${postCursor.hasNext()}"
+          role="navigation"
+          class="group inline-flex items-center gap-1 truncate text-sm text-gray-600 hover:text-gray-900 dark:text-slate-100 dark:hover:text-slate-200"
+          th:href="@{${postCursor.next.status.permalink}}"
+          th:title="${postCursor.next.spec.title}"
+        >
+          <span th:text="|下一篇：${#strings.abbreviate(postCursor.next.spec.title,20)}|"></span>
+
+          <!-- SVG 右箭头 -->
+          <svg
+            class="transition-transform duration-300 group-hover:translate-x-0.5"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- 评论组件 -->
+    <div id="comment" th:if="${haloCommentEnabled}" class="mt-4">
+      <h2 class="mb-2 text-base font-medium">评论</h2>
+      <halo:comment group="content.halo.run" kind="Post" th:attr="name=${post.metadata.name}" />
+    </div>
   </th:block>
 </html>

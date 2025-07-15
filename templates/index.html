@@ -1,34 +1,36 @@
-<!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org" th:replace="~{modules/layout :: html(content = ~{::content})}">
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(
+          content = ~{::content},
+          contentBefore = ~{::contentBefore}
+      )}"
+>
+  <th:block th:fragment="contentBefore">
+    <!-- 博客信息 -->
+    <th:block th:replace="~{modules/components/authorInfo}" />
+  </th:block>
+
   <th:block th:fragment="content">
-    <div class="mx-auto flex h-screen w-96 flex-col items-center justify-center">
-      <ul class="w-full list-inside list-disc">
-        <li th:each="post : ${posts.items}">
-          <span class="icon-[tabler--box]"></span>
-          <a
-            th:text="${post.spec.title}"
-            th:href="${post.status.permalink}"
-            class="hover:text-gray-600 hover:underline"
-          ></a>
-        </li>
-      </ul>
-      <div class="mt-6 flex w-full items-center justify-between" th:if="${posts.hasPrevious() || posts.hasNext()}">
-        <a
-          th:href="@{${posts.prevUrl}}"
-          class="whitespace-no-wrap group inline-flex items-center justify-center gap-1 rounded-md border border-gray-200 bg-white px-4 py-1 text-sm font-medium leading-6 text-gray-600 shadow-sm hover:bg-gray-50 focus:shadow-none focus:outline-none"
-        >
-          <span class="i-tabler-arrow-left text-lg transition-all group-hover:-translate-x-1"></span>
-          <span>上一页</span>
-        </a>
-        <span class="text-sm text-gray-900" th:text="${posts.page} +' / '+ ${posts.totalPages}"></span>
-        <a
-          th:href="@{${posts.nextUrl}}"
-          class="whitespace-no-wrap group inline-flex items-center justify-center gap-1 rounded-md border border-gray-200 bg-white px-4 py-1 text-sm font-medium leading-6 text-gray-600 shadow-sm hover:bg-gray-50 focus:shadow-none focus:outline-none"
-        >
-          <span>下一页</span>
-          <span class="i-tabler-arrow-right text-lg transition-all group-hover:translate-x-1"></span>
-        </a>
-      </div>
+    <!-- 分类菜单 -->
+    <th:block th:replace="~{modules/components/categories}" />
+
+    <!-- 博客文章展示 -->
+    <div class="flex h-full w-full flex-col">
+      <!-- 文章列表 -->
+      <th:block th:replace="~{modules/components/postList}"></th:block>
+
+      <!-- 空数据 -->
+      <th:block th:replace="~{modules/components/emptyData}"></th:block>
+
+      <!-- 分页 -->
+      <th:block th:replace="~{modules/components/pagination}"></th:block>
     </div>
+
+    <!-- 标签导航 -->
+    <th:block th:replace="~{modules/components/tags}"></th:block>
+
+    <!-- 首页的友情链接 -->
+    <th:block th:replace="~{modules/components/friendshipLinks}" />
   </th:block>
 </html>

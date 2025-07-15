@@ -1,0 +1,70 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <div
+    th:fragment="authorInfo"
+    th:class="${theme.config.authorInfo.backgroundType == 'disable' || theme.config.authorInfo.backgroundImage == ''} ? 'relative *:z-10' : 'relative *:z-10' flex h-full w-full flex-col items-center overflow-hidden p-12 px-4 pb-7"
+    th:if="${theme.config.authorInfo.showAuthorInfo == true}"
+    th:style="${theme.config.authorInfo.fontColor != null && theme.config.authorInfo.fontColor != '' && theme.config.authorInfo.backgroundType != 'disable'} ?
+              'color: ' + ${theme.config.authorInfo.fontColor} + ' !important;' :
+              null"
+  >
+    <!-- 背景图 + 亮度 + 模糊 -->
+    <div
+      class="pointer-events-none absolute top-0 h-full w-full scale-110 bg-cover bg-center bg-no-repeat"
+      th:if="${theme.config.authorInfo.backgroundType != 'disable'}"
+      th:style="
+             |background-image: url('${theme.config.authorInfo.backgroundImage}')| +
+             (${theme.config.authorInfo.brightness != null and theme.config.authorInfo.brightness != ''} ?
+                 |; filter: brightness(| + (${theme.config.authorInfo.brightness} == 100 ? '1' : '0.' + ${theme.config.authorInfo.brightness}) + ')' +
+                 (${theme.config.authorInfo.blur != null and theme.config.authorInfo.blur != ''} ?
+                     | blur(${theme.config.authorInfo.blur}px)| : '') :
+                 (${theme.config.authorInfo.blur != null and theme.config.authorInfo.blur != ''} ?
+                     |; filter: blur(${theme.config.authorInfo.blur}px)| : '')) +
+             (${theme.config.authorInfo.background != null and theme.config.authorInfo.background != '' and theme.config.authorInfo.backgroundType == 'color'} ?
+                 |; background: ${theme.config.authorInfo.background}| : '')
+         "
+    ></div>
+
+    <!-- 头像 -->
+    <div th:if="${!#strings.isEmpty(theme.config.authorInfo.avatar)}" class="relative mb-4 h-[88px] w-[88px]">
+      <img
+        th:src="@{${theme.config.authorInfo.avatar}}"
+        alt="Author Avatar"
+        class="h-[88px] w-[88px] rounded-full border-[3px] border-white object-cover"
+      />
+      <div class="absolute bottom-[2px] right-[2px] h-6 w-6 rounded-full border-[3px] border-white bg-green-500"></div>
+    </div>
+
+    <!-- 昵称 -->
+    <h3
+      th:if="${!#strings.isEmpty(theme.config.authorInfo.name)}"
+      th:text="${theme.config.authorInfo.name}"
+      class="text-2xl font-semibold"
+    ></h3>
+
+    <!-- 简介 -->
+    <p
+      th:if="${!#strings.isEmpty(theme.config.authorInfo.description)}"
+      th:text="${theme.config.authorInfo.description}"
+      class="mt-4 max-w-md text-center text-sm font-medium opacity-60"
+    ></p>
+
+    <!-- 三方平台链接 -->
+    <div
+      th:if="${!#lists.isEmpty(theme.config.authorInfo.links)}"
+      th:with="links = ${theme.config.authorInfo.links}"
+      class="mt-6 flex flex-wrap justify-center gap-5"
+    >
+      <th:block th:each="link : ${links}">
+        <a
+          th:href="@{${link.url.startsWith('http') ? link.url : 'https://' + link.url}}"
+          target="_blank"
+          class="flex items-center gap-[6px] text-sm font-medium transition-all hover:scale-110"
+        >
+          <img th:if="${!#strings.isEmpty(link.icon)}" th:src="@{${link.icon}}" class="h-5 w-5" />
+          <span th:if="${!#strings.isEmpty(link.label)}" th:text="${link.label}"></span>
+        </a>
+      </th:block>
+    </div>
+  </div>
+</html>

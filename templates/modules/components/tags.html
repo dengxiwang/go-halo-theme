@@ -1,0 +1,22 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <!-- 所有标签 -->
+  <ul
+    th:if="${!#lists.isEmpty(tagFinder.listAll())}"
+    th:with=" tags=${tagFinder.listAll()}"
+    th:fragment="tags"
+    id="filters"
+    class="flex flex-wrap gap-x-3 gap-y-1 rounded-lg border bg-white px-4 py-2 font-medium"
+  >
+    <li th:each="currentTag : ${tags}" class="group">
+      <a
+        th:href="@{${currentTag.status.permalink}}"
+        class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium transition-all duration-300 hover:bg-blue-100 hover:text-blue-600"
+        th:classappend="${currentTag.metadata.name == tag.metadata.name} ? 'active-menu'"
+      >
+        <span th:text="|# ${currentTag.spec.displayName}|">标签名</span>
+        <span class="ml-1 text-xs" th:text="'(' + ${currentTag.postCount} + ')'"></span>
+      </a>
+    </li>
+  </ul>
+</html>

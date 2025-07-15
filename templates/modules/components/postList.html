@@ -1,0 +1,15 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <div
+    th:fragment="postList"
+    id="post-list"
+    th:if="${posts.total gt 0}"
+    th:with="postItems=${posts.items}, list_layout=${theme.config.layout.post_list_layout}"
+    th:classappend="${theme.config.post.column == 1} ? 'grid-cols-1' : (${theme.config.post.column == 2} ? 'grid-cols-2' : 'grid-cols-2')"
+    class="grid gap-4 max-md:grid-cols-1"
+  >
+    <th:block th:each="post : ${postItems}">
+      <th:block th:replace="~{modules/components/postCard :: post-card(${post})}" />
+    </th:block>
+  </div>
+</html>

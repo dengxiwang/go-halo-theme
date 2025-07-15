@@ -1,39 +1,194 @@
 apiVersion: v1alpha1
 kind: Setting
 metadata:
-  name: theme-modern-starter-setting
+  name: go-halo-theme-setting
 spec:
   forms:
     - group: post
       label: 文章
       formSchema:
         - $formkit: select
-          name: content_size
-          label: 字体大小
-          value: prose-base
+          name: column
+          label: 列表显示列数
+          value: 2
           options:
-            - value: prose-base
-              label: prose-base
-            - value: prose-sm
-              label: prose-sm
-            - value: prose-lg
-              label: prose-lg
-            - value: prose-xl
-              label: prose-xl
-            - value: prose-2xl
-              label: prose-2xl
+            - value: 1
+              label: 一列
+            - value: 2
+              label: 两列
+    # - group: sidebar
+    #   label: 侧边栏
+    #   formSchema:
+    #   - $formkit: select
+    #     name: useSidebar
+    #     label: 是否使用侧边栏
+    #     value: true
+    #     options:
+    #     - label: 开启
+    #       value: true
+    #     - label: 关闭
+    #       value: false
+    #   - $formkit: select
+    #     name: showTags
+    #     label: 是否展示标签
+    #     value: true
+    #     options:
+    #     - label: 开启
+    #       value: true
+    #     - label: 关闭
+    #       value: false
+    #   - $formkit: select
+    - group: footer
+      label: 页脚
+      formSchema:
+        - $formkit: text
+          name: icpNumber
+          label: 工信部备案号
+          placeholder: 如：豫ICP备XXX号
+          value: ""
+        - $formkit: text
+          name: psnNumber
+          label: 网安备案号
+          placeholder: 如：豫公网安备XXX号
+          value: ""
+        - $formkit: text
+          name: subCopyright
+          label: 版权声明副说明
+          placeholder: 如：since 2020 - present
+          value: ""
+    - group: friendshipLink
+      label: 友链
+      formSchema:
         - $formkit: select
-          name: content_theme
-          label: 颜色主题
-          value: prose-gray
+          name: showFriendshipLinks
+          label: 是否展示友链
+          value: true
           options:
-            - value: prose-gray
-              label: prose-gray
-            - value: prose-slate
-              label: prose-slate
-            - value: prose-zinc
-              label: prose-zinc
-            - value: prose-neutral
-              label: prose-neutral
-            - value: prose-stone
-              label: prose-stone
+            - label: 开启
+              value: true
+            - label: 关闭
+              value: false
+        - $formkit: repeater
+          name: links
+          label: 链接
+          value: []
+          children:
+            - $formkit: text
+              name: label
+              label: 网站名称（非必填）
+              placeholder: 如：GOTAB百宝箱
+              value: ""
+            - $formkit: text
+              name: url
+              label: 网站地址
+              placeholder: 如：https://www.gotab.cn
+              value: ""
+            - $formkit: attachment
+              name: icon
+              id: friendship_link_icon
+              key: friendship_link_icon
+              label: 网站图标（非必填）
+              placeholder: 网站图标
+              value: ""
+    - group: authorInfo
+      label: 博主简介
+      formSchema:
+        - $formkit: select
+          name: showAuthorInfo
+          label: 是否展示博主简介
+          value: true
+          options:
+            - label: 开启
+              value: true
+            - label: 关闭
+              value: false
+        - $formkit: attachment
+          name: avatar
+          id: author_info_avatar
+          key: author_info_avatar
+          label: 头像
+          placeholder: 头像
+          value: ""
+        - $formkit: text
+          name: name
+          label: 名称
+          placeholder: 如：doxwant
+          value: "佚名"
+        - $formkit: text
+          name: description
+          label: 描述
+          placeholder: 如：我是 XX，一个拥有多年经验的创意设计师和开发人员，在这里可以了解
+          value: "欢迎访问我的个人博客，我将在这里与你分享更多精彩内容"
+        - $formkit: repeater
+          name: links
+          label: 三方平台链接或个人其他主页
+          value: []
+          children:
+            - $formkit: text
+              name: label
+              label: 网站名称（非必填）
+              placeholder: 如：GOTAB百宝箱
+              value: ""
+            - $formkit: text
+              name: url
+              label: 网站地址
+              placeholder: 如：https://www.gotab.cn
+              value: ""
+            - $formkit: attachment
+              name: icon
+              id: author_info_other_homepage_icon
+              key: author_info_other_homepage_icon
+              label: 网站图标（非必填）
+              placeholder: 网站图标
+              value: ""
+        - $formkit: select
+          name: backgroundType
+          label: 背景类型
+          value: color
+          id: backgroundType
+          key: backgroundType
+          options:
+            - label: 自定义颜色/渐变色
+              value: color
+            - label: 自定义图片
+              value: image
+            - label: 禁用
+              value: disable
+        - $formkit: text
+          if: "$get(backgroundType).value === color"
+          name: background
+          label: 背景颜色（支持渐变色 css ）
+          placeholder: 如：linear-gradient(45deg,#03A9F4,#00ff5042)
+          value: "linear-gradient(45deg,#03A9F4,#00ff5042)"
+          validation: "required"
+        - $formkit: attachment
+          if: "$get(backgroundType).value === image"
+          name: backgroundImage
+          id: author_info_background_image
+          key: author_info_background_image
+          label: 背景图片（没有背景颜色时生效）
+          placeholder: 背景图片
+          value: ""
+          validation: "required"
+        - $formkit: color
+          name: fontColor
+          id: fontColor
+          key: fontColor
+          label: 字体颜色
+          value: "#ffffff"
+        - $formkit: number
+          name: blur
+          label: 背景模糊像素（px）：0-32
+          placeholder: 如：0
+          value: 0
+          step: 1
+          min: 0
+          max: 32
+        - $formkit: number
+          name: brightness
+          label: 背景亮度（%）：0-100
+          placeholder: 如：100
+          value: 100
+          step: 1
+          min: 0
+          max: 100

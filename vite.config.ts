@@ -1,6 +1,6 @@
-import { defineConfig } from "vite";
-import { fileURLToPath } from "url";
 import path from "path";
+import { fileURLToPath } from "url";
+import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [],
@@ -12,6 +12,17 @@ export default defineConfig({
       name: "main",
       fileName: "main",
       formats: ["iife"],
+    },
+    minify: "terser",
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: false,
+      },
+      format: {
+        comments: false,
+      },
+      mangle: true,
     },
   },
 });

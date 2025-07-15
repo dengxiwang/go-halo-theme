@@ -1,0 +1,46 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <style>
+    /* 隐藏带有 x-cloak 属性的元素 */
+    [x-cloak] {
+      display: none !important;
+    }
+  </style>
+
+  <header
+    th:fragment="header"
+    class="sticky top-0 z-50 flex min-h-[68px] w-full border-b bg-white p-4"
+    x-data="{ isMobile: window.innerWidth < 768 }"
+    x-init="window.addEventListener('resize', () => isMobile = window.innerWidth < 768)"
+  >
+    <div class="max-container-width m-auto flex w-full flex-wrap items-center justify-between gap-4 *:min-h-9">
+      <!-- 左侧logo展示 -->
+      <div class="flex gap-x-6 gap-y-3" style="flex: 1 0 auto">
+        <!-- logo -->
+        <th:block th:replace="~{modules/header/header-logo-area}" />
+
+        <!-- 搜索区域（仅桌面端显示） -->
+        <template x-if="!isMobile">
+          <th:block th:replace="~{modules/header/header-search}" />
+        </template>
+      </div>
+
+      <!-- 菜单区域（仅桌面端显示） -->
+      <div x-show="!isMobile" x-cloak>
+        <th:block th:if="${!isMobile}" th:replace="~{modules/header/header-main-menu}" />
+      </div>
+
+      <div x-show="isMobile" class="flex gap-2">
+        <!-- 手机搜索样式（仅移动端显示） -->
+        <template x-if="isMobile">
+          <th:block th:replace="~{modules/header/header-mobile-search}" />
+        </template>
+
+        <!-- 手机菜单样式（仅移动端显示） -->
+        <div x-show="isMobile" x-cloak>
+          <th:block th:replace="~{modules/header/header-mobile-menu}" />
+        </div>
+      </div>
+    </div>
+  </header>
+</html>

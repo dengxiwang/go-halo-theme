@@ -1,0 +1,85 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(
+          content = ~{::content},
+          contentBefore = ~{::contentBefore},
+          title = '文章分类' + ' - ' + ${site.title}
+      )}"
+>
+  <th:block th:fragment="content">
+    <div class="container mx-auto">
+      <div class="rounded-lg border bg-white p-4">
+        <div class="mb-6 flex items-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="mr-2 h-6 w-6 text-blue-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
+            />
+          </svg>
+          <span class="text-xl font-bold">分类</span>
+          <span class="" th:text="'（' + ${#lists.size(categories)} + '）'"></span>
+        </div>
+
+        <!-- 无分类数据时 -->
+        <div th:if="${#lists.isEmpty(categories)}" class="m-6 flex flex-col items-center justify-center">
+          <div class="-mr-[34px]">
+            <th:block th:replace="~{modules/components/emptyDataSvg}"></th:block>
+          </div>
+
+          <!-- 提示信息 -->
+          <h2 class="mt-6 text-xl font-semibold text-gray-800">暂无分类</h2>
+          <p class="mt-2 text-gray-500">暂无分类数据，请稍后再来查看或切换其他分类。</p>
+
+          <!-- 返回首页按钮 -->
+          <div class="mt-6">
+            <a href="/" class="inline-block rounded-lg border px-4 py-2 text-sm transition hover:bg-gray-100">
+              返回首页
+            </a>
+          </div>
+        </div>
+
+        <!-- 分类列表 -->
+        <div class="space-y-6" th:if="${!#lists.isEmpty(categories)}">
+          <div th:each="category : ${categories}" class="border-l-4 border-blue-500 py-2 pl-4">
+            <!-- 一级分类 -->
+            <a
+              th:href="@{${category.status.permalink}}"
+              class="flex items-center justify-between rounded-lg px-3 py-2 font-semibold transition duration-300 hover:bg-gray-100"
+            >
+              <span th:text="${category.spec.displayName}"></span>
+              <span
+                class="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800"
+                th:text="|${category.status.postCount} 篇文章|"
+              ></span>
+            </a>
+
+            <!-- 子分类 -->
+            <div th:if="${not #lists.isEmpty(category.children)}" class="ml-6 mt-2 space-y-2">
+              <div
+                th:each="child : ${category.children}"
+                class="rounded-lg px-3 py-2 transition duration-300 hover:bg-gray-100"
+              >
+                <a th:href="@{${child.status.permalink}}" class="flex items-center justify-between">
+                  <span th:text="${child.spec.displayName}"></span>
+                  <span
+                    class="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-xs font-medium"
+                    th:text="|${child.status.postCount ?: 0} 篇文章|"
+                  ></span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </th:block>
+</html>

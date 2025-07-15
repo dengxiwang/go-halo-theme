@@ -1,32 +1,25 @@
-# Theme Modern Starter
+# GO-HALO-THEME
 
-一个集成了现代前端技术栈的 Halo 2.0 的主题开发模板。
+一款简约的个人技术博客主题
 
-主题开发文档可查阅：<https://docs.halo.run/2.0.0-SNAPSHOT/developer-guide/theme/prepare>
+## 在线预览
+[https://blog.gotab.cn](https://blog.gotab.cn)
 
-## 特性
+## 使用方式
 
-- 使用 [Vite](https://vitejs.dev/) 进行静态资源构建。
-- 使用 [Tailwind CSS](https://tailwindcss.com/) 进行样式开发。
-- 使用 [@tailwindcss/typography](https://tailwindcss.com/docs/typography-plugin) 作为内容样式。
-- 使用 [Iconify](https://iconify.design/) + [@iconify/tailwind](https://iconify.design/docs/usage/css/tailwind/#installation) 作为图标方案。
-- 集成了 [Alpine.js](https://alpinejs.dev/)。
-- 集成了 ESLint + Prettier。
+1. 手动从以下地址下载主题包并在 Console 的主题管理界面安装，安装方式可参考：<https://docs.halo.run/user-guide/themes>
 
-## 开发
+    - https://www.halo.run/store/apps/app-KgWqR
+    - https://github.com/halo-dev/theme-earth/releases
 
-```bash
-git clone git@github.com:halo-dev/theme-modern-starter.git ~/halo2-dev/themes/theme-modern-starter
-```
+3. 如果安装了[应用市场](https://www.halo.run/store/apps/app-VYJbF)插件，可以直接在应用市场中搜索`Go`并安装。
 
-```bash
-cd ~/halo2-dev/themes/theme-modern-starter
-```
+## 插件支持
 
-```bash
-pnpm install 
-```
+为了获得更好的体验，你还可以安装以下插件（如果需要）：
 
-```bash
-pnpm dev
-```
+- highlight.js 代码高亮：<https://halo.run/store/apps/app-sqpgf>
+
+## 打赏项目
+
+感谢您对本项目的喜爱，您的打赏是对本项目最好的支持！

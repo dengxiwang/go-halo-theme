@@ -1,0 +1,87 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <style>
+    [x-cloak] {
+      display: none !important;
+    }
+  </style>
+
+  <ul
+    th:fragment="categories"
+    id="filters"
+    class="flex flex-wrap gap-x-5 gap-y-1 rounded-lg border bg-white px-4 py-1 font-medium"
+  >
+    <!-- 全部分类 -->
+    <li>
+      <a
+        href="/"
+        class="group flex h-9 cursor-pointer items-center gap-1 transition-all hover:text-blue-500"
+        th:classappend="${category == null} ? 'active-menu'"
+      >
+        <span class="max-w-32 overflow-hidden text-ellipsis">全部</span>
+      </a>
+    </li>
+
+    <!-- 一级分类循环 -->
+    <th:block th:with="categories = ${categoryFinder.listAsTree()}">
+      <li
+        th:each="categoryItem : ${categories}"
+        class="relative"
+        x-data="{ open: false }"
+        @mouseenter="open = true"
+        @mouseleave="open = false"
+      >
+        <!-- 父级分类链接 -->
+        <a
+          th:href="@{${categoryItem.status.permalink}}"
+          class="group flex h-9 cursor-pointer items-center gap-1 transition-all hover:text-blue-500"
+          th:attr="data-has-children=${not #lists.isEmpty(categoryItem.children)}"
+          th:classappend="${categoryItem.metadata.name == category.metadata.name} ? 'active-menu'"
+          @click.prevent="window.location.href = $el.getAttribute('href');"
+        >
+          <span class="max-w-32 overflow-hidden text-ellipsis" th:text="${categoryItem.spec.displayName}">分类名</span>
+
+          <!-- 下拉箭头图标 -->
+          <svg
+            th:if="${not #lists.isEmpty(categoryItem.children)}"
+            class="h-[14px] w-[14px] transition-all duration-200 group-hover:text-blue-500"
+            :class="{ 'rotate-180': open }"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </a>
+
+        <!-- 子分类下拉菜单 -->
+        <ul
+          th:if="${not #lists.isEmpty(categoryItem.children)}"
+          x-show="open"
+          x-cloak
+          x-transition:enter="transition ease-out duration-200"
+          x-transition:enter-start="opacity-0 scale-95"
+          x-transition:enter-end="opacity-100 scale-100"
+          x-transition:leave="transition ease-in duration-100"
+          x-transition:leave-start="opacity-100 scale-100"
+          x-transition:leave-end="opacity-0 scale-95"
+          class="absolute left-1/2 z-10 mt-0 w-max min-w-[120px] -translate-x-1/2 rounded-lg border border-gray-300 bg-white px-1 py-1 shadow-sm"
+        >
+          <li
+            th:each="childCategory : ${categoryItem.children}"
+            class="cursor-pointer whitespace-nowrap rounded transition hover:bg-gray-100"
+          >
+            <a
+              th:href="@{${childCategory.status.permalink}}"
+              th:text="${childCategory.spec.displayName}"
+              class="block max-w-28 overflow-hidden text-ellipsis px-4 py-[6px] transition-all hover:text-blue-500"
+              th:classappend="${category != null and category.metadata.name == childCategory.metadata.name} ? 'active-menu'"
+            >
+            </a>
+          </li>
+        </ul>
+      </li>
+    </th:block>
+  </ul>
+</html>

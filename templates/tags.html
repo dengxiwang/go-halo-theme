@@ -1,0 +1,34 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(
+          content = ~{::content},
+          contentBefore = ~{::contentBefore},
+          title = '标签' + ' - ' + ${site.title}
+      )}"
+>
+  <th:block th:fragment="content">
+    <div class="m-auto flex max-w-96 justify-center">
+      <div class="flex flex-col items-center justify-center" th:if="${#lists.isEmpty(tagFinder.listAll())}">
+        <div class="-mr-[34px]">
+          <th:block th:replace="~{modules/components/emptyDataSvg}"></th:block>
+        </div>
+
+        <!-- 提示信息 -->
+        <h2 class="mt-6 text-xl font-semibold text-gray-800">暂无内容</h2>
+
+        <!-- 返回首页按钮 -->
+        <div class="mt-6">
+          <a href="/" class="inline-block rounded-lg border bg-white px-4 py-2 text-sm transition hover:bg-gray-100">
+            返回首页
+          </a>
+        </div>
+      </div>
+      <div
+        style="zoom: 1.1"
+        th:if="${!#lists.isEmpty(tagFinder.listAll())}"
+        th:replace="~{modules/components/tagsList :: tagsList(aClass='bg-white border hover:bg-gray-100', wrapperClass='justify-center')}"
+      ></div>
+    </div>
+  </th:block>
+</html>

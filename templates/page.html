@@ -1,0 +1,29 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(
+        title = ${singlePage.spec.title} + ' - ' + ${site.title},
+        content = ~{::content},
+        )}"
+>
+  <th:block th:fragment="content">
+    <div class="h-full flex-1 rounded-lg border bg-white p-6 max-md:p-4">
+      <h1
+        class="mb-2 border-b pb-6 text-center text-3xl font-bold leading-tight max-md:pb-4"
+        th:text="${singlePage.spec.title}"
+      ></h1>
+      <!-- 内容 -->
+      <article
+        id="content"
+        class="markdown-body !max-w-none break-words"
+        th:utext="${singlePage.content.content}"
+      ></article>
+    </div>
+
+    <!-- 评论组件 -->
+    <div id="comment" th:if="${haloCommentEnabled}" class="mt-4">
+      <h2 class="mb-2 text-base font-medium">评论</h2>
+      <halo:comment group="content.halo.run" kind="SinglePage" th:attr="name=${singlePage.metadata.name}" />
+    </div>
+  </th:block>
+</html>

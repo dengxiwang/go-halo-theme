@@ -1,0 +1,83 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <style>
+    /* 避免页面加载时下拉菜单短暂显示 */
+    [x-cloak] {
+      display: none !important;
+    }
+  </style>
+
+  <div
+    th:fragment="header-main-menu"
+    th:with="menu = ${menuFinder.getPrimary}"
+    class="mr-4 flex items-center text-nowrap font-medium"
+    id="main-menu"
+  >
+    <ul th:with="menuItems = ${menu.menuItems}" class="flex flex-wrap gap-x-8 gap-y-4">
+      <li
+        th:each="menuItem, iterStat : ${menuItems}"
+        class="relative"
+        x-data="{ open: false }"
+        @mouseenter="open = true"
+        @mouseleave="open = false"
+      >
+        <!-- 父菜单链接 -->
+        <a
+          th:href="@{${menuItem.status.href}}"
+          class="group flex h-9 cursor-pointer items-center gap-1 transition-all hover:text-blue-500"
+          th:attr="data-has-children=${not #lists.isEmpty(menuItem.children)}"
+          @click.prevent="
+                   if ($el.dataset.hasChildren === 'true') {
+                       open = !open;
+                   } else {
+                       window.location.href = $el.getAttribute('href');
+                   }
+               "
+        >
+          <!-- 显示菜单名称 -->
+          <span class="max-w-32 overflow-hidden text-ellipsis" th:text="${menuItem.status.displayName}"></span>
+
+          <!-- 如果有子菜单，显示 SVG 下拉箭头 -->
+          <svg
+            th:if="${not #lists.isEmpty(menuItem.children)}"
+            class="h-[14px] w-[14px] transition-all duration-200 group-hover:text-blue-500"
+            :class="{ 'rotate-180': open }"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </a>
+
+        <!-- 子菜单 -->
+        <ul
+          th:if="${not #lists.isEmpty(menuItem.children)}"
+          x-show="open"
+          x-cloak
+          x-transition:enter="transition ease-out duration-200"
+          x-transition:enter-start="opacity-0 scale-95"
+          x-transition:enter-end="opacity-100 scale-100"
+          x-transition:leave="transition ease-in duration-100"
+          x-transition:leave-start="opacity-100 scale-100"
+          x-transition:leave-end="opacity-0 scale-95"
+          th:classappend="${iterStat.last or (menuItems.size() >= 2 and iterStat.index == menuItems.size() - 2)} ? 'absolute right-0 top-9' : 'absolute left-0 top-9'"
+          class="z-10 w-max rounded-lg border border-gray-300 bg-white px-1 py-1 shadow-sm"
+        >
+          <li
+            th:each="childMenuItem : ${menuItem.children}"
+            class="cursor-pointer whitespace-nowrap rounded transition hover:bg-gray-100"
+          >
+            <a
+              th:href="@{${childMenuItem.status.href}}"
+              th:text="${childMenuItem.status.displayName}"
+              th:target="${childMenuItem.spec.target?.value}"
+              class="block max-w-28 overflow-hidden text-ellipsis px-4 py-[6px] transition-all hover:text-blue-500"
+            ></a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</html>

@@ -1,7 +1,41 @@
 body {
-  background: #f2f2f2;
+    background-color: #ffffff;
 }
 
 ul {
-  list-style: decimal;
+    list-style-type: none;
+}
+
+.transition-main {
+    transition: all 0.3s !important;
+}
+
+.mobile-handle-btn {
+    padding: 6px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: transparent;
+    transition: all 0.15s;
+}
+
+.active-menu {
+    color: #3B82F6;
+}
+
+.max-container-width {
+    max-width: 1280px;
+}
+
+.markdown-body {
+
+    ol,
+    ul,
+    menu {
+        list-style: disc
+    }
+}
+
+pre code {
+    padding: 0px !important;
 }

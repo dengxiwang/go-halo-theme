@@ -1,0 +1,108 @@
+<!-- post-card.html -->
+<div
+  th:fragment="post-card(post)"
+  class="group relative flex overflow-hidden rounded-lg border bg-white transition-all"
+>
+  <!-- 内容区 -->
+  <div class="flex flex-1 flex-col justify-between p-4">
+    <a th:href="@{${post.status.permalink}}" class="flex gap-1 transition-all duration-300 hover:text-blue-500">
+      <div class="flex flex-1 flex-col gap-1">
+        <!-- 标题 -->
+        <h1 class="line-clamp-2 flex cursor-pointer items-center gap-2 text-lg font-medium">
+          <div
+            th:if="${post.spec.pinned != null and post.spec.pinned}"
+            class="text-nowrap rounded bg-red-500 px-2 py-0.5 text-xs font-medium text-white"
+          >
+            置顶
+          </div>
+          <span
+            class="line-clamp-1"
+            th:text="${post.spec != null and post.spec.title != null ? post.spec.title : '无标题'}"
+          ></span>
+        </h1>
+
+        <!-- 摘要 -->
+        <p
+          class="line-clamp-2 text-sm opacity-60"
+          th:text="${post.status != null and post.status.excerpt != null ? post.status.excerpt : '暂无摘要信息'}"
+        ></p>
+      </div>
+      <!-- 封面图 -->
+      <div
+        th:if="${post.spec != null and post.spec.cover != null and post.spec.cover != ''}"
+        class="relative ml-4 h-20 w-32 overflow-hidden bg-gray-100"
+      >
+        <img
+          th:src="${post.spec.cover}"
+          th:alt="${post.spec.title != null ? post.spec.title : '文章封面'}"
+          class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+        />
+      </div>
+    </a>
+
+    <!-- 底部信息 -->
+    <div class="mt-3 flex flex-wrap items-center gap-4 gap-y-2 border-t pt-4 text-xs font-medium">
+      <!-- 作者 -->
+      <span
+        class="opacity-50"
+        th:text="${post.owner != null and post.owner.displayName != null ? '作者：' + post.owner.displayName : '作者：匿名用户'}"
+      >
+      </span>
+
+      <!-- 发布时间 -->
+      <time
+        class="opacity-50"
+        th:text="${post.spec != null and post.spec.publishTime != null ?
+                            '发布时间：' + #dates.format(post.spec.publishTime, 'yyyy-MM-dd') :
+                            '发布时间：未知时间'}"
+      >
+      </time>
+
+      <!-- 分类 & 标签 -->
+      <div
+        th:if="${post.categories != null and #lists.size(post.categories) > 0} or ${post.tags != null and #lists.size(post.tags) > 0}"
+        class="flex flex-wrap items-center gap-4 gap-y-2"
+      >
+        <!-- 分类 -->
+        <div class="flex items-center" th:if="${post.categories != null and #lists.size(post.categories) > 0}">
+          <span class="opacity-50">分类：</span>
+          <span class="flex flex-wrap gap-1">
+            <span
+              th:each="category, iterStat : ${post.categories != null ? post.categories : T(java.util.Collections).emptyList()}"
+              th:if="${category.spec.displayName != null and category.status != null and category.status.permalink != null}"
+            >
+              <a
+                th:href="@{${category.status.permalink}}"
+                class="opacity-50 transition-all duration-300 hover:text-blue-500 hover:opacity-100"
+              >
+                <span th:text="${category.spec.displayName}"></span>
+              </a>
+              <span th:if="${!iterStat.last}" class="opacity-50">,</span>
+            </span>
+          </span>
+        </div>
+
+        <!-- 标签 -->
+        <div class="flex items-center" th:if="${post.tags != null and #lists.size(post.tags) > 0}">
+          <span class="opacity-50">标签：</span>
+          <span class="flex flex-wrap gap-1">
+            <span
+              th:each="tag, iterStat : ${post.tags != null ? post.tags : T(java.util.Collections).emptyList()}"
+              th:if="${tag.spec.displayName != null and tag.status != null and tag.status.permalink != null}"
+            >
+              <a
+                th:href="@{${tag.status.permalink}}"
+                class="opacity-50 transition-all duration-300 hover:text-blue-500 hover:opacity-100"
+              >
+                #<span th:text="${tag.spec.displayName}"></span>
+              </a>
+              <span th:if="${!iterStat.last}" class="opacity-50">,</span>
+            </span>
+            <!-- 无有效标签时显示默认 -->
+            <span th:if="${post.tags == null or #lists.isEmpty(post.tags)}" class="opacity-50">#无标签</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

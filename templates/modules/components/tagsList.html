@@ -1,0 +1,21 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <!-- 标签列表组件：支持传参设置背景类名 -->
+  <div
+    th:if="${!#lists.isEmpty(tagFinder.listAll())}"
+    th:fragment="tagsList(aClass, wrapperClass)"
+    class="flex flex-wrap gap-2"
+    th:classappend="${wrapperClass != null} ? ${wrapperClass} : ''"
+  >
+    <div th:each="currentTag : ${tagFinder.listAll()}" class="group">
+      <a
+        th:href="@{${currentTag.status.permalink}}"
+        class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-all duration-300"
+        th:classappend="${aClass != null} ? ${aClass} : 'bg-gray-100 hover:bg-blue-100 hover:text-blue-600'"
+      >
+        <span th:text="| #${currentTag.spec.displayName}|">标签名</span>
+        <span class="ml-1 text-xs" th:text="'(' + ${currentTag.postCount} + ')'"></span>
+      </a>
+    </div>
+  </div>
+</html>

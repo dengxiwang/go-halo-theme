@@ -1,0 +1,32 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <div
+    th:fragment="friendshipLinks"
+    class="max-container-width mx-auto mt-auto flex w-full flex-col gap-3 px-2 py-3"
+    th:if="${theme.config.friendshipLink.showFriendshipLinks == true}"
+  >
+    <!-- 标题 -->
+    <span class="font-medium opacity-50">友情链接</span>
+
+    <!-- 无数据 -->
+    <div th:if="${#lists.isEmpty(theme.config.friendshipLink.links)}">暂无友情链接</div>
+
+    <!-- 友链展示 -->
+    <div
+      th:if="${!#lists.isEmpty(theme.config.friendshipLink.links)}"
+      th:with="links = ${theme.config.friendshipLink.links}"
+      class="flex flex-wrap gap-5"
+    >
+      <th:block th:each="link : ${links}">
+        <a
+          th:href="@{${link.url.startsWith('http') ? link.url : 'https://' + link.url}}"
+          target="_blank"
+          class="flex items-center gap-[6px] transition-all hover:text-blue-500"
+        >
+          <img th:src="@{${link.icon}}" class="h-4 w-4" />
+          <span th:text="${link.label}"></span>
+        </a>
+      </th:block>
+    </div>
+  </div>
+</html>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(
+          content = ~{::content},
+          contentBefore = ~{::contentBefore},
+          title = ${author.spec.displayName} + ' - ' + ${site.title}
+      )}"
+>
+  <th:block th:fragment="contentBefore">
+    <div
+      class="flex justify-center overflow-hidden border-b bg-cover bg-center bg-no-repeat"
+      th:classappend="${!#strings.isEmpty(author.spec.avatar)} ? 'relative text-white' : 'bg-white' "
+    >
+      <!-- 背景图 -->
+      <div
+        th:if="${!#strings.isEmpty(author.spec.avatar)}"
+        class="absolute z-0 h-full w-full scale-110 bg-cover bg-center bg-no-repeat transition-transform duration-500 group-hover:scale-110"
+        th:style="|background-image: url('${author.spec.avatar}');filter: brightness(0.65) blur(4px);|"
+      ></div>
+
+      <div
+        class="max-container-width z-10 flex w-full flex-col gap-4 px-4 py-6 text-center sm:px-[20px] sm:py-8 lg:px-6 lg:py-12"
+      >
+        <div th:if="${!#strings.isEmpty(author.spec.avatar)}" class="relative m-auto h-24 w-24">
+          <img
+            th:src="@{${author.spec.avatar}}"
+            class="h-24 w-24 rounded-full border-[3px] border-white object-cover"
+          />
+          <div
+            class="absolute bottom-[2px] right-[2px] h-6 w-6 rounded-full border-[3px] border-white bg-green-500"
+          ></div>
+        </div>
+        <h1 class="text-2xl font-bold leading-tight" th:text="${author.spec.displayName}"></h1>
+      </div>
+    </div>
+  </th:block>
+
+  <div th:fragment="content">
+    <!-- 博客文章展示 -->
+    <div class="flex h-full w-full flex-col">
+      <!-- 文章列表 -->
+      <th:block th:replace="~{modules/components/postList}"></th:block>
+
+      <!-- 空数据 -->
+      <th:block th:replace="~{modules/components/emptyData}"></th:block>
+
+      <!-- 分页 -->
+      <th:block th:replace="~{modules/components/pagination}"></th:block>
+    </div>
+  </div>
+</html>

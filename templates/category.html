@@ -1,0 +1,25 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(title = '分类：' + ${category.spec.displayName} + ' - ' + ${site.title},
+        content = ~{::content},
+        contentBefore= ~{::contentBefore}
+    )}"
+>
+  <th:block th:fragment="content">
+    <!-- 分类导航 -->
+    <th:block th:replace="~{modules/components/categories}"></th:block>
+
+    <!-- 分类下文章 -->
+    <div class="h-full">
+      <!-- 文章列表 -->
+      <th:block th:replace="~{modules/components/postList}"></th:block>
+
+      <!-- 空数据 -->
+      <th:block th:replace="~{modules/components/emptyData}"></th:block>
+
+      <!-- 分页选择器 -->
+      <th:block th:replace="~{modules/components/pagination}"></th:block>
+    </div>
+  </th:block>
+</html>

@@ -1,0 +1,21 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <div
+    th:if="${archives.total == 0}"
+    class="flex flex-col items-center justify-center overflow-hidden rounded-lg border bg-white p-8 py-12 text-center"
+  >
+    <!-- 无数据图标 -->
+    <div class="-mr-[34px]">
+      <th:block th:replace="~{modules/components/emptyDataSvg}"></th:block>
+    </div>
+
+    <!-- 提示信息 -->
+    <h2 class="mt-6 text-xl font-semibold text-gray-800">暂无文章</h2>
+    <p class="mt-2 text-gray-500">当前未归档任何文章，请稍后再来查看或切换其他分类。</p>
+
+    <!-- 返回首页按钮 -->
+    <div class="mt-6">
+      <a href="/" class="inline-block rounded-lg border px-4 py-2 text-sm transition hover:bg-gray-100"> 返回首页 </a>
+    </div>
+  </div>
+</html>
