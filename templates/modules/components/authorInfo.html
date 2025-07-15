@@ -2,7 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org">
   <div
     th:fragment="authorInfo"
-    th:class="${theme.config.authorInfo.backgroundType == 'disable' || theme.config.authorInfo.backgroundImage == ''} ? 'relative *:z-10' : 'relative *:z-10' flex h-full w-full flex-col items-center overflow-hidden p-12 px-4 pb-7"
+    class="relative flex h-full w-full flex-col items-center overflow-hidden p-12 px-4 *:z-10"
+    th:classappend="${theme.config.authorInfo.backgroundType != 'disable' && theme.config.authorInfo.backgroundImage != ''} ?
+                    '':'pb-7'"
     th:if="${theme.config.authorInfo.showAuthorInfo == true}"
     th:style="${theme.config.authorInfo.fontColor != null && theme.config.authorInfo.fontColor != '' && theme.config.authorInfo.backgroundType != 'disable'} ?
               'color: ' + ${theme.config.authorInfo.fontColor} + ' !important;' :

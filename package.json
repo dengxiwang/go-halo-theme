@@ -26,7 +26,7 @@
     "@iconify/tailwind": "^1.2.0",
     "@tailwindcss/typography": "^0.5.16",
     "@types/alpinejs": "^3.13.11",
-    "@types/node": "^24.0.13",
+    "@types/node": "^24.0.14",
     "@typescript-eslint/eslint-plugin": "^8.37.0",
     "@typescript-eslint/parser": "^8.37.0",
     "autoprefixer": "^10.4.21",
