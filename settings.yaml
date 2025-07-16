@@ -155,6 +155,8 @@ spec:
               value: color
             - label: 自定义图片
               value: image
+            - label: 视频动画
+              value: video
             - label: 禁用
               value: disable
         - $formkit: text
@@ -173,6 +175,25 @@ spec:
           placeholder: 背景图片
           value: ""
           validation: "required"
+          accepts:
+            - "image/png"
+            - "image/jpeg"
+            - "image/gif"
+            - "image/webp"
+            - "image/svg+xml"
+            - "image/bmp"
+            - "image/tiff"
+        - $formkit: attachment
+          if: "$get(backgroundType).value === video"
+          name: backgroundVideo
+          id: author_info_background_video
+          key: author_info_background_video
+          label: 背景视频/动画
+          placeholder: 背景视频/动画
+          value: ""
+          validation: "required"
+          accepts:
+            - "video/mp4"
         - $formkit: color
           name: fontColor
           id: fontColor

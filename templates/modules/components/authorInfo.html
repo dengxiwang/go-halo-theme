@@ -15,7 +15,7 @@
       class="pointer-events-none absolute top-0 h-full w-full scale-110 bg-cover bg-center bg-no-repeat"
       th:if="${theme.config.authorInfo.backgroundType != 'disable'}"
       th:style="
-             |background-image: url('${theme.config.authorInfo.backgroundImage}')| +
+             |background-image: url('${theme.config.authorInfo.backgroundType == 'image'? theme.config.authorInfo.backgroundImage : null}')| +
              (${theme.config.authorInfo.brightness != null and theme.config.authorInfo.brightness != ''} ?
                  |; filter: brightness(| + (${theme.config.authorInfo.brightness} == 100 ? '1' : '0.' + ${theme.config.authorInfo.brightness}) + ')' +
                  (${theme.config.authorInfo.blur != null and theme.config.authorInfo.blur != ''} ?
@@ -25,7 +25,22 @@
              (${theme.config.authorInfo.background != null and theme.config.authorInfo.background != '' and theme.config.authorInfo.backgroundType == 'color'} ?
                  |; background: ${theme.config.authorInfo.background}| : '')
          "
-    ></div>
+    >
+      <!-- 新增：如果背景类型是 video，并且设置了 backgroundVideo，则插入 video 元素 -->
+      <div
+        th:if="${theme.config.authorInfo.backgroundType == 'video' and theme.config.authorInfo.backgroundVideo != null}"
+        class="absolute inset-0 overflow-hidden"
+      >
+        <video
+          autoplay
+          loop
+          muted
+          playsinline
+          class="h-full w-full object-cover"
+          th:src="${theme.config.authorInfo.backgroundVideo}"
+        ></video>
+      </div>
+    </div>
 
     <!-- 头像 -->
     <div
