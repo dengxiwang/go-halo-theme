@@ -8,7 +8,7 @@
       )}"
 >
   <th:block th:fragment="content">
-    <div class="m-auto flex max-w-96 justify-center">
+    <div class="m-auto flex max-w-4xl justify-center">
       <div class="flex flex-col items-center justify-center" th:if="${#lists.isEmpty(tagFinder.listAll())}">
         <div class="-mr-[34px]">
           <th:block th:replace="~{modules/components/emptyDataSvg}"></th:block>
