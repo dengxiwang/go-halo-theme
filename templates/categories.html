@@ -58,7 +58,7 @@
               <span th:text="${category.spec.displayName}"></span>
               <span
                 class="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800"
-                th:text="|${category.status.postCount} 篇文章|"
+                th:text="|${category.status.postCount ?: 0} 篇文章|"
               ></span>
             </a>
 
