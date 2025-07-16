@@ -9,13 +9,13 @@
   <ul
     th:fragment="categories"
     id="filters"
-    class="flex flex-wrap gap-x-5 gap-y-1 rounded-lg border bg-white px-4 py-1 font-medium"
+    class="flex flex-wrap gap-5 gap-y-3 rounded-lg border bg-white p-4 py-3 text-sm font-medium"
   >
     <!-- 全部分类 -->
     <li>
       <a
         href="/"
-        class="group flex h-9 cursor-pointer items-center gap-1 transition-all hover:text-blue-500"
+        class="group flex cursor-pointer items-center gap-1 transition-all hover:text-blue-500"
         th:classappend="${category == null} ? 'active-menu'"
       >
         <span class="max-w-32 overflow-hidden text-ellipsis">全部</span>
@@ -34,12 +34,16 @@
         <!-- 父级分类链接 -->
         <a
           th:href="@{${categoryItem.status.permalink}}"
-          class="group flex h-9 cursor-pointer items-center gap-1 transition-all hover:text-blue-500"
+          class="group flex cursor-pointer items-center gap-1 transition-all hover:text-blue-500"
           th:attr="data-has-children=${not #lists.isEmpty(categoryItem.children)}"
           th:classappend="${categoryItem.metadata.name == category.metadata.name} ? 'active-menu'"
           @click.prevent="window.location.href = $el.getAttribute('href');"
         >
-          <span class="max-w-32 overflow-hidden text-ellipsis" th:text="${categoryItem.spec.displayName}">分类名</span>
+          <span
+            class="max-w-32 overflow-hidden text-ellipsis"
+            th:text="|${categoryItem.spec.displayName} (${categoryItem.postCount})|"
+            >分类名</span
+          >
 
           <!-- 下拉箭头图标 -->
           <svg
@@ -66,7 +70,7 @@
           x-transition:leave="transition ease-in duration-100"
           x-transition:leave-start="opacity-100 scale-100"
           x-transition:leave-end="opacity-0 scale-95"
-          class="absolute left-1/2 z-10 mt-0 w-max min-w-[120px] -translate-x-1/2 rounded-lg border border-gray-300 bg-white px-1 py-1 shadow-sm"
+          class="absolute left-1/2 z-10 mt-0 w-max min-w-[80px] -translate-x-1/2 rounded-lg border border-gray-300 bg-white px-1 py-1 shadow-sm"
         >
           <li
             th:each="childCategory : ${categoryItem.children}"
@@ -74,8 +78,8 @@
           >
             <a
               th:href="@{${childCategory.status.permalink}}"
-              th:text="${childCategory.spec.displayName}"
-              class="block max-w-28 overflow-hidden text-ellipsis px-4 py-[6px] transition-all hover:text-blue-500"
+              th:text="|${childCategory.spec.displayName} (${childCategory.postCount})|"
+              class="block max-w-28 overflow-hidden text-ellipsis px-2 py-1 transition-all hover:text-blue-500"
               th:classappend="${category != null and category.metadata.name == childCategory.metadata.name} ? 'active-menu'"
             >
             </a>

@@ -2,9 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org">
   <div
     th:fragment="authorInfo"
-    class="relative flex h-full w-full flex-col items-center overflow-hidden p-12 px-4 *:z-10"
-    th:classappend="${theme.config.authorInfo.backgroundType != 'disable' && theme.config.authorInfo.backgroundImage != ''} ?
-                    '':'pb-7'"
+    class="relative flex h-full w-full flex-col items-center gap-4 overflow-hidden p-10 px-4 *:z-10 max-md:gap-3 max-md:p-8 max-md:px-4"
+    th:classappend="${theme.config.authorInfo.backgroundType != 'disable'} ?
+                    '':'pb-6 max-md:pb-4'"
     th:if="${theme.config.authorInfo.showAuthorInfo == true}"
     th:style="${theme.config.authorInfo.fontColor != null && theme.config.authorInfo.fontColor != '' && theme.config.authorInfo.backgroundType != 'disable'} ?
               'color: ' + ${theme.config.authorInfo.fontColor} + ' !important;' :
@@ -28,13 +28,18 @@
     ></div>
 
     <!-- 头像 -->
-    <div th:if="${!#strings.isEmpty(theme.config.authorInfo.avatar)}" class="relative mb-4 h-[88px] w-[88px]">
+    <div
+      th:if="${!#strings.isEmpty(theme.config.authorInfo.avatar)}"
+      class="relative mb-1 h-[88px] w-[88px] max-md:mb-[2px] max-md:h-20 max-md:w-20"
+    >
       <img
         th:src="@{${theme.config.authorInfo.avatar}}"
         alt="Author Avatar"
-        class="h-[88px] w-[88px] rounded-full border-[3px] border-white object-cover"
+        class="h-[88px] w-[88px] rounded-full border-[3px] border-white object-cover max-md:h-20 max-md:w-20"
       />
-      <div class="absolute bottom-[2px] right-[2px] h-6 w-6 rounded-full border-[3px] border-white bg-green-500"></div>
+      <div
+        class="absolute bottom-[2px] right-[2px] h-6 w-6 rounded-full border-[3px] border-white bg-green-500 max-md:h-5 max-md:w-5"
+      ></div>
     </div>
 
     <!-- 昵称 -->
@@ -48,14 +53,14 @@
     <p
       th:if="${!#strings.isEmpty(theme.config.authorInfo.description)}"
       th:text="${theme.config.authorInfo.description}"
-      class="mt-4 max-w-md text-center text-sm font-medium opacity-60"
+      class="max-w-md text-center text-sm font-medium opacity-60"
     ></p>
 
     <!-- 三方平台链接 -->
     <div
       th:if="${!#lists.isEmpty(theme.config.authorInfo.links)}"
       th:with="links = ${theme.config.authorInfo.links}"
-      class="mt-6 flex flex-wrap justify-center gap-5"
+      class="mt-2 flex flex-wrap justify-center gap-5"
     >
       <th:block th:each="link : ${links}">
         <a

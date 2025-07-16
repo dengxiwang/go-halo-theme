@@ -1,5 +1,6 @@
 import Alpine from "alpinejs";
 import "github-markdown-css/github-markdown-light.css";
+import * as tocbot from "tocbot";
 import "./styles/main.css";
 import "./styles/tailwind.css";
 
@@ -115,7 +116,7 @@ function showCopyTooltip(text: string, isError = false) {
   }
 
   tooltip.textContent = text;
-  tooltip.style.backgroundColor = isError ? "#ef4444" : "#10b981";
+  tooltip.style.backgroundColor = isError ? "#ef4444" : "#4ACBA0";
   tooltip.classList.remove("opacity-0");
   tooltip.classList.add("opacity-100");
 
@@ -227,5 +228,55 @@ document.addEventListener("DOMContentLoaded", () => {
         parentMenuItem.__x.$data.submenuOpen = true;
       }
     }
+  });
+});
+
+// 生成目录
+document.addEventListener("DOMContentLoaded", function () {
+  const content = document.getElementById("content");
+  const titles = content?.querySelectorAll("h1, h2, h3, h4");
+
+  if (!titles || titles.length === 0) {
+    const tocContainer = document.querySelector(".toc-container");
+    tocContainer?.remove();
+    return;
+  }
+
+  (tocbot as any).init({
+    tocSelector: ".toc",
+    contentSelector: "#content",
+    headingSelector: "h1, h2, h3, h4",
+    extraListClasses: "space-y-1",
+    extraLinkClasses:
+      "group flex items-center justify-between rounded py-1 px-1.5 transition-all hover:bg-gray-100 text-sm opacity-80",
+    collapseDepth: 6,
+    headingsOffset: 200,
+    scrollSmooth: false,
+    tocScrollOffset: 50,
+  });
+
+  // 锚点偏移处理
+  const navbarHeight = 144;
+
+  // 处理所有 # 锚点点击
+  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+    anchor.addEventListener("click", function (e) {
+      e.preventDefault();
+
+      const href = anchor.getAttribute("href");
+      if (!href || href === "#") return;
+
+      const targetId = href.replace("#", "");
+      const targetElement = document.getElementById(targetId);
+
+      if (targetElement) {
+        const offsetTop = targetElement.getBoundingClientRect().top + window.scrollY - navbarHeight;
+
+        window.scrollTo({
+          top: offsetTop,
+          behavior: "smooth", // 或者 "auto" 如果你不想要动画
+        });
+      }
+    });
   });
 });

@@ -9,11 +9,11 @@
 
   <header
     th:fragment="header"
-    class="sticky top-0 z-50 flex min-h-[68px] w-full border-b bg-white p-4"
+    class="sticky top-0 z-50 flex min-h-[68px] w-full border-b bg-white p-4 max-md:min-h-14 max-md:px-4 max-md:py-2"
     x-data="{ isMobile: window.innerWidth < 768 }"
     x-init="window.addEventListener('resize', () => isMobile = window.innerWidth < 768)"
   >
-    <div class="max-container-width m-auto flex w-full flex-wrap items-center justify-between gap-4 *:min-h-9">
+    <div class="max-container-width mx-auto flex w-full flex-wrap items-center justify-between gap-4 *:min-h-9">
       <!-- 左侧logo展示 -->
       <div class="flex gap-x-6 gap-y-3" style="flex: 1 0 auto">
         <!-- logo -->

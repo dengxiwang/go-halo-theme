@@ -22,6 +22,9 @@ importers:
       terser:
         specifier: ^5.43.1
         version: 5.43.1
+      tocbot:
+        specifier: ^4.36.4
+        version: 4.36.4
     devDependencies:
       "@halo-dev/theme-package-cli":
         specifier: ^1.0.0
@@ -1896,6 +1899,10 @@ packages:
       { integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ== }
     engines: { node: ">=8.0" }
 
+  tocbot@4.36.4:
+    resolution:
+      { integrity: sha512-ffznkKnZ1NdghwR1y8hN6W7kjn4FwcXq32Z1mn35gA7jd8dt2cTVAwL3d0BXXZGPu0Hd0evverUvcYAb/7vn0g== }
+
   ts-api-utils@2.1.0:
     resolution:
       { integrity: sha512-CUgTZL1irw8u29bzrOD/nH85jqyc74D6SshFgujOIA7osm2Rz7dYH77agkx7H4FBNxDq7Cjf+IjaX/8zwFW+ZQ== }
@@ -3390,6 +3397,8 @@ snapshots:
   to-regex-range@5.0.1:
     dependencies:
       is-number: 7.0.0
+
+  tocbot@4.36.4: {}
 
   ts-api-utils@2.1.0(typescript@5.8.3):
     dependencies:

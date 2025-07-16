@@ -4,7 +4,7 @@
   <div
     th:if="${!#lists.isEmpty(tagFinder.listAll())}"
     th:fragment="tagsList(aClass, wrapperClass)"
-    class="flex flex-wrap gap-2"
+    class="flex flex-wrap gap-3"
     th:classappend="${wrapperClass != null} ? ${wrapperClass} : ''"
   >
     <div th:each="currentTag : ${tagFinder.listAll()}" class="group">

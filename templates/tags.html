@@ -24,11 +24,12 @@
           </a>
         </div>
       </div>
-      <div
-        style="zoom: 1.1"
-        th:if="${!#lists.isEmpty(tagFinder.listAll())}"
-        th:replace="~{modules/components/tagsList :: tagsList(aClass='bg-white border hover:bg-gray-100', wrapperClass='justify-center')}"
-      ></div>
+      <div style="zoom: 1.1">
+        <div
+          th:if="${!#lists.isEmpty(tagFinder.listAll())}"
+          th:replace="~{modules/components/tagsList :: tagsList(aClass='bg-white border hover:bg-gray-100', wrapperClass='justify-center')}"
+        ></div>
+      </div>
     </div>
   </th:block>
 </html>

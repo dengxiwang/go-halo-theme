@@ -14,7 +14,9 @@
     ></div>
 
     <!-- 主要内容 -->
-    <div class="max-container-width z-10 flex w-full flex-col gap-4 px-4 py-6 sm:px-[20px] sm:py-8 lg:px-6 lg:py-12">
+    <div
+      class="max-container-width z-10 flex w-full flex-col gap-4 px-4 py-6 sm:px-[20px] sm:py-8 md:gap-5 lg:px-6 lg:py-12"
+    >
       <!-- 标题 -->
       <h1 class="text-center text-3xl font-bold leading-tight max-md:text-left" th:text="${post.spec.title}"></h1>
 
@@ -27,7 +29,10 @@
       </div>
 
       <!-- 分类和标签容器 -->
-      <div class="flex flex-wrap justify-center gap-2 max-md:justify-start">
+      <div
+        th:if="${!#lists.isEmpty(post.categories) or !#lists.isEmpty(post.tags)}"
+        class="flex flex-wrap justify-center gap-2 max-md:justify-start"
+      >
         <!-- 分类 -->
         <div th:if="${not #lists.isEmpty(post.categories)}" class="flex flex-wrap gap-2">
           <a
