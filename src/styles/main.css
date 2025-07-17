@@ -46,3 +46,8 @@ ul {
 pre code {
     padding: 0px !important;
 }
+
+hyperlink-card {
+    margin-top: 0px !important;
+    margin-bottom: 1rem !important;
+}
