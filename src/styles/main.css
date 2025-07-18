@@ -43,6 +43,11 @@ ul {
     }
 }
 
+/* 修复样式问题 */
+.inline-block:has(pre) {
+    display: block !important;
+}
+
 pre code {
     padding: 0px !important;
 }
