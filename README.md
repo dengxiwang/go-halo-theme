@@ -23,3 +23,11 @@
 ## 打赏项目
 
 感谢您对本项目的喜爱，您的打赏是对本项目最好的支持！
+
+<div style="display:flex;flex-wrap:wrap;gap:12px;">
+
+<img src="https://www.gotab.cn/images/wxpay.JPG" width="200" alt="微信支付二维码">
+
+<img src="https://www.gotab.cn/images/alipay.JPG" width="200" alt="支付宝二维码">
+
+</div>
