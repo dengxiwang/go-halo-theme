@@ -5,7 +5,7 @@
     class="relative flex h-full w-full flex-col items-center justify-center gap-4 overflow-hidden p-10 px-4 *:z-10 max-md:gap-3 max-md:p-8 max-md:px-4"
     th:classappend="(${theme.config.authorInfo.backgroundType != 'disable'} ?
                     '':'pb-6 max-md:pb-4') +
-                       (${theme.config.authorInfo.backgroundHeightType == 'screen'} ? 'min-h-screen -mt-[69px] !py-20' : '')"
+                       (${theme.config.authorInfo.backgroundHeightType == 'screen'} ? 'min-h-screen -mt-[69px] max-md:-mt-[56px] !py-20' : '')"
     th:if="${theme.config.authorInfo.showAuthorInfo == true}"
     th:style="${theme.config.authorInfo.fontColor != null && theme.config.authorInfo.fontColor != '' && theme.config.authorInfo.backgroundType != 'disable'} ?
               'color: ' + ${theme.config.authorInfo.fontColor} + ' !important;' :
@@ -245,7 +245,7 @@
     <script>
       function scrollToElement(element) {
         // 获取元素距离页面顶部的距离
-        const offsetTop = element.offsetTop + 2;
+        const offsetTop = element.offsetTop + (window.innerWidth < 768 ? 14 : 2);
         // 滚动到指定位置，behavior: 'smooth' 表示平滑滚动
         window.scrollTo({
           top: offsetTop,
