@@ -1,0 +1,51 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(title = ${title} + ' - ' + ${site.title}, hero = null, content = ~{::content}, head = null, footer = null, sidebar = ~{::sidebar}, contentClass = '')}"
+>
+  <th:block th:fragment="content">
+    <div class="h-full">
+      <div>
+        <!-- 渲染瞬间列表 -->
+        <ul class="flex flex-col gap-y-4">
+          <li
+            th:each="moment : ${moments.items}"
+            th:with="content=${moment.spec.content}"
+            class="flex flex-wrap gap-2 rounded-lg border bg-white p-4"
+          >
+            <div th:if="${not #strings.isEmpty(content.html)}" th:utext="${content.html}" class="w-full"></div>
+            <th:block th:if="${not #lists.isEmpty(content.medium)}" th:each="momentItem : ${content.medium}">
+              <div
+                th:if="${momentItem.type.name == 'PHOTO'}"
+                class="mb-1 rounded-md border"
+                style="height: 124px; width: auto; overflow: hidden"
+              >
+                <img th:src="${momentItem.url}" style="height: 124px" />
+              </div>
+              <div
+                style="height: 260px"
+                th:if="${momentItem.type.name == 'VIDEO'}"
+                class="mb-1 overflow-hidden rounded-md border"
+              >
+                <video th:src="${momentItem.url}" controls="true" style="height: 260px"></video>
+              </div>
+              <div th:if="${momentItem.type.name == 'AUDIO'}" class="mb-1 overflow-hidden rounded-full border">
+                <audio th:src="${momentItem.url}" controls="true"></audio>
+              </div>
+            </th:block>
+            <div class="flex w-full flex-wrap gap-2 text-xs font-medium opacity-50">
+              <p th:text="'发布人：' + ${moment.spec.owner}"></p>
+              <p th:text="'发布时间：' + ${#dates.format(moment.spec.releaseTime, 'yyyy-MM-dd HH:mm:ss')}"></p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- 空数据 -->
+      <th:block th:replace="~{modules/moments/emptyDataForMoments}"></th:block>
+
+      <!-- 分页 -->
+      <th:block th:replace="~{modules/moments/momentsPagination}"></th:block>
+    </div>
+  </th:block>
+</html>

@@ -15,9 +15,12 @@
     <script th:src="@{/assets/dist/main.iife.js?v={version}(version=${theme.spec.version})}" defer></script>
   </head>
 
-  <body class="flex h-full min-h-screen w-full flex-col bg-[#F9F8F7]">
+  <body class="flex h-full min-h-screen w-full flex-col">
+    <!-- 网站背景 -->
+    <div class="fixed left-0 top-0 z-[-999] h-full w-full bg-[#F9F8F7]"></div>
+
     <!-- 头部 -->
-    <th:block th:replace="~{modules/header/header}" />
+    <th:block th:replace="~{modules/header/header :: header(isHomePage=${isHomePage})}" />
 
     <!-- 可选内容块 -->
     <div th:if="${contentBefore != null}">

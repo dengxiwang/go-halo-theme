@@ -3,8 +3,25 @@ import "github-markdown-css/github-markdown-light.css";
 import * as tocbot from "tocbot";
 import "./styles/main.css";
 import "./styles/tailwind.css";
+// 引入 Swiper 核心模块
+import Swiper from "swiper";
+import "swiper/css";
+import "swiper/css/autoplay";
+import { Autoplay } from "swiper/modules";
 
 window.Alpine = Alpine;
+
+document.addEventListener("DOMContentLoaded", () => {
+  const el = document.querySelector(".moment-swiper") as any;
+  if (el) {
+    new Swiper(el, {
+      direction: "vertical",
+      loop: true,
+      autoplay: { delay: 3000 },
+      modules: [Autoplay],
+    });
+  }
+});
 
 Alpine.start();
 
@@ -233,36 +250,57 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // 生成目录
 document.addEventListener("DOMContentLoaded", function () {
+  const imagesContainer = document.getElementById("sidebar-images");
+
+  // 如果存在图片容器，同样延迟显示
+  if (imagesContainer) {
+    setTimeout(() => {
+      imagesContainer.classList.remove("opacity-0");
+      imagesContainer.style.fontSize = "";
+    }, 200);
+  }
+
   const content = document.getElementById("content");
   const titles = content?.querySelectorAll("h1, h2, h3, h4");
+  const tocContainer = document.querySelector(".toc-container") as any;
 
+  // 🔴 没有标题（理论上不会出现，因为服务端已过滤）
   if (!titles || titles.length === 0) {
-    const tocContainer = document.querySelector(".toc-container");
     tocContainer?.remove();
     return;
   }
 
-  (tocbot as any).init({
-    tocSelector: ".toc",
-    contentSelector: "#content",
-    headingSelector: "h1, h2, h3, h4",
-    extraListClasses: "space-y-1",
-    extraLinkClasses:
-      "group flex items-center justify-between rounded py-1 px-1.5 transition-all hover:bg-gray-100 text-sm opacity-80",
-    collapseDepth: 6,
-    headingsOffset: 200,
-    scrollSmooth: false,
-    tocScrollOffset: 50,
-  });
+  // ✅ 有标题：显示目录（使用动画）
+  if (tocContainer) {
+    // 等待 reflow，确保布局稳定
+    setTimeout(() => {
+      tocContainer.style.opacity = "1";
+      tocContainer.style.height = "auto";
+      tocContainer.style.fontSize = ""; // 恢复字体
+    }, 100);
 
-  // 锚点偏移处理
-  const navbarHeight = 144;
+    // 初始化 tocbot
+    if (typeof tocbot !== "undefined") {
+      (tocbot as any).init({
+        tocSelector: "#toc",
+        contentSelector: "#content",
+        headingSelector: "h1, h2, h3, h4",
+        extraListClasses: "space-y-1",
+        extraLinkClasses:
+          "group flex items-center justify-between rounded py-1 px-1.5 transition-all hover:bg-gray-100 text-sm opacity-80",
+        collapseDepth: 6,
+        headingsOffset: 200,
+        scrollSmooth: false,
+        tocScrollOffset: 50,
+      });
+    }
+  }
+  // 🔹 锚点跳转偏移（适配你的导航栏高度）
+  const navbarHeight = 144; // 你的导航栏高度
 
-  // 处理所有 # 锚点点击
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
     anchor.addEventListener("click", function (e) {
       e.preventDefault();
-
       const href = anchor.getAttribute("href");
       if (!href || href === "#") return;
 
@@ -274,7 +312,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         window.scrollTo({
           top: offsetTop,
-          behavior: "smooth", // 或者 "auto" 如果你不想要动画
+          behavior: "smooth",
         });
       }
     });

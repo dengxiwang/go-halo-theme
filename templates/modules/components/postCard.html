@@ -1,11 +1,8 @@
 <!-- post-card.html -->
-<div
-  th:fragment="post-card(post)"
-  class="group relative flex overflow-hidden rounded-lg border bg-white transition-all"
->
+<div th:fragment="post-card(post)" class="relative flex overflow-hidden rounded-lg border bg-white transition-all">
   <!-- 内容区 -->
   <div class="flex flex-1 flex-col justify-between p-4">
-    <a th:href="@{${post.status.permalink}}" class="flex gap-1 transition-all duration-300 hover:text-blue-500">
+    <a th:href="@{${post.status.permalink}}" class="group flex gap-1 transition-all duration-300 hover:text-blue-500">
       <div class="flex flex-1 flex-col gap-1">
         <!-- 标题 -->
         <h1 class="line-clamp-2 flex cursor-pointer items-center gap-2 text-lg font-medium">
@@ -23,19 +20,19 @@
 
         <!-- 摘要 -->
         <p
-          class="line-clamp-2 text-sm opacity-60"
+          class="line-clamp-3 text-sm opacity-60"
           th:text="${post.status != null and post.status.excerpt != null ? post.status.excerpt : '暂无摘要信息'}"
         ></p>
       </div>
       <!-- 封面图 -->
       <div
         th:if="${post.spec != null and post.spec.cover != null and post.spec.cover != ''}"
-        class="relative ml-4 h-20 w-32 overflow-hidden bg-gray-100"
+        class="relative ml-2 h-[92px] w-36 overflow-hidden bg-gray-100"
       >
         <img
           th:src="${post.spec.cover}"
           th:alt="${post.spec.title != null ? post.spec.title : '文章封面'}"
-          class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+          class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.15]"
         />
       </div>
     </a>

@@ -14,7 +14,11 @@
 
   <!-- 文章具体内容 -->
   <th:block th:fragment="content">
-    <div class="flex flex-1 gap-2">
+    <div
+      class="max-sm:block"
+      th:classappend="${!#lists.isEmpty(theme.config.post.postImgs) or #strings.contains(post.content.content, '<h') ? 'grid gap-2' : ''}"
+      style="grid-template-columns: 1fr 14rem"
+    >
       <div class="h-auto flex-1 overflow-hidden rounded-lg border bg-white p-6 max-md:p-4">
         <!-- 内容 -->
         <article
@@ -22,6 +26,43 @@
           class="markdown-body !max-w-none break-words"
           th:utext="${post.content.content}"
         ></article>
+      </div>
+
+      <!-- 右侧区域 -->
+      <div
+        th:if="${!#lists.isEmpty(theme.config.post.postImgs)} or ${#strings.contains(post.content.content, '<h')}"
+        class="space-y-2 max-sm:hidden"
+      >
+        <!-- 目录 -->
+        <div
+          th:if="${#strings.contains(post.content.content, '<h')}"
+          class="toc-container sticky top-20 h-0 w-56 overflow-hidden rounded-lg border bg-white p-3 opacity-0 transition-all duration-300"
+          style="font-size: 0"
+        >
+          <div class="mb-3 flex items-center justify-between">
+            <h3 class="text-lg font-medium">文章目录</h3>
+          </div>
+          <div id="toc" class="toc"></div>
+        </div>
+
+        <!-- 图片列表 -->
+        <div
+          th:if="${!#lists.isEmpty(theme.config.post.postImgs)}"
+          th:with="images = ${theme.config.post.postImgs}"
+          class="w-56 space-y-2 overflow-hidden opacity-0 transition-all duration-300 *:rounded-lg *:border *:bg-white *:p-3"
+          style="font-size: 0"
+          id="sidebar-images"
+        >
+          <th:block th:each="item : ${images}">
+            <!-- 只有当 img 存在时才渲染 -->
+            <div th:if="${!#strings.isEmpty(item.img)}" class="text-center">
+              <h4 class="mb-2 text-sm font-medium" th:text="${item.label}"></h4>
+              <div class="min-h-52 w-full overflow-hidden rounded-md border">
+                <img th:src="${item.img}" alt="侧边图片" class="h-full w-full object-contain" loading="lazy" />
+              </div>
+            </div>
+          </th:block>
+        </div>
       </div>
     </div>
 

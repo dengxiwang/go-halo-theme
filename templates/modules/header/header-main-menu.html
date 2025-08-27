@@ -63,7 +63,7 @@
           x-transition:leave-start="opacity-100 scale-100"
           x-transition:leave-end="opacity-0 scale-95"
           th:classappend="${iterStat.last or (menuItems.size() >= 2 and iterStat.index == menuItems.size() - 2)} ? 'absolute right-0 top-9' : 'absolute left-0 top-9'"
-          class="z-10 w-max rounded-lg border border-gray-300 bg-white px-1 py-1 shadow-sm"
+          class="z-10 w-max rounded-lg border border-gray-300 bg-white px-1 py-1 text-black shadow-sm"
         >
           <li
             th:each="childMenuItem : ${menuItem.children}"

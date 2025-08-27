@@ -3,7 +3,8 @@
   xmlns:th="https://www.thymeleaf.org"
   th:replace="~{modules/layout :: html(
           content = ~{::content},
-          contentBefore = ~{::contentBefore}
+          contentBefore = ~{::contentBefore},
+          isHomePage = true
       )}"
 >
   <th:block th:fragment="contentBefore">
@@ -12,6 +13,9 @@
   </th:block>
 
   <th:block th:fragment="content">
+    <!-- 瞬间 -->
+    <th:block th:replace="~{modules/moments/moment}" />
+
     <!-- 分类菜单 -->
     <th:block th:replace="~{modules/components/categories}" />
 

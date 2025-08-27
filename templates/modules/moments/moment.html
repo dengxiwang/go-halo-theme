@@ -1,0 +1,116 @@
+<th:block th:fragment="moment">
+  <div class="relative w-full" th:if="${theme.config.moments.showMoments}">
+    <!-- 插件未安装 -->
+    <th:block th:if="${not pluginFinder.available('PluginMoments')}">
+      <div class="w-full cursor-pointer rounded-lg border bg-white p-3 text-center text-sm font-medium">
+        瞬间插件未安装或者未启用，请前往<span
+          class="transition-all hover:text-blue-500"
+          onclick="window.open('https://github.com/halo-sigs/plugin-moments', '_blank')"
+        >
+          GitHub </span
+        >安装或前往控制台启用
+      </div>
+    </th:block>
+
+    <!-- 插件已安装 -->
+    <th:block th:if="${pluginFinder.available('PluginMoments')}">
+      <!-- 外层容器，点击跳转 -->
+      <div
+        class="flex w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg border bg-white p-3 text-center text-sm font-medium transition-all hover:text-blue-500"
+        onclick="window.location.href = '/moments'"
+      >
+        <!-- 左侧图标 -->
+        <div class="flex-shrink-0">
+          <svg
+            t="1756295027134"
+            class="icon"
+            viewBox="0 0 1024 1024"
+            version="1.1"
+            xmlns="http://www.w3.org/2000/svg"
+            p-id="5596"
+            width="20"
+            height="20"
+          >
+            <path
+              d="M381.8288 18.901489c42.635029-11.310603 86.403882-17.002232 130.205481-17.002232 68.479651 0 135.072325 13.469779 197.999516 40.101323l-8.362458 369.71439L381.8288 18.901489 381.8288 18.901489z"
+              fill="#F57659"
+              p-id="5597"
+            ></path>
+            <path
+              d="M71.201134 255.390621c22.278399-38.284955 49.218982-73.313749 80.134085-104.090707 48.393173-48.396243 104.980983-85.958744 168.285774-111.666242l255.614725 267.305999L71.201134 255.390621 71.201134 255.390621z"
+              fill="#F0B360"
+              p-id="5598"
+            ></path>
+            <path
+              d="M18.900977 642.275066c-11.276834-42.463114-17.000186-86.234013-17.000186-130.276089 0-68.548212 13.502525-135.140886 40.099277-197.933001l369.749182 8.293897L18.900977 642.275066 18.900977 642.275066z"
+              fill="#EFDE58"
+              p-id="5599"
+            ></path>
+            <path
+              d="M255.39011 952.798355c-38.010709-22.1423-72.968895-49.079812-104.021122-80.134085-48.428989-48.325635-85.993536-104.911398-111.664196-168.283728l267.302929-255.513418L255.39011 952.798355 255.39011 952.798355z"
+              fill="#BBEF5C"
+              p-id="5600"
+            ></path>
+            <path
+              d="M512.034281 1022.100744c-68.481697 0-135.072325-13.470803-197.999516-40.031738l8.362458-369.71439 319.843562 392.81348C599.535147 1016.411161 555.80211 1022.100744 512.034281 1022.100744L512.034281 1022.100744z"
+              fill="#61F15E"
+              p-id="5601"
+            ></path>
+            <path
+              d="M448.830797 717.096145l504.036631 51.54905c-22.107507 37.940101-48.976458 72.900334-80.167854 104.019075-48.327682 48.464805-104.980983 86.029352-168.283728 111.734804L448.830797 717.096145 448.830797 717.096145z"
+              fill="#5BE4EE"
+              p-id="5602"
+            ></path>
+            <path
+              d="M612.320335 701.707666l392.81348-319.915193c11.276834 42.499953 16.966417 86.302575 16.966417 130.206504 0 68.753897-13.502525 135.282103-40.066531 198.002586L612.320335 701.707666 612.320335 701.707666z"
+              fill="#5C9BF6"
+              p-id="5603"
+            ></path>
+            <path
+              d="M768.60989 71.235414c37.975916 22.038946 73.004711 48.942689 104.089683 80.0645 48.464805 48.326659 86.027305 104.980983 111.664196 168.284751l-267.302929 255.580956L768.60989 71.235414 768.60989 71.235414z"
+              fill="#6D58F1"
+              p-id="5604"
+            ></path>
+          </svg>
+        </div>
+
+        <!-- Swiper 容器 -->
+        <div class="swiper-container moment-swiper h-5 flex-1 overflow-hidden">
+          <div class="swiper-wrapper">
+            <!-- 遍历瞬间 -->
+            <th:block th:each="moment : ${momentFinder.listAll()}" th:with="content=${moment.spec.content}">
+              <div class="swiper-slide" th:if="${not #strings.isEmpty(content.raw)}">
+                <div class="line-clamp-1 text-sm" th:utext="${content.raw}"></div>
+              </div>
+            </th:block>
+
+            <!-- 无数据提示 -->
+            <th:block th:if="${#lists.isEmpty(momentFinder.listAll())}">
+              <div class="swiper-slide text-sm">暂无瞬间内容</div>
+            </th:block>
+          </div>
+        </div>
+
+        <!-- 右侧图标 -->
+        <div class="flex-shrink-0">
+          <svg
+            t="1756295078160"
+            class="icon"
+            viewBox="0 0 1024 1024"
+            version="1.1"
+            xmlns="http://www.w3.org/2000/svg"
+            p-id="8219"
+            width="20"
+            height="20"
+          >
+            <path
+              d="M512 0C230.4 0 0 230.4 0 512s230.4 512 512 512 512-230.4 512-512S793.6 0 512 0z m247.466667 298.666667l-238.933334 541.866666c-4.266667 4.266667-8.533333 8.533333-12.8 8.533334s-8.533333-4.266667-8.533333-8.533334l-38.4-256-256-34.133333c-4.266667 0-8.533333-4.266667-8.533333-8.533333 0-8.533333 4.266667-12.8 8.533333-12.8l546.133333-247.466667c4.266667 0 8.533333 0 12.8 4.266667 0 4.266667 0 8.533333-4.266666 12.8z"
+              fill="#26C541"
+              p-id="8220"
+            ></path>
+          </svg>
+        </div>
+      </div>
+    </th:block>
+  </div>
+</th:block>

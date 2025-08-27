@@ -16,6 +16,33 @@ spec:
               label: 一列
             - value: 2
               label: 两列
+        - $formkit: repeater
+          name: postImgs
+          label: 文章侧边图片（如：收款码、公众号等）
+          value: []
+          children:
+            - $formkit: text
+              name: label
+              label: 图片名称
+              placeholder: 如：微信赞赏码
+              value: ""
+              validation: "required"
+            - $formkit: attachment
+              name: img
+              id: post_img_src
+              key: post_img_src
+              label: 图片地址
+              placeholder: 图片地址
+              value: ""
+              validation: "required"
+              accepts:
+                - "image/png"
+                - "image/jpeg"
+                - "image/gif"
+                - "image/webp"
+                - "image/svg+xml"
+                - "image/bmp"
+                - "image/tiff"
     # - group: sidebar
     #   label: 侧边栏
     #   formSchema:
@@ -116,11 +143,20 @@ spec:
           label: 名称
           placeholder: 如：doxwant
           value: "佚名"
-        - $formkit: text
+        - $formkit: textarea
           name: description
+          rows: 3
           label: 描述
           placeholder: 如：我是 XX，一个拥有多年经验的创意设计师和开发人员，在这里可以了解
           value: "欢迎访问我的个人博客，我将在这里与你分享更多精彩内容"
+        - $formkit: number
+          name: descriptionOpacity
+          label: 描述透明度（%）：0-100
+          placeholder: 如：75
+          value: 75
+          step: 1
+          min: 0
+          max: 100
         - $formkit: repeater
           name: links
           label: 三方平台链接或个人其他主页
@@ -194,6 +230,17 @@ spec:
           validation: "required"
           accepts:
             - "video/mp4"
+        - $formkit: select
+          name: backgroundHeightType
+          label: 背景高度
+          value: fit
+          id: backgroundHeightType
+          key: backgroundHeightType
+          options:
+            - label: 适应内容大小
+              value: fit
+            - label: 全屏
+              value: screen
         - $formkit: color
           name: fontColor
           id: fontColor
@@ -216,3 +263,15 @@ spec:
           step: 1
           min: 0
           max: 100
+    - group: moments
+      label: 瞬间
+      formSchema:
+        - $formkit: select
+          name: showMoments
+          label: 是否在首页展示
+          value: false
+          options:
+            - label: 开启
+              value: true
+            - label: 关闭
+              value: false

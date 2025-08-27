@@ -8,12 +8,45 @@
   </style>
 
   <header
-    th:fragment="header"
-    class="sticky top-0 z-50 flex min-h-[68px] w-full border-b bg-white p-4 max-md:min-h-14 max-md:px-4 max-md:py-2"
-    x-data="{ isMobile: window.innerWidth < 768 }"
-    x-init="window.addEventListener('resize', () => isMobile = window.innerWidth < 768)"
+    th:fragment="header(isHomePage)"
+    class="sticky top-0 z-50 flex min-h-[68px] w-full p-4 max-md:min-h-14 max-md:px-4 max-md:py-2"
+    th:style="|${theme.config.authorInfo.backgroundHeightType == 'screen' ? 'transition: all 0.15s;' : '' }| +
+    |border-bottom-width:1px;border-color:transparent;|"
+    x-data="{
+        isMobile: window.innerWidth < 768,
+        isScrolled: false,
+        fontColor: $el.getAttribute('data-font-color') || '#ffffff',
+        backgroundHeightType: $el.getAttribute('data-background-height-type') || 'fit',
+        init() {
+            // 监听窗口大小变化
+            window.addEventListener('resize', () => {
+                this.isMobile = window.innerWidth < 768;
+            });
+
+            // 监听滚动事件
+            window.addEventListener('scroll', () => {
+                this.isScrolled = window.scrollY > 10;
+            });
+
+            // 初始化状态
+            this.isScrolled = window.scrollY > 10;
+        }
+    }"
+    x-bind:class="
+    $root.hasAttribute('data-header-transparent') && backgroundHeightType == 'screen'
+            ? (isScrolled ? 'bg-white !border-[#e5e7eb]' : 'bg-transparent')
+            : 'bg-white !border-[#e5e7eb]'
+    "
+    th:attr="data-header-transparent=${isHomePage}, data-font-color=${theme.config.authorInfo.fontColor}, data-background-height-type=${theme.config.authorInfo.backgroundHeightType}"
   >
-    <div class="max-container-width mx-auto flex w-full flex-wrap items-center justify-between gap-4 *:min-h-9">
+    <div
+      class="max-container-width mx-auto flex w-full flex-wrap items-center justify-between gap-4 *:min-h-9"
+      x-bind:style="
+             $root.hasAttribute('data-header-transparent') && backgroundHeightType == 'screen'
+                 ? (isScrolled ? '': ('color: ' + fontColor + ' !important;'))
+                 : ''
+         "
+    >
       <!-- 左侧logo展示 -->
       <div class="flex gap-x-6 gap-y-3" style="flex: 1 0 auto">
         <!-- logo -->

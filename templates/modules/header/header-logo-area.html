@@ -1,7 +1,7 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
   <a
-    th:fragment="header-logo-area"
+    th:fragment="header-logo-area(isHomePage)"
     class="flex max-w-48 items-center gap-3 text-nowrap font-semibold"
     th:href="${site.url}"
     th:aria-label="${site.title}"

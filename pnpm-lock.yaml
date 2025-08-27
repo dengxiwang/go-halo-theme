@@ -19,6 +19,9 @@ importers:
       prettier-plugin-tailwindcss:
         specifier: ^0.6.14
         version: 0.6.14(prettier@3.6.2)
+      swiper:
+        specifier: ^11.2.10
+        version: 11.2.10
       terser:
         specifier: ^5.43.1
         version: 5.43.1
@@ -1855,6 +1858,11 @@ packages:
       { integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w== }
     engines: { node: ">= 0.4" }
 
+  swiper@11.2.10:
+    resolution:
+      { integrity: sha512-RMeVUUjTQH+6N3ckimK93oxz6Sn5la4aDlgPzB+rBrG/smPdCTicXyhxa+woIpopz+jewEloiEE3lKo1h9w2YQ== }
+    engines: { node: ">= 4.7.0" }
+
   synckit@0.11.8:
     resolution:
       { integrity: sha512-+XZ+r1XGIJGeQk3VvXhT6xx/VpbHsRzsTkGgF6E5RX9TTXD0118l87puaEBZ566FhqblC6U0d4XnubznJDm30A== }
@@ -3332,6 +3340,8 @@ snapshots:
       has-flag: 4.0.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
+
+  swiper@11.2.10: {}
 
   synckit@0.11.8:
     dependencies:

@@ -2,9 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org">
   <div
     th:fragment="authorInfo"
-    class="relative flex h-full w-full flex-col items-center gap-4 overflow-hidden p-10 px-4 *:z-10 max-md:gap-3 max-md:p-8 max-md:px-4"
-    th:classappend="${theme.config.authorInfo.backgroundType != 'disable'} ?
-                    '':'pb-6 max-md:pb-4'"
+    class="relative flex h-full w-full flex-col items-center justify-center gap-4 overflow-hidden p-10 px-4 *:z-10 max-md:gap-3 max-md:p-8 max-md:px-4"
+    th:classappend="(${theme.config.authorInfo.backgroundType != 'disable'} ?
+                    '':'pb-6 max-md:pb-4') +
+                       (${theme.config.authorInfo.backgroundHeightType == 'screen'} ? 'min-h-screen -mt-[69px] !py-20' : '')"
     th:if="${theme.config.authorInfo.showAuthorInfo == true}"
     th:style="${theme.config.authorInfo.fontColor != null && theme.config.authorInfo.fontColor != '' && theme.config.authorInfo.backgroundType != 'disable'} ?
               'color: ' + ${theme.config.authorInfo.fontColor} + ' !important;' :
@@ -61,19 +62,147 @@
     <h3
       th:if="${!#strings.isEmpty(theme.config.authorInfo.name)}"
       th:text="${theme.config.authorInfo.name}"
-      class="text-2xl font-semibold"
+      class="font-semibold"
+      th:classappend="${theme.config.authorInfo.backgroundHeightType == 'screen' ? 'text-4xl' : 'text-2xl'}"
     ></h3>
 
-    <!-- 简介 -->
+    <!-- 三方平台链接 -->
+    <div
+      th:if="${!#lists.isEmpty(theme.config.authorInfo.links) and theme.config.authorInfo.backgroundHeightType == 'screen'}"
+      th:with="links = ${theme.config.authorInfo.links}"
+      class="mt-2 flex flex-wrap justify-center gap-5"
+    >
+      <th:block th:each="link : ${links}">
+        <a
+          th:if="${!#strings.isEmpty(link.label) or !#strings.isEmpty(link.icon)}"
+          th:href="@{${link.url.startsWith('http') ? link.url : 'https://' + link.url}}"
+          target="_blank"
+          class="flex items-center gap-[6px] text-lg font-medium transition-all hover:scale-110"
+        >
+          <img th:if="${!#strings.isEmpty(link.icon)}" th:src="@{${link.icon}}" class="h-5 w-5" />
+          <span th:if="${!#strings.isEmpty(link.label)}" th:text="${link.label}"></span>
+        </a>
+      </th:block>
+    </div>
+
+    <!-- 简介：打字机版本 -->
+    <div
+      x-data="typewriter()"
+      x-init="init()"
+      th:attr="data-text=${theme.config.authorInfo.description}"
+      th:if="${!#strings.isEmpty(theme.config.authorInfo.description) and theme.config.authorInfo.backgroundHeightType == 'screen'}"
+      class="relative w-full max-w-md whitespace-pre-line text-center text-lg font-medium"
+      style="line-height: 1.5; opacity: 0.9"
+    >
+      <p x-text="displayedText" class="typewriter absolute left-1/2 top-0 w-full -translate-x-1/2 leading-relaxed"></p>
+    </div>
+
+    <style>
+      [x-data] .typewriter::after {
+        content: "|";
+        margin-left: 4px;
+        opacity: 1;
+        animation: blink 0.8s infinite;
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+
+        50% {
+          opacity: 0;
+        }
+      }
+    </style>
+
+    <script>
+      const initializedElements = new WeakSet();
+
+      function typewriter() {
+        return {
+          displayedText: "",
+          fullLines: [],
+          currentLineIndex: 0,
+          currentCharIndex: 0,
+          isTyping: true,
+
+          typeSpeed: 120,
+          deleteSpeed: 60,
+          pauseBeforeDelete: 1500,
+          pauseBeforeNext: 500,
+
+          init() {
+            // 🚫 如果这个元素已被初始化过，跳过
+            if (initializedElements.has(this.$el)) {
+              return;
+            }
+            // ✅ 标记为已初始化
+            initializedElements.add(this.$el);
+
+            this.$nextTick(() => {
+              const rawText = this.$el.dataset.text || "";
+              this.fullLines = rawText
+                .split("\n")
+                .map((line) => line.trim())
+                .filter((line) => line.length > 0);
+
+              if (this.fullLines.length > 0) {
+                setTimeout(() => this.typeLine(), 500);
+              }
+            });
+          },
+
+          typeLine() {
+            if (!this.isTyping) return;
+
+            if (this.currentLineIndex >= this.fullLines.length) {
+              this.currentLineIndex = 0;
+            }
+
+            const line = this.fullLines[this.currentLineIndex];
+            if (this.currentCharIndex < line.length) {
+              this.displayedText += line[this.currentCharIndex];
+              this.currentCharIndex++;
+              setTimeout(() => this.typeLine(), this.typeSpeed);
+            } else {
+              setTimeout(() => this.deleteLine(), this.pauseBeforeDelete);
+            }
+          },
+
+          deleteLine() {
+            this.isTyping = false;
+
+            if (this.displayedText.length > 0) {
+              this.displayedText = this.displayedText.slice(0, -1);
+              setTimeout(() => this.deleteLine(), this.deleteSpeed);
+            } else {
+              const nextLineIndex = (this.currentLineIndex + 1) % this.fullLines.length;
+              this.currentLineIndex = nextLineIndex;
+              this.currentCharIndex = 0;
+
+              setTimeout(() => {
+                this.isTyping = true;
+                this.typeLine();
+              }, this.pauseBeforeNext);
+            }
+          },
+        };
+      }
+    </script>
+
+    <!-- 简介标准版 -->
     <p
-      th:if="${!#strings.isEmpty(theme.config.authorInfo.description)}"
-      th:text="${theme.config.authorInfo.description}"
-      class="max-w-md text-center text-sm font-medium opacity-60"
+      th:if="${!#strings.isEmpty(theme.config.authorInfo.description) and theme.config.authorInfo.backgroundHeightType != 'screen'}"
+      th:utext="${theme.config.authorInfo.description}"
+      class="max-w-md whitespace-pre-line text-center text-sm font-medium"
+      th:style="${'opacity: ' + (theme.config.authorInfo.descriptionOpacity / 100.0) + '; line-height: 1.5;'}"
     ></p>
 
     <!-- 三方平台链接 -->
     <div
-      th:if="${!#lists.isEmpty(theme.config.authorInfo.links)}"
+      th:if="${!#lists.isEmpty(theme.config.authorInfo.links) and theme.config.authorInfo.backgroundHeightType != 'screen'}"
       th:with="links = ${theme.config.authorInfo.links}"
       class="mt-2 flex flex-wrap justify-center gap-5"
     >
@@ -89,5 +218,70 @@
         </a>
       </th:block>
     </div>
+
+    <!-- 向下滚动的箭头 -->
+    <div
+      class="scroll-down"
+      th:if="${theme.config.authorInfo.backgroundHeightType == 'screen'}"
+      onclick="scrollToElement(this)"
+    >
+      <svg
+        class="arrow"
+        t="1756209418115"
+        viewBox="0 0 1024 1024"
+        version="1.1"
+        xmlns="http://www.w3.org/2000/svg"
+        p-id="4983"
+        width="200"
+        height="200"
+      >
+        <path
+          d="M512 611.872L226.752 318.592A48.48 48.48 0 0 0 192 304c-26.496 0-48 21.056-48 47.008 0 12.064 4.736 23.68 13.248 32.416l308.416 317.12q18.88 19.456 46.336 19.456 27.424 0 46.336-19.456l308.384-317.12c8.544-8.736 13.28-20.352 13.28-32.416 0-25.952-21.504-47.008-48-47.008-13.12 0-25.696 5.28-34.752 14.592L512 611.84z"
+          th:fill="${theme.config.authorInfo.fontColor != null && theme.config.authorInfo.fontColor != '' ? theme.config.authorInfo.fontColor : '#ffffff'}"
+          p-id="4984"
+        ></path>
+      </svg>
+    </div>
+    <script>
+      function scrollToElement(element) {
+        // 获取元素距离页面顶部的距离
+        const offsetTop = element.offsetTop + 2;
+        // 滚动到指定位置，behavior: 'smooth' 表示平滑滚动
+        window.scrollTo({
+          top: offsetTop,
+          behavior: "smooth",
+        });
+      }
+    </script>
+    <style>
+      .scroll-down {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        opacity: 0.5;
+      }
+
+      .arrow {
+        width: 40px;
+        height: 40px;
+        animation: smoothBounce 2s infinite ease-in-out;
+      }
+
+      @keyframes smoothBounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+
+        50% {
+          transform: translateY(-15px);
+        }
+      }
+    </style>
   </div>
 </html>

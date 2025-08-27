@@ -1,0 +1,152 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <style>
+    svg.arrow-icon {
+      width: 1em;
+      height: 1em;
+      vertical-align: middle;
+    }
+
+    .custom-select-wrapper {
+      position: relative;
+      display: inline-block;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-color: transparent;
+      border: none;
+    }
+
+    .custom-select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-color: white;
+      border: 1px solid #d1d5db;
+      border-radius: 0.5rem;
+      padding: 0.25rem 2rem 0.25rem 1rem;
+      outline: none;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .custom-select-icon {
+      position: absolute;
+      right: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: #9ca3af;
+    }
+  </style>
+
+  <div class="mt-4 rounded-lg border bg-white px-4 py-2" th:if="${moments.total > 0}">
+    <div class="flex w-full flex-wrap items-center justify-between gap-4">
+      <!-- 合计数据 -->
+      <span th:text="'共 ' + ${moments.total} + ' 条瞬间'"></span>
+
+      <div class="flex flex-wrap gap-2" th:if="${moments.totalPages > 0}">
+        <div class="flex overflow-hidden rounded-lg border">
+          <!-- 上一页 -->
+          <a
+            th:href="@{${moments.prevUrl}}"
+            th:classappend="${!moments.hasPrevious} ? 'opacity-30 cursor-not-allowed'"
+            th:attr="onclick=${moments.hasPrevious} ? null : 'event.preventDefault(); return false;'"
+            class="flex h-[30px] w-[30px] items-center justify-center transition-all hover:bg-gray-100"
+          >
+            <svg
+              class="arrow-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </a>
+          <div class="border-r"></div>
+          <!-- 下一页 -->
+          <a
+            th:href="@{${moments.nextUrl}}"
+            th:classappend="${!moments.hasNext} ? 'opacity-30 cursor-not-allowed'"
+            th:attr="onclick=${moments.hasNext} ? null : 'event.preventDefault(); return false;'"
+            class="flex h-[30px] w-[30px] items-center justify-center transition-all hover:bg-gray-100"
+          >
+            <svg
+              class="arrow-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </a>
+        </div>
+
+        <!-- 自定义下拉页码选择器 -->
+        <div class="flex h-8 items-center justify-center gap-2">
+          <div class="custom-select-wrapper relative">
+            <select
+              id="pageSelector"
+              class="custom-select h-8 rounded-lg border px-2"
+              onchange="handlePageSelect(this)"
+            >
+              <option
+                th:each="pageNum : ${#numbers.sequence(1, moments.totalPages)}"
+                th:text="${pageNum}"
+                th:selected="${pageNum == moments.page}"
+                th:value="${pageNum}"
+              ></option>
+            </select>
+            <svg
+              class="custom-select-icon arrow-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </div>
+          <span>页</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script th:inline="javascript">
+    function handlePageSelect(select) {
+      const selectedPage = parseInt(select.value, 10);
+      const currentPage = /*[(${moments.page})]*/ 1;
+
+      if (selectedPage === currentPage) return;
+
+      let currentPath = window.location.pathname;
+      let newUrl;
+
+      // 如果当前页是第一页，去掉 /page/1
+      if (selectedPage === 1) {
+        newUrl = currentPath.replace(/\/page\/\d+\/?$/, "") || "/";
+      } else {
+        // 其他页替换或添加 /page/x
+        const pageRegex = /\/page\/\d+\/?$/;
+        if (pageRegex.test(currentPath)) {
+          newUrl = currentPath.replace(pageRegex, `/page/${selectedPage}/`);
+        } else {
+          newUrl = `${currentPath}/page/${selectedPage}/`;
+        }
+      }
+
+      // 去掉多余的双斜杠并跳转
+      newUrl = newUrl.replace(/\/\/+/g, "/");
+      location.href = newUrl;
+    }
+  </script>
+</html>
