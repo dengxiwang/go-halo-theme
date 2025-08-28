@@ -5,6 +5,9 @@
 ## 在线预览
 [https://blog.gotab.cn](https://blog.gotab.cn)
 
+## 好物推广
+有需要云服务器的可以看一下：[高性价比云服务器](https://www.rainyun.com/gotab_)，我也一直在用，感谢您的支持！
+
 ## 使用方式
 
 1. 手动从以下地址下载主题包并在 Console 的主题管理界面安装，安装方式可参考：<https://docs.halo.run/user-guide/themes>
