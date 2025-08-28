@@ -136,6 +136,17 @@ spec:
               value: true
             - label: 关闭
               value: false
+        - $formkit: select
+          name: backgroundHeightType
+          label: 区域内容高度
+          value: fit
+          id: backgroundHeightType
+          key: backgroundHeightType
+          options:
+            - label: 适应内容大小
+              value: fit
+            - label: 全屏
+              value: screen
         - $formkit: attachment
           name: avatar
           id: author_info_avatar
@@ -151,12 +162,12 @@ spec:
         - $formkit: textarea
           name: description
           rows: 3
-          label: 描述
+          label: 描述（换行将开启打字机的切换效果）
           placeholder: 如：我是 XX，一个拥有多年经验的创意设计师和开发人员，在这里可以了解
           value: "欢迎访问我的个人博客，我将在这里与你分享更多精彩内容"
         - $formkit: number
           name: descriptionOpacity
-          label: 描述透明度（%）：0-100
+          label: 描述透明度，全屏高度时替换为下指示箭头透明度（%）：0-100
           placeholder: 如：75
           value: 75
           step: 1
@@ -235,17 +246,6 @@ spec:
           validation: "required"
           accepts:
             - "video/mp4"
-        - $formkit: select
-          name: backgroundHeightType
-          label: 背景高度
-          value: fit
-          id: backgroundHeightType
-          key: backgroundHeightType
-          options:
-            - label: 适应内容大小
-              value: fit
-            - label: 全屏
-              value: screen
         - $formkit: color
           name: fontColor
           id: fontColor

@@ -102,18 +102,19 @@
         content: " ";
         border-right: 2px solid;
         margin-left: 4px;
-        opacity: 1;
+        opacity: 0;
         animation: blink 0.8s infinite;
+        animation-delay: 0.2s;
       }
 
       @keyframes blink {
         0%,
         100% {
-          opacity: 1;
+          opacity: 0;
         }
 
         50% {
-          opacity: 0;
+          opacity: 1;
         }
       }
     </style>
@@ -198,7 +199,7 @@
       th:if="${!#strings.isEmpty(theme.config.authorInfo.description) and theme.config.authorInfo.backgroundHeightType != 'screen'}"
       th:utext="${theme.config.authorInfo.description}"
       class="max-w-md whitespace-pre-line text-center text-sm font-medium"
-      th:style="${'opacity: ' + (theme.config.authorInfo.descriptionOpacity / 100.0) + '; line-height: 1.5;'}"
+      th:style="|opacity:| + ${theme.config.authorInfo.descriptionOpacity} / 100.0 + |; line-height: 1.5;|"
     ></p>
 
     <!-- 三方平台链接 -->
@@ -222,9 +223,10 @@
 
     <!-- 向下滚动的箭头 -->
     <div
-      class="scroll-down"
+      class="scroll-down transition-all hover:!opacity-100"
       th:if="${theme.config.authorInfo.backgroundHeightType == 'screen'}"
       onclick="scrollToElement(this)"
+      th:style="|opacity:| + ${theme.config.authorInfo.descriptionOpacity} / 100.0 + |;|"
     >
       <svg
         class="arrow"
@@ -264,7 +266,6 @@
         justify-content: center;
         align-items: center;
         cursor: pointer;
-        opacity: 0.5;
       }
 
       .arrow {

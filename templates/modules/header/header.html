@@ -37,7 +37,7 @@
             : 'bg-white !border-[#e5e7eb]'
     "
     x-bind:style="$root.hasAttribute('data-header-transparent') && backgroundHeightType == 'screen'
-    ? (isScrolled?'transition: all 0.3s;border-color:transparent;':'transition:none;border-color:transparent;')
+    ? (isScrolled?'transition: all 0.3s;border-color:transparent;':'transition:background-color,background 0.3s,border-color 0s;border-color:transparent;')
     : 'border-color:transparent;'"
     th:attr="data-header-transparent=${isHomePage}, data-font-color=${theme.config.authorInfo.fontColor}, data-background-height-type=${theme.config.authorInfo.backgroundHeightType}"
   >
