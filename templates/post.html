@@ -58,7 +58,7 @@
               <!-- 只有当 img 存在时才渲染 -->
               <div th:if="${!#strings.isEmpty(item.img)}" class="text-center">
                 <h4 class="mb-2 text-sm font-medium" th:text="${item.label}"></h4>
-                <div class="min-h-52 w-full overflow-hidden rounded-md border">
+                <div class="w-full overflow-hidden rounded-md border">
                   <!-- 判断 url 是否存在，决定是否用 a 标签包裹 -->
                   <a
                     th:if="${!#strings.isEmpty(item.url)}"
