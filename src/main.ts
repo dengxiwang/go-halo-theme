@@ -35,9 +35,17 @@ if (window.history && "scrollRestoration" in window.history) {
 }
 
 // 页面加载时滚动到顶部
-window.addEventListener("load", () => {
-  window.scrollTo(0, 0);
-});
+function scrollToTop() {
+  window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => {
+    requestAnimationFrame(scrollToTop);
+  });
+} else {
+  requestAnimationFrame(scrollToTop);
+}
 
 const btnScrollToTop = document.getElementById("btn-scroll-to-top") as HTMLDivElement;
 
@@ -286,8 +294,7 @@ document.addEventListener("DOMContentLoaded", function () {
         contentSelector: "#content",
         headingSelector: "h1, h2, h3, h4",
         extraListClasses: "space-y-1",
-        extraLinkClasses:
-          "group flex items-center justify-between rounded py-1 px-1.5 transition-all hover:bg-gray-100 text-sm opacity-80",
+        extraLinkClasses: "group rounded py-1 px-1.5 transition-all hover:bg-gray-100 text-sm opacity-80 line-clamp-1",
         collapseDepth: 6,
         headingsOffset: 200,
         scrollSmooth: false,
@@ -312,7 +319,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         window.scrollTo({
           top: offsetTop,
-          behavior: "smooth",
+          behavior: "auto",
         });
       }
     });

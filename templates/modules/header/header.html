@@ -9,9 +9,8 @@
 
   <header
     th:fragment="header(isHomePage)"
-    class="sticky top-0 z-50 flex min-h-[68px] w-full p-4 max-md:min-h-14 max-md:px-4 max-md:py-2"
-    th:style="|${theme.config.authorInfo.backgroundHeightType == 'screen' ? 'transition: all 0.15s;' : '' }| +
-    |border-bottom-width:1px;border-color:transparent;|"
+    class="sticky top-0 z-50 flex min-h-[68px] w-full border-b p-4 max-md:min-h-14 max-md:px-4 max-md:py-2"
+    style="border-color: transparent"
     x-data="{
         isMobile: window.innerWidth < 768,
         isScrolled: false,
@@ -37,6 +36,9 @@
             ? (isScrolled ? 'bg-white !border-[#e5e7eb]' : 'bg-transparent')
             : 'bg-white !border-[#e5e7eb]'
     "
+    x-bind:style="$root.hasAttribute('data-header-transparent') && backgroundHeightType == 'screen'
+    ? (isScrolled?'transition: all 0.3s;border-color:transparent;':'transition:none;border-color:transparent;')
+    : 'border-color:transparent;'"
     th:attr="data-header-transparent=${isHomePage}, data-font-color=${theme.config.authorInfo.fontColor}, data-background-height-type=${theme.config.authorInfo.backgroundHeightType}"
   >
     <div

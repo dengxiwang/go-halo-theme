@@ -43,6 +43,11 @@ spec:
                 - "image/svg+xml"
                 - "image/bmp"
                 - "image/tiff"
+            - $formkit: text
+              name: url
+              label: 图片链接（点击将跳转）
+              placeholder: 图片链接
+              value: ""
     # - group: sidebar
     #   label: 侧边栏
     #   formSchema:
