@@ -69,6 +69,22 @@ btnScrollToTop.addEventListener("click", (e) => {
   });
 });
 
+function fallbackCopyText(text: string) {
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand("copy");
+    showCopyTooltip("已复制");
+  } catch (err) {
+    showCopyTooltip("复制失败", true);
+  }
+  document.body.removeChild(textarea);
+}
+
 // 添加复制按钮
 document.addEventListener("DOMContentLoaded", () => {
   const codeBlocks = document.querySelectorAll("pre > code");
@@ -119,11 +135,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // 绑定复制事件
     copyBtn.addEventListener("click", async () => {
       try {
+        // 尝试现代 API
         await navigator.clipboard.writeText(codeEl.textContent || "");
         showCopyTooltip("已复制");
       } catch (err) {
-        console.error("复制失败:", err);
-        showCopyTooltip("复制失败", true);
+        console.warn("Clipboard API 失败:", err);
+        // 降级到传统方法
+        fallbackCopyText(codeEl.textContent || "");
       }
     });
   });
