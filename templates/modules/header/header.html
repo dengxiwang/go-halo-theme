@@ -42,7 +42,7 @@
     th:attr="data-header-transparent=${isHomePage}, data-font-color=${theme.config.authorInfo.fontColor}, data-background-height-type=${theme.config.authorInfo.backgroundHeightType}"
   >
     <div
-      class="max-container-width mx-auto flex w-full flex-wrap items-center justify-between gap-4 *:min-h-9"
+      class="max-container-width mx-auto flex w-full items-center justify-between gap-4 *:min-h-9"
       x-bind:style="
              $root.hasAttribute('data-header-transparent') && backgroundHeightType == 'screen'
                  ? (isScrolled ? '': ('color: ' + fontColor + ' !important;'))

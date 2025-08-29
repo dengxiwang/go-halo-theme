@@ -37,11 +37,11 @@
           <!-- 目录 -->
           <div
             th:if="${#strings.contains(post.content.content, '<h')}"
-            class="toc-container h-0 w-56 overflow-hidden rounded-lg border bg-white p-3 opacity-0 transition-all duration-300"
+            class="toc-container h-0 w-60 overflow-hidden rounded-lg border bg-white p-3 opacity-0 transition-all duration-300"
             style="font-size: 0"
           >
             <div class="mb-2 flex items-center justify-between">
-              <h3 class="text-lg font-medium">文章目录</h3>
+              <h3 class="ml-1 text-base font-medium">文章目录</h3>
             </div>
             <div id="toc" class="toc"></div>
           </div>
@@ -50,7 +50,7 @@
           <div
             th:if="${!#lists.isEmpty(theme.config.post.postImgs)}"
             th:with="images = ${theme.config.post.postImgs}"
-            class="w-56 space-y-2 overflow-hidden opacity-0 transition-all duration-300 *:rounded-lg *:border *:bg-white *:p-3"
+            class="w-60 space-y-2 overflow-hidden opacity-0 transition-all duration-300 *:rounded-lg *:border *:bg-white *:p-3"
             style="font-size: 0"
             id="sidebar-images"
           >

@@ -274,6 +274,14 @@
         animation: smoothBounce 2s infinite ease-in-out;
       }
 
+      /* 当屏幕宽度小于或等于 768px 时应用 */
+      @media (max-width: 768px) {
+        .arrow {
+          width: 32px;
+          height: 32px;
+        }
+      }
+
       @keyframes smoothBounce {
         0%,
         100% {

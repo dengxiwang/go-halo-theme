@@ -5,35 +5,38 @@
     <a th:href="@{${post.status.permalink}}" class="group flex gap-1 transition-all duration-300 hover:text-blue-500">
       <div class="flex flex-1 flex-col gap-1">
         <!-- 标题 -->
-        <h1 class="line-clamp-2 flex cursor-pointer items-center gap-2 text-lg font-medium">
-          <div
-            th:if="${post.spec.pinned != null and post.spec.pinned}"
-            class="text-nowrap rounded bg-red-500 px-2 py-0.5 text-xs font-medium text-white"
-          >
-            置顶
-          </div>
+        <h1 class="line-clamp-2 font-medium">
           <span
-            class="line-clamp-1"
+            th:if="${post.spec.pinned != null and post.spec.pinned}"
+            class="mr-1 text-nowrap rounded bg-red-500 px-1.5 py-0.5 text-xs font-medium text-white"
+            >置顶</span
+          >
+          <span
+            class="align-middle text-lg"
             th:text="${post.spec != null and post.spec.title != null ? post.spec.title : '无标题'}"
           ></span>
         </h1>
-
-        <!-- 摘要 -->
-        <p
-          class="line-clamp-3 text-sm opacity-60"
-          th:text="${post.status != null and post.status.excerpt != null ? post.status.excerpt : '暂无摘要信息'}"
-        ></p>
-      </div>
-      <!-- 封面图 -->
-      <div
-        th:if="${post.spec != null and post.spec.cover != null and post.spec.cover != ''}"
-        class="relative ml-2 h-[92px] w-36 overflow-hidden bg-gray-100"
-      >
-        <img
-          th:src="${post.spec.cover}"
-          th:alt="${post.spec.title != null ? post.spec.title : '文章封面'}"
-          class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.15]"
-        />
+        <div class="flex space-x-2">
+          <div class="flex-1">
+            <!-- 摘要 -->
+            <span
+              class="line-clamp-4 text-sm leading-5 opacity-60"
+              th:text="${post.status != null and post.status.excerpt != null ? post.status.excerpt : '暂无摘要信息'}"
+            >
+            </span>
+          </div>
+          <!-- 封面图 -->
+          <div
+            th:if="${post.spec != null and post.spec.cover != null and post.spec.cover != ''}"
+            class="relative h-[80px] w-36 overflow-hidden bg-gray-100"
+          >
+            <img
+              th:src="${post.spec.cover}"
+              th:alt="${post.spec.title != null ? post.spec.title : '文章封面'}"
+              class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.15]"
+            />
+          </div>
+        </div>
       </div>
     </a>
 
