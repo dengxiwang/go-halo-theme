@@ -7,12 +7,7 @@
       <!-- 版权说明 -->
       <span class="line text-center">
         <span>©</span>
-        <a
-          th:text="${site.title}"
-          th:href="${site.url}"
-          th:aria-label="${site.title}"
-          class="transition-all hover:text-blue-500"
-        >
+        <a th:text="${site.title}" href="/" th:aria-label="${site.title}" class="transition-all hover:text-blue-500">
         </a>
         <span>All Rights Reserved.</span>
         <span th:unless="${#strings.isEmpty(theme.config.footer.subCopyright)}">
