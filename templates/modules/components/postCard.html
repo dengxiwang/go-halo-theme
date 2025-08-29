@@ -20,7 +20,7 @@
           <div class="flex-1">
             <!-- 摘要 -->
             <span
-              class="line-clamp-3 text-sm leading-6 tracking-wider opacity-60"
+              class="line-clamp-3 text-sm leading-6 tracking-wide opacity-60"
               th:text="${post.status != null and post.status.excerpt != null ? post.status.excerpt : '暂无摘要信息'}"
             >
             </span>
@@ -28,7 +28,8 @@
           <!-- 封面图 -->
           <div
             th:if="${post.spec != null and post.spec.cover != null and post.spec.cover != ''}"
-            class="relative h-[72px] w-32 overflow-hidden bg-gray-100"
+            class="relative overflow-hidden bg-gray-100"
+            style="width: 128px; height: 72px"
           >
             <img
               th:src="${post.spec.cover}"
