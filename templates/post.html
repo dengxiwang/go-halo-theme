@@ -16,8 +16,8 @@
   <th:block th:fragment="content">
     <div
       class="max-sm:block"
-      th:classappend="${!#lists.isEmpty(theme.config.post.postImgs) or #strings.contains(post.content.content, '<h') ? 'grid gap-2' : ''}"
-      style="grid-template-columns: 1fr 14rem"
+      th:classappend="${(theme.config.post.showPostImgs == true and !#lists.isEmpty(theme.config.post.postImgs)) or #strings.contains(post.content.content, '<h') ? 'grid gap-2' : ''}"
+      style="grid-template-columns: 1fr 15rem"
     >
       <div class="h-auto flex-1 overflow-hidden rounded-lg border bg-white p-6 max-md:p-4">
         <!-- 内容 -->
@@ -30,7 +30,7 @@
 
       <!-- 右侧区域 -->
       <div
-        th:if="${!#lists.isEmpty(theme.config.post.postImgs)} or ${#strings.contains(post.content.content, '<h')}"
+        th:if="${(theme.config.post.showPostImgs == true and !#lists.isEmpty(theme.config.post.postImgs)) or #strings.contains(post.content.content, '<h')}"
         class="space-y-2 max-sm:hidden"
       >
         <div class="sticky top-20 space-y-2">
@@ -48,7 +48,7 @@
 
           <!-- 图片列表 -->
           <div
-            th:if="${!#lists.isEmpty(theme.config.post.postImgs)}"
+            th:if="${theme.config.post.showPostImgs == true and !#lists.isEmpty(theme.config.post.postImgs)}"
             th:with="images = ${theme.config.post.postImgs}"
             class="w-60 space-y-2 overflow-hidden opacity-0 transition-all duration-300 *:rounded-lg *:border *:bg-white *:p-3"
             style="font-size: 0"
@@ -103,7 +103,7 @@
         <a
           th:if="${postCursor.hasPrevious()}"
           role="navigation"
-          class="group inline-flex items-center gap-1 truncate text-sm text-gray-600 hover:text-gray-900 dark:text-slate-100 dark:hover:text-slate-200"
+          class="group inline-flex items-center gap-1 truncate text-sm text-gray-600 hover:text-gray-900"
           th:href="@{${postCursor.previous.status.permalink}}"
           th:title="${postCursor.previous.spec.title}"
         >
@@ -131,7 +131,7 @@
         <a
           th:if="${postCursor.hasNext()}"
           role="navigation"
-          class="group inline-flex items-center gap-1 truncate text-sm text-gray-600 hover:text-gray-900 dark:text-slate-100 dark:hover:text-slate-200"
+          class="group inline-flex items-center gap-1 truncate text-sm text-gray-600 hover:text-gray-900"
           th:href="@{${postCursor.next.status.permalink}}"
           th:title="${postCursor.next.spec.title}"
         >

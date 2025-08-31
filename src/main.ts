@@ -107,15 +107,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 创建语言标签
     const langTag = document.createElement("span");
-    langTag.className =
-      "px-2 py-0.5 text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded";
+    langTag.className = "px-2 py-0.5 text-xs font-medium bg-gray-200 rounded";
     langTag.textContent = lang || "CODE";
 
     // 创建复制按钮
     const copyBtn = document.createElement("button");
     copyBtn.type = "button";
-    copyBtn.className =
-      "p-1.5 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 focus:outline-none transition-colors";
+    copyBtn.className = "p-1.5 text-gray-600 hover:text-gray-900 focus:outline-none transition-colors";
     copyBtn.innerHTML = `
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="9" y="9" width="13" height="13" rx="2"></rect>
@@ -312,7 +310,8 @@ document.addEventListener("DOMContentLoaded", function () {
         contentSelector: "#content",
         headingSelector: "h1, h2, h3, h4",
         extraListClasses: "space-y-1",
-        extraLinkClasses: "group rounded py-1 px-1.5 transition-all hover:bg-gray-100 text-sm opacity-80 line-clamp-1",
+        extraLinkClasses:
+          "group rounded px-1.5 py-1 transition-all hover:bg-gray-100 text-sm opacity-80 line-clamp-1 h-[1.68rem]",
         collapseDepth: 6,
         headingsOffset: 200,
         scrollSmooth: false,

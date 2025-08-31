@@ -16,7 +16,7 @@
       class="pointer-events-none absolute top-0 h-full w-full scale-110 bg-cover bg-center bg-no-repeat"
       th:if="${theme.config.authorInfo.backgroundType != 'disable'}"
       th:style="
-             |background-image: url('${theme.config.authorInfo.backgroundType == 'image'? theme.config.authorInfo.backgroundImage : null}')| +
+             |background-image: url('${theme.config.authorInfo.backgroundType == 'image'? theme.config.authorInfo.backgroundImage : ''}')| +
              (${theme.config.authorInfo.brightness != null and theme.config.authorInfo.brightness != ''} ?
                  |; filter: brightness(| + (${theme.config.authorInfo.brightness} == 100 ? '1' : '0.' + ${theme.config.authorInfo.brightness}) + ')' +
                  (${theme.config.authorInfo.blur != null and theme.config.authorInfo.blur != ''} ?
@@ -248,7 +248,7 @@
     <script>
       function scrollToElement(element) {
         // 获取元素距离页面顶部的距离
-        const offsetTop = element.offsetTop + (window.innerWidth < 768 ? 16 : 2);
+        const offsetTop = element.offsetTop + (window.innerWidth < 768 ? 8 : 2);
         // 滚动到指定位置，behavior: 'smooth' 表示平滑滚动
         window.scrollTo({
           top: offsetTop,

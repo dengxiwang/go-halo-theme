@@ -16,6 +16,15 @@ spec:
               label: 一列
             - value: 2
               label: 两列
+        - $formkit: select
+          name: showPostImgs
+          label: 是否展示侧边图片
+          value: true
+          options:
+            - label: 开启
+              value: true
+            - label: 关闭
+              value: false
         - $formkit: repeater
           name: postImgs
           label: 文章侧边图片（如：收款码、公众号等）
