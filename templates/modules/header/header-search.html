@@ -4,7 +4,7 @@
     th:if="${pluginFinder.available('PluginSearchWidget')}"
     th:fragment="header-search"
     type="button"
-    onclick="SearchWidget.open()"
+    @click="SearchWidget.open();"
     class="flex w-full max-w-48 items-center gap-3 rounded-lg bg-black/5 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
   >
     <!-- 搜索图标 -->

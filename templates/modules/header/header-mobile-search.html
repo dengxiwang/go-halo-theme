@@ -4,8 +4,8 @@
   <button
     th:if="${pluginFinder.available('PluginSearchWidget')}"
     th:fragment="header-monile-search"
-    class="mobile-handle-btn flex h-9 w-9 items-center justify-center hover:bg-gray-200"
-    onclick="SearchWidget.open()"
+    class="mobile-handle-btn flex h-9 w-9 items-center justify-center hover:bg-black/5"
+    @click="SearchWidget.open();"
   >
     <svg
       class="h-5 w-5 flex-shrink-0"

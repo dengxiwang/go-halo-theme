@@ -9,7 +9,6 @@
       max-width: 280px;
       height: 100%;
       background: #f9f9f9;
-      border-right: 1px solid #ccc;
       transition: transform 0.3s ease;
       z-index: 1002;
       transform: translateX(100%);
@@ -98,29 +97,12 @@
     .dropdown-icon.open {
       transform: rotate(180deg);
     }
-
-    /* 当抽屉打开时，禁止页面滚动 */
-    .disable-scroll {
-      overflow: hidden;
-    }
-
-    /* 可选：防止页面因滚动条消失而跳动 */
-    .disable-scroll::before {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: transparent;
-      z-index: -1;
-    }
   </style>
 
   <!-- 菜单按钮 -->
   <button
-    class="mobile-handle-btn hover:bg-gray-200"
-    @click="isOpen = true;document.body.classList.add('disable-scroll')"
+    class="mobile-handle-btn hover:bg-black/5"
+    @click="isOpen = true;disableScroll(document.body)"
     th:fragment="header-monile-menu"
   >
     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -129,20 +111,13 @@
   </button>
 
   <!-- 遮罩层 -->
-  <div
-    class="overlay"
-    :class="{ 'open': isOpen }"
-    @click="isOpen = false; document.body.classList.remove('disable-scroll')"
-  ></div>
+  <div class="overlay" :class="{ 'open': isOpen }" @click="isOpen = false; enableScroll(document.body)"></div>
 
   <!-- 抽屉 -->
   <div class="drawer relative text-black" :class="{ 'open': isOpen }">
     <div class="flex items-center justify-between border-b p-2">
       <!-- <p class="font-medium mx-2">导航菜单</p> -->
-      <button
-        class="close-btn hover:bg-gray-200"
-        @click="isOpen = false; document.body.classList.remove('disable-scroll')"
-      >
+      <button class="close-btn hover:bg-gray-200" @click="isOpen = false; enableScroll(document.body)">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -150,7 +125,7 @@
     </div>
 
     <!-- 保留原始 Thymeleaf 结构 -->
-    <div th:with="menu = ${menuFinder.getPrimary}" class="overflow-scroll" style="height: calc(100% - 49px)">
+    <div th:with="menu = ${menuFinder.getPrimary}" class="os-scroll overflow-scroll" style="height: calc(100% - 49px)">
       <ul th:with="menuItems = ${menu.menuItems}" class="flex flex-col font-medium">
         <li th:each="menuItem : ${menuItems}" class="menu-item border-b" x-data="{ submenuOpen: false }">
           <!-- 有子菜单 -->

@@ -1,15 +1,26 @@
 import Alpine from "alpinejs";
 import "github-markdown-css/github-markdown-light.css";
-import * as tocbot from "tocbot";
-import "./styles/main.css";
-import "./styles/tailwind.css";
-// 引入 Swiper 核心模块
 import Swiper from "swiper";
 import "swiper/css";
 import "swiper/css/autoplay";
 import { Autoplay } from "swiper/modules";
+import * as tocbot from "tocbot";
+import { disableScroll, enableScroll, initScrollbars, watchModalAndControlBodyScroll } from "./scrollbar";
+import "./styles/main.css";
+import "./styles/tailwind.css";
+
+// 页面加载后初始化
+document.addEventListener("DOMContentLoaded", () => {
+  initScrollbars();
+  watchModalAndControlBodyScroll();
+});
+
+(window as any).disableScroll = disableScroll;
+(window as any).enableScroll = enableScroll;
 
 window.Alpine = Alpine;
+
+Alpine.start();
 
 document.addEventListener("DOMContentLoaded", () => {
   const el = document.querySelector(".moment-swiper") as any;
@@ -22,12 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
-
-Alpine.start();
-
-export function count(x: number, y: number) {
-  return x + y;
-}
 
 // 禁止浏览器自动恢复滚动位置
 if (window.history && "scrollRestoration" in window.history) {
@@ -319,6 +324,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
   }
+
   // 🔹 锚点跳转偏移（适配你的导航栏高度）
   const navbarHeight = 144; // 你的导航栏高度
 

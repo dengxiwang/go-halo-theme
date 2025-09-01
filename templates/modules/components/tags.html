@@ -15,7 +15,7 @@
         th:classappend="${currentTag.metadata.name == tag.metadata.name} ? 'active-menu'"
       >
         <span th:text="|# ${currentTag.spec.displayName}|">标签名</span>
-        <span class="ml-1 text-xs" th:text="'(' + ${currentTag.postCount} + ')'"></span>
+        <span class="ml-1 text-xs" th:text="'(' + ${currentTag.postCount ?: 0} + ')'"></span>
       </a>
     </li>
   </ul>

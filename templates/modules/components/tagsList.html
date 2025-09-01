@@ -14,7 +14,7 @@
         th:classappend="${aClass != null} ? ${aClass} : 'bg-gray-100 hover:bg-blue-100 hover:text-blue-600'"
       >
         <span th:text="| #${currentTag.spec.displayName}|">标签名</span>
-        <span class="ml-1 text-xs" th:text="'(' + ${currentTag.postCount} + ')'"></span>
+        <span class="ml-1 text-xs" th:text="'(' + ${currentTag.postCount ?: 0} + ')'"></span>
       </a>
     </div>
   </div>

@@ -13,6 +13,9 @@ importers:
       github-markdown-css:
         specifier: ^5.8.1
         version: 5.8.1
+      overlayscrollbars:
+        specifier: ^2.12.0
+        version: 2.12.0
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
@@ -1465,6 +1468,10 @@ packages:
     resolution:
       { integrity: sha512-JjCoypp+jKn1ttEFExxhetCKeJt9zhAgAve5FXHixTvFDW/5aEktX9bufBKLRRMdU7bNtpLfcGu94B3cdEJgjg== }
     engines: { node: ">= 0.8.0" }
+
+  overlayscrollbars@2.12.0:
+    resolution:
+      { integrity: sha512-mWJ5MOkcZ/ljHwfLw8+bN0V9ziGCoNoqULcp994j5DTGNQvnkWKWkA7rnO29Kyew5AoHxUnJ4Ndqfcl0HSQjXg== }
 
   p-limit@3.1.0:
     resolution:
@@ -3066,6 +3073,8 @@ snapshots:
       levn: 0.4.1
       prelude-ls: 1.2.1
       type-check: 0.4.0
+
+  overlayscrollbars@2.12.0: {}
 
   p-limit@3.1.0:
     dependencies:

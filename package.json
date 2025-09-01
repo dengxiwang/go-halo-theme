@@ -16,6 +16,7 @@
   "dependencies": {
     "alpinejs": "^3.14.9",
     "github-markdown-css": "^5.8.1",
+    "overlayscrollbars": "^2.12.0",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "swiper": "^11.2.10",

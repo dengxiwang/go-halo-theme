@@ -41,7 +41,7 @@
         >
           <span
             class="max-w-32 overflow-hidden text-ellipsis"
-            th:text="|${categoryItem.spec.displayName} (${categoryItem.postCount})|"
+            th:text="|${categoryItem.spec.displayName} (${categoryItem.postCount ?: 0})|"
             >分类名</span
           >
 
@@ -78,7 +78,7 @@
           >
             <a
               th:href="@{${childCategory.status.permalink}}"
-              th:text="|${childCategory.spec.displayName} (${childCategory.postCount})|"
+              th:text="|${childCategory.spec.displayName} (${childCategory.postCount ?: 0})|"
               class="block max-w-28 overflow-hidden text-ellipsis px-2 py-1 transition-all hover:text-blue-500"
               th:classappend="${category != null and category.metadata.name == childCategory.metadata.name} ? 'active-menu'"
             >

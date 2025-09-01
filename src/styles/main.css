@@ -60,3 +60,11 @@ hyperlink-card {
     margin-top: 0px !important;
     margin-bottom: 1rem !important;
 }
+
+* {
+    scrollbar-width: none;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
