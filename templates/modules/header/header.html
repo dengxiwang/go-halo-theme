@@ -9,7 +9,7 @@
 
   <header
     th:fragment="header(isHomePage)"
-    class="sticky top-0 z-50 flex min-h-[68px] w-full border-b p-4 max-md:min-h-14 max-md:px-4 max-md:py-2"
+    class="transition-header-property sticky top-0 z-50 flex min-h-[68px] w-full border-b p-4 duration-300 max-md:min-h-14 max-md:px-4 max-md:py-2"
     th:style="${isHomePage == true && theme.config.authorInfo.backgroundHeightType == 'screen'} ? 'background-color:transparent;border-color: transparent; color:' + ${theme.config.authorInfo.fontColor} : 'background-color:white;border-color: #e5e7eb;'"
     x-data="{
         isMobile: window.innerWidth < 768,
@@ -33,12 +33,9 @@
     }"
     x-bind:class="
     $root.hasAttribute('data-header-transparent') && backgroundHeightType == 'screen'
-            ? (isScrolled ? 'bg-white !border-[#e5e7eb]' : 'bg-transparent !border-transparent')
-            : 'bg-white !border-[#e5e7eb]'
+            ? (isScrolled ? '!bg-white !text-black !border-[#e5e7eb]' : '!bg-transparent !border-transparent')
+            : '!bg-white !border-[#e5e7eb]'
     "
-    x-bind:style="$root.hasAttribute('data-header-transparent') && backgroundHeightType == 'screen'
-    ? (isScrolled?'background-color:white;transition:background-color,background 0.3s,border-color 0.3s;border-color:transparent;':'background-color:transparent;transition:background-color,background 0.3s,border-color 0s;border-color:transparent;')
-    : 'background-color:white;border-color:transparent;'"
     th:attr="data-header-transparent=${isHomePage}, data-font-color=${theme.config.authorInfo.fontColor}, data-background-height-type=${theme.config.authorInfo.backgroundHeightType}"
   >
     <div
@@ -55,7 +52,7 @@
         <th:block th:replace="~{modules/header/header-logo-area}" />
 
         <!-- 搜索区域（仅桌面端显示） -->
-        <template x-if="!isMobile">
+        <template x-if="!isMobile" th:if="${theme.config.header.showSearch == true}">
           <th:block th:replace="~{modules/header/header-search}" />
         </template>
       </div>
@@ -67,7 +64,7 @@
 
       <div x-show="isMobile" class="flex gap-2">
         <!-- 手机搜索样式（仅移动端显示） -->
-        <template x-if="isMobile">
+        <template x-if="isMobile" th:if="${theme.config.header.showSearch == true}">
           <th:block th:replace="~{modules/header/header-mobile-search}" />
         </template>
 

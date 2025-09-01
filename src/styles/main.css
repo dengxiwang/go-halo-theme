@@ -68,3 +68,7 @@ hyperlink-card {
 ::-webkit-scrollbar {
     display: none;
 }
+
+.transition-header-property {
+    transition-property: background-color, border-color;
+}

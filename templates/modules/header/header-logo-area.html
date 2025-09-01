@@ -1,23 +1,26 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
   <a
+    th:if="${theme.config.header.showLogo == true || theme.config.header.showTitle == true}"
     th:fragment="header-logo-area(isHomePage)"
     class="flex max-w-48 items-center gap-3 text-nowrap font-semibold"
     href="/"
     th:aria-label="${site.title}"
     th:title="${site.title}"
   >
-    <!-- 单标题 -->
-    <th:block
-      th:if="${#strings.isEmpty(site.logo)}"
-      class="overflow-hidden text-ellipsis text-lg"
-      th:text="${site.title}"
-    />
-
     <!-- 标题 + logo -->
-    <th:block th:unless="${#strings.isEmpty(site.logo)}">
-      <img th:src="${site.logo}" th:alt="${site.title}" class="h-8 w-auto" />
-      <div th:text="${site.title}" class="overflow-hidden text-ellipsis text-lg"></div>
+    <th:block>
+      <img
+        th:if="${theme.config.header.showLogo == true && !#strings.isEmpty(site.logo)}"
+        th:src="${site.logo}"
+        th:alt="${site.title}"
+        class="h-8 w-auto"
+      />
+      <div
+        th:if="${theme.config.header.showTitle == true}"
+        th:text="${site.title}"
+        class="overflow-hidden text-ellipsis text-lg"
+      ></div>
     </th:block>
   </a>
 </html>

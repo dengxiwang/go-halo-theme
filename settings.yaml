@@ -57,28 +57,36 @@ spec:
               label: 图片链接（点击将跳转）
               placeholder: 图片链接
               value: ""
-    # - group: sidebar
-    #   label: 侧边栏
-    #   formSchema:
-    #   - $formkit: select
-    #     name: useSidebar
-    #     label: 是否使用侧边栏
-    #     value: true
-    #     options:
-    #     - label: 开启
-    #       value: true
-    #     - label: 关闭
-    #       value: false
-    #   - $formkit: select
-    #     name: showTags
-    #     label: 是否展示标签
-    #     value: true
-    #     options:
-    #     - label: 开启
-    #       value: true
-    #     - label: 关闭
-    #       value: false
-    #   - $formkit: select
+    - group: header
+      label: 顶栏
+      formSchema:
+        - $formkit: select
+          name: showLogo
+          label: 是否展示 logo
+          value: true
+          options:
+            - label: 开启
+              value: true
+            - label: 关闭
+              value: false
+        - $formkit: select
+          name: showTitle
+          label: 是否展示网站标题
+          value: true
+          options:
+            - label: 开启
+              value: true
+            - label: 关闭
+              value: false
+        - $formkit: select
+          name: showSearch
+          label: 是否展示搜索栏
+          value: true
+          options:
+            - label: 开启
+              value: true
+            - label: 关闭
+              value: false
     - group: footer
       label: 页脚
       formSchema:
