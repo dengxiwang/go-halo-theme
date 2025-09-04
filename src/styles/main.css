@@ -72,3 +72,11 @@ hyperlink-card {
 .transition-header-property {
     transition-property: background-color, border-color;
 }
+
+.toc>.toc-list {
+    margin-left: 0px;
+}
+
+.toc-list {
+    margin-left: 1rem;
+}

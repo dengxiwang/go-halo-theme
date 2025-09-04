@@ -8,6 +8,8 @@
   </style>
 
   <header
+    id="header"
+    th:unless="${#lists.isEmpty(menuFinder.getPrimary.menuItems) && theme.config.header.showSearch == false && theme.config.header.showLogo == false && theme.config.header.showTitle == false}"
     th:fragment="header(isHomePage)"
     class="transition-header-property sticky top-0 z-50 flex min-h-[68px] w-full border-b p-4 duration-300 max-md:min-h-14 max-md:px-4 max-md:py-2"
     th:style="${isHomePage == true && theme.config.authorInfo.backgroundHeightType == 'screen'} ? 'background-color:transparent;border-color: transparent; color:' + ${theme.config.authorInfo.fontColor} : 'background-color:white;border-color: #e5e7eb;'"
@@ -58,7 +60,7 @@
       </div>
 
       <!-- 菜单区域（仅桌面端显示） -->
-      <div x-show="!isMobile" x-cloak>
+      <div x-show="!isMobile" x-cloak th:if="${!#lists.isEmpty(menuFinder.getPrimary.menuItems)}">
         <th:block th:if="${!isMobile}" th:replace="~{modules/header/header-main-menu}" />
       </div>
 
@@ -69,7 +71,7 @@
         </template>
 
         <!-- 手机菜单样式（仅移动端显示） -->
-        <div x-show="isMobile" x-cloak>
+        <div x-show="isMobile" x-cloak th:if="${!#lists.isEmpty(menuFinder.getPrimary.menuItems)}">
           <th:block th:replace="~{modules/header/header-mobile-menu}" />
         </div>
       </div>

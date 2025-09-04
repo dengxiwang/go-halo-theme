@@ -5,7 +5,7 @@
     class="relative flex h-full w-full flex-col items-center justify-center gap-4 overflow-hidden p-10 *:z-10 max-md:gap-3 max-md:p-8"
     th:classappend="(${theme.config.authorInfo.backgroundType != 'disable'} ?
                     '':'pb-6 max-md:pb-4') +
-                       (${theme.config.authorInfo.backgroundHeightType == 'screen'} ? 'min-h-screen -mt-[69px] max-md:-mt-[56px] !py-20' : '')"
+                       (${theme.config.authorInfo.backgroundHeightType == 'screen'} ? (${#lists.isEmpty(menuFinder.getPrimary.menuItems) && theme.config.header.showSearch == false && theme.config.header.showLogo == false && theme.config.header.showTitle == false} ? 'min-h-screen !py-20' : 'min-h-screen -mt-[69px] max-md:-mt-[56px] !py-20') : '')"
     th:if="${theme.config.authorInfo.showAuthorInfo == true}"
     th:style="${theme.config.authorInfo.fontColor != null && theme.config.authorInfo.fontColor != '' && theme.config.authorInfo.backgroundType != 'disable'} ?
               'color: ' + ${theme.config.authorInfo.fontColor} + ' !important;' :
@@ -223,7 +223,7 @@
 
     <!-- 向下滚动的箭头 -->
     <div
-      class="scroll-down transition-all hover:!opacity-100"
+      class="scroll-down transition-opacity hover:!opacity-100"
       th:if="${theme.config.authorInfo.backgroundHeightType == 'screen'}"
       onclick="scrollToElement(this)"
       th:style="|opacity:| + ${theme.config.authorInfo.descriptionOpacity} / 100.0 + |;|"
@@ -235,8 +235,8 @@
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
         p-id="4983"
-        width="200"
-        height="200"
+        width="40"
+        height="40"
       >
         <path
           d="M512 611.872L226.752 318.592A48.48 48.48 0 0 0 192 304c-26.496 0-48 21.056-48 47.008 0 12.064 4.736 23.68 13.248 32.416l308.416 317.12q18.88 19.456 46.336 19.456 27.424 0 46.336-19.456l308.384-317.12c8.544-8.736 13.28-20.352 13.28-32.416 0-25.952-21.504-47.008-48-47.008-13.12 0-25.696 5.28-34.752 14.592L512 611.84z"
@@ -247,13 +247,22 @@
     </div>
     <script>
       function scrollToElement(element) {
-        // 获取元素距离页面顶部的距离
-        const offsetTop = element.offsetTop + (window.innerWidth < 768 ? 8 : 2);
-        // 滚动到指定位置，behavior: 'smooth' 表示平滑滚动
-        window.scrollTo({
-          top: offsetTop,
-          behavior: "smooth",
-        });
+        const header = document.getElementById("header");
+        if (!header) {
+          // 滚动满屏高度
+          window.scrollTo({
+            top: window.innerHeight,
+            behavior: "smooth",
+          });
+        } else {
+          // 获取元素距离页面顶部的距离
+          const offsetTop = element.offsetTop + (window.innerWidth < 768 ? 8 : 2);
+          // 滚动到指定位置，behavior: 'smooth' 表示平滑滚动
+          window.scrollTo({
+            top: offsetTop,
+            behavior: "smooth",
+          });
+        }
       }
     </script>
     <style>
