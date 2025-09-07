@@ -26,11 +26,11 @@
 
             // 监听滚动事件
             window.addEventListener('scroll', () => {
-                this.isScrolled = window.scrollY > 10;
+                this.isScrolled = window.scrollY > 0;
             });
 
             // 初始化状态
-            this.isScrolled = window.scrollY > 10;
+            this.isScrolled = window.scrollY > 0;
         }
     }"
     x-bind:class="
