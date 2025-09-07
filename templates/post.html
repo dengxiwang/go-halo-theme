@@ -31,7 +31,7 @@
       <!-- 右侧区域 -->
       <div
         th:if="${(theme.config.post.showPostImgs == true and !#lists.isEmpty(theme.config.post.postImgs)) or #strings.contains(post.content.content, '<h')}"
-        class="space-y-2 max-sm:hidden"
+        class="space-y-2 max-md:hidden"
       >
         <div
           class="sticky space-y-2"

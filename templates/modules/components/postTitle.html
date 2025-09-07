@@ -34,7 +34,7 @@
       <!-- 分类和标签容器 -->
       <div
         th:if="${!#lists.isEmpty(post.categories) or !#lists.isEmpty(post.tags)}"
-        class="flex flex-wrap justify-center gap-2 max-md:justify-start"
+        class="flex flex-wrap justify-center gap-2 max-sm:justify-start"
       >
         <!-- 分类 -->
         <div th:if="${not #lists.isEmpty(post.categories)}" class="flex flex-wrap gap-2">
