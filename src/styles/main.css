@@ -100,10 +100,3 @@ hyperlink-card {
         min-height: 100dvh;
     }
 }
-
-button,
-[type='button'],
-[type='reset'],
-[type='submit'] {
-    height: 2.5em !important;
-}

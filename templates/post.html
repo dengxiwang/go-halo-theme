@@ -15,7 +15,7 @@
   <!-- 文章具体内容 -->
   <th:block th:fragment="content">
     <div
-      class="max-sm:block"
+      class="max-md:block"
       th:classappend="${(theme.config.post.showPostImgs == true and !#lists.isEmpty(theme.config.post.postImgs)) or #strings.contains(post.content.content, '<h') ? 'grid gap-2' : ''}"
       style="grid-template-columns: 1fr 15rem"
     >
