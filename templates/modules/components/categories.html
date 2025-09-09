@@ -40,7 +40,7 @@
           @click.prevent="window.location.href = $el.getAttribute('href');"
         >
           <span
-            class="max-w-32 overflow-hidden text-ellipsis"
+            class="max-w-48 overflow-hidden text-ellipsis text-nowrap"
             th:text="|${categoryItem.spec.displayName} (${categoryItem.postCount ?: 0})|"
             >分类名</span
           >
