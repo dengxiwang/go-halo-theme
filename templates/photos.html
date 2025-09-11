@@ -1,0 +1,338 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(title = ${title} + ' - ' + ${site.title}, hero = null, content = ~{::content}, head = null, footer = null, sidebar = ~{::sidebar}, contentClass = '')}"
+>
+  <th:block th:fragment="content">
+    <div class="h-full">
+      <!-- 分组导航 -->
+      <th:block th:replace="~{modules/photos/photosGroup}"></th:block>
+
+      <!-- 图库数据 -->
+      <div
+        id="photos"
+        th:if="${photos.total > 0}"
+        class="columns-1 gap-4 rounded-lg border bg-white p-4 sm:columns-2 sm:gap-4 md:columns-3 lg:columns-4 [&>div:not(:first-child)]:mt-4"
+      >
+        <div th:each="photo : ${photos.items}" class="photo-container group relative flex h-auto max-w-full">
+          <div
+            class="relative flex w-full cursor-pointer overflow-hidden rounded-lg transition-all duration-300 hover:scale-105"
+          >
+            <!-- 图片 -->
+            <img
+              class="animated fadeIn m-auto transform-gpu"
+              th:src="${photo.spec.url}"
+              th:srcset="|${thumbnail.gen(photo.spec.url, 's')} 400w,
+                                    ${thumbnail.gen(photo.spec.url, 'm')} 800w,
+                                    ${thumbnail.gen(photo.spec.url, 'l')} 1200w|"
+              sizes="(max-width: 1200px) 100vw, 1200px"
+              th:alt="${photo.spec.displayName}"
+              th:attr="data-fullsize=${photo.spec.url},
+                                  data-display-name=${photo.spec.displayName},
+                                  data-description=${photo.spec.description ?: ''}"
+            />
+
+            <!-- 悬停时显示标题和描述 -->
+            <div
+              class="pointer-events-none absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-3 text-sm text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+            >
+              <div class="font-medium" th:text="${photo.spec.displayName}">Photo Name</div>
+              <div class="text-xs opacity-90" th:if="${photo.spec.description}" th:text="${photo.spec.description}">
+                Photo description.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 空数据 -->
+      <th:block th:replace="~{modules/photos/emptyDataForPhotos}"></th:block>
+
+      <!-- 分页 -->
+      <th:block th:replace="~{modules/photos/photosPagination}"></th:block>
+    </div>
+
+    <!-- 全屏查看模态框 -->
+    <div class="photo-modal" id="photoModal">
+      <!-- 左切换按钮 -->
+      <button class="photo-modal-btn" id="prevBtn" aria-label="Previous">
+        <svg
+          t="1757565509729"
+          class="icon"
+          viewBox="0 0 1024 1024"
+          version="1.1"
+          xmlns="http://www.w3.org/2000/svg"
+          p-id="2258"
+          width="20"
+          height="20"
+        >
+          <path
+            d="M684.29 799.276L393.929 513.019 684.29 226.762c37.685-37.153 38.003-97.625 0.707-134.384-37.297-36.758-98.646-36.435-136.331 0.718l-357.43 352.378c-0.155 0.153-0.297 0.314-0.451 0.468-0.084 0.082-0.172 0.157-0.256 0.239-18.357 18.092-27.581 41.929-27.743 65.902-0.004 0.311-0.017 0.623-0.018 0.934 0.001 0.316 0.014 0.632 0.018 0.948 0.165 23.97 9.389 47.803 27.743 65.892 0.083 0.082 0.171 0.157 0.255 0.239 0.154 0.154 0.296 0.315 0.452 0.468l357.43 352.378c37.685 37.153 99.034 37.476 136.331 0.718 37.297-36.758 36.979-97.231-0.707-134.384z"
+            fill="#fff"
+            p-id="2259"
+          ></path>
+        </svg>
+      </button>
+
+      <!-- 右切换按钮 -->
+      <button class="photo-modal-btn" id="nextBtn" aria-label="Next">
+        <svg
+          t="1757565541796"
+          class="icon"
+          viewBox="0 0 1024 1024"
+          version="1.1"
+          xmlns="http://www.w3.org/2000/svg"
+          p-id="3072"
+          width="20"
+          height="20"
+        >
+          <path
+            d="M803.758 514.017c-0.001-0.311-0.013-0.622-0.018-0.933-0.162-23.974-9.386-47.811-27.743-65.903-0.084-0.082-0.172-0.157-0.256-0.239-0.154-0.154-0.296-0.315-0.451-0.468L417.861 94.096c-37.685-37.153-99.034-37.476-136.331-0.718-37.297 36.758-36.979 97.231 0.707 134.384l290.361 286.257-290.362 286.257c-37.685 37.153-38.004 97.625-0.707 134.383 37.297 36.758 98.646 36.435 136.331-0.718l357.43-352.378c0.155-0.153 0.297-0.314 0.451-0.468 0.084-0.082 0.172-0.157 0.256-0.239 18.354-18.089 27.578-41.922 27.743-65.892 0.004-0.315 0.017-0.631 0.018-0.947z"
+            fill="#fff"
+            p-id="3073"
+          ></path>
+        </svg>
+      </button>
+
+      <!-- 关闭按钮 -->
+      <button class="photo-modal-btn" id="closeModal" aria-label="Close">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <line x1="6" y1="6" x2="18" y2="18" stroke="#fff" stroke-width="4" stroke-linecap="round" />
+          <line x1="18" y1="6" x2="6" y2="18" stroke="#fff" stroke-width="4" stroke-linecap="round" />
+        </svg>
+      </button>
+
+      <!-- 图片 -->
+      <img class="modal-img" id="modalImg" src="" alt="Fullscreen photo" />
+
+      <!-- 全屏标题与描述 -->
+      <div
+        id="modalCaption"
+        class="mt-4 px-6 text-center opacity-0 transition-all duration-300"
+        style="transform: translateY(10px)"
+      >
+        <div id="captionTitle" class="text-lg font-medium text-white/75">Photo Title</div>
+        <div id="captionDesc" class="mt-1 text-sm text-white/50">Photo description.</div>
+      </div>
+    </div>
+
+    <style>
+      .photo-modal-btn {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.25);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1001;
+        opacity: 0.7;
+        transition: all 0.2s ease;
+      }
+
+      .photo-modal-btn:hover:not(:disabled) {
+        opacity: 1;
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+
+      .photo-modal-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      .photo-modal-btn svg {
+        fill: #fff;
+        width: 18px;
+        height: 18px;
+      }
+
+      #closeModal {
+        top: 20px;
+        right: 20px;
+      }
+
+      #prevBtn {
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+      #nextBtn {
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+      .photo-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.75);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease;
+      }
+
+      .photo-modal.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .modal-img {
+        max-width: 90vw;
+        max-height: 75vh;
+        object-fit: contain;
+        opacity: 0;
+        transform: scale(0.98);
+        transition:
+          opacity 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      .modal-img.active {
+        opacity: 1;
+        transform: scale(1);
+      }
+    </style>
+
+    <script>
+      // DOM Elements
+      const modal = document.getElementById("photoModal");
+      const modalImg = document.getElementById("modalImg");
+      const closeBtn = document.getElementById("closeModal");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+
+      // 提取所有图片数据（包含完整信息）
+      const photoContainers = document.querySelectorAll(".photo-container");
+      const photos = Array.from(photoContainers).map((container) => {
+        const img = container.querySelector("img");
+        return {
+          src: img.dataset.fullsize,
+          alt: img.alt || "",
+          displayName: img.dataset.displayName || "Untitled",
+          description: img.dataset.description || "",
+        };
+      });
+
+      let currentIndex = -1;
+
+      // 打开模态图
+      function openModal(index) {
+        if (index < 0 || index >= photos.length) return;
+
+        currentIndex = index;
+        const photo = photos[index];
+
+        // 设置图片
+        modalImg.src = photo.src;
+        modalImg.alt = photo.alt;
+        modalImg.classList.remove("active");
+        void modalImg.offsetWidth; // 触发重排
+        modalImg.classList.add("active");
+
+        // 更新标题和描述
+        const captionTitle = document.getElementById("captionTitle");
+        const captionDesc = document.getElementById("captionDesc");
+        const modalCaption = document.getElementById("modalCaption");
+
+        captionTitle.textContent = photo.displayName;
+        captionDesc.textContent = photo.description;
+
+        // 淡入文字
+        modalCaption.style.opacity = 0;
+        modalCaption.style.transform = "translateY(10px)";
+        void modalCaption.offsetHeight;
+        modalCaption.style.opacity = 1;
+        modalCaption.style.transform = "translateY(0)";
+
+        updateNavButtons();
+        modal.classList.add("active");
+      }
+
+      // 更新左右按钮状态
+      function updateNavButtons() {
+        prevBtn.disabled = currentIndex <= 0;
+        nextBtn.disabled = currentIndex >= photos.length - 1;
+      }
+
+      // 切换函数
+      function showNext() {
+        if (currentIndex < photos.length - 1) {
+          openModal(currentIndex + 1);
+        }
+      }
+
+      function showPrev() {
+        if (currentIndex > 0) {
+          openModal(currentIndex - 1);
+        }
+      }
+
+      // 绑定事件：点击缩略图打开
+      photoContainers.forEach((container, index) => {
+        container.addEventListener("click", () => openModal(index));
+      });
+
+      // 按钮事件
+      closeBtn.addEventListener("click", closeModal);
+      prevBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showPrev();
+      });
+      nextBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showNext();
+      });
+
+      // 点击背景关闭
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal || e.target.id === "closeModal") {
+          closeModal();
+        }
+      });
+
+      // 键盘控制
+      document.addEventListener("keydown", (e) => {
+        if (!modal.classList.contains("active")) return;
+
+        switch (e.key) {
+          case "Escape":
+            closeModal();
+            break;
+          case "ArrowLeft":
+            showPrev();
+            break;
+          case "ArrowRight":
+            showNext();
+            break;
+        }
+      });
+
+      // 关闭模态框
+      function closeModal() {
+        const modalCaption = document.getElementById("modalCaption");
+        modalCaption.style.opacity = 0;
+        modalCaption.style.transform = "translateY(10px)";
+
+        setTimeout(() => {
+          modalImg.src = "";
+        }, 200);
+
+        modalImg.classList.remove("active");
+        modal.classList.remove("active");
+        currentIndex = -1;
+      }
+    </script>
+  </th:block>
+</html>

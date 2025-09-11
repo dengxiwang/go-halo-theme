@@ -1,0 +1,35 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <ul
+    th:fragment="photosGroup"
+    id="photos-filters"
+    class="mb-4 flex flex-wrap gap-5 gap-y-3 rounded-lg border bg-white p-4 py-3 text-sm font-medium"
+  >
+    <!-- 全部分组 -->
+    <li>
+      <a
+        href="/photos"
+        class="flex cursor-pointer items-center gap-1 transition-all hover:text-blue-500"
+        th:classappend="${#lists.isEmpty(param.group)} ? 'active-menu' : ''"
+      >
+        <span class="max-w-32 overflow-hidden text-ellipsis">全部</span>
+      </a>
+    </li>
+
+    <!-- 分组循环 -->
+    <li class="relative" th:each="group : ${photoFinder.groupBy()}">
+      <!-- 父级分类链接 -->
+      <a
+        th:href="@{|/photos?group=${group.metadata.name}|}"
+        class="group flex cursor-pointer items-center gap-1 transition-all hover:text-blue-500"
+        th:classappend="${#lists.contains(param.group, group.metadata.name)} ? 'active-menu': ''"
+      >
+        <span
+          class="max-w-48 overflow-hidden text-ellipsis text-nowrap"
+          th:text="|${group.spec.displayName} (${group.status.photoCount ?: 0})|"
+          >分类名</span
+        >
+      </a>
+    </li>
+  </ul>
+</html>
