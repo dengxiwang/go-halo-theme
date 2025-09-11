@@ -4,6 +4,15 @@ metadata:
   name: go-halo-theme-setting
 spec:
   forms:
+    - group: global
+      label: 全局
+      formSchema:
+        - $formkit: text
+          name: background
+          label: 全局背景样式（对应 css 的 background 属性）
+          placeholder: 如：#F9F8F7
+          value: "#F9F8F7"
+          validation: "required"
     - group: post
       label: 文章
       formSchema:

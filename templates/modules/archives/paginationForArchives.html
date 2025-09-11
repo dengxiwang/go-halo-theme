@@ -138,9 +138,9 @@
         // 其他页替换或添加 /page/x
         const pageRegex = /\/page\/\d+\/?$/;
         if (pageRegex.test(currentPath)) {
-          newUrl = currentPath.replace(pageRegex, `/page/${selectedPage}/`);
+          newUrl = currentPath.replace(pageRegex, `/page/${selectedPage}`);
         } else {
-          newUrl = `${currentPath}/page/${selectedPage}/`;
+          newUrl = `${currentPath}/page/${selectedPage}`;
         }
       }
 

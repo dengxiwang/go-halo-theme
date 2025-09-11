@@ -17,7 +17,11 @@
 
   <body data-overlayscrollbars-initialize class="os-scroll min-full-height flex h-full w-full flex-col">
     <!-- 网站背景 -->
-    <div class="fixed left-0 top-0 z-[-999] h-full w-full bg-[#F9F8F7]"></div>
+    <div
+      id="global-background"
+      class="fixed left-0 top-0 z-[-999] h-full w-full"
+      th:style="|background: ${theme.config.global.background};|"
+    ></div>
 
     <!-- 头部 -->
     <th:block th:replace="~{modules/header/header :: header(isHomePage=${isHomePage})}" />
