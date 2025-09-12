@@ -5,8 +5,9 @@
     id="post-list"
     th:if="${posts.total gt 0}"
     th:with="postItems=${posts.items}, list_layout=${theme.config.layout.post_list_layout}"
-    th:classappend="${theme.config.post.column == 1} ? 'grid-cols-1' : (${theme.config.post.column == 2} ? 'grid-cols-2' : 'grid-cols-2')"
-    class="grid gap-4 max-md:grid-cols-1"
+    class="grid gap-4"
+    th:classappend="|${theme.config.post.column == 1 ? 'grid-cols-1' : 'grid-cols-2'}
+                ${theme.config.post.postListCardStyle == 'left-img' ? 'max-lg:grid-cols-1' : 'max-md:grid-cols-1'}|"
   >
     <th:block th:each="post : ${postItems}">
       <th:block th:replace="~{modules/components/postCard :: post-card(${post})}" />
