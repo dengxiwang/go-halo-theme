@@ -38,13 +38,21 @@ spec:
               label: 默认
             - value: left-img
               label: 左图右文
-        - $formkit: text
+        - $formkit: attachment
           if: "$get(postListCardStyle).value === 'left-img'"
           name: defaultCoverImg
           label: 文章默认封面
           placeholder: 文章默认封面
           value: ""
           validation: "required"
+          accepts:
+            - "image/png"
+            - "image/jpeg"
+            - "image/gif"
+            - "image/webp"
+            - "image/svg+xml"
+            - "image/bmp"
+            - "image/tiff"
         - $formkit: select
           name: showPostImgs
           label: 是否展示侧边图片
