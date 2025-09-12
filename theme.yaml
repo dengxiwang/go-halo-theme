@@ -14,7 +14,7 @@ spec:
   issues: https://github.com/dengxiwang/go-halo-theme/issues
   settingName: "go-halo-theme-setting"
   configMapName: "go-halo-theme-configMap"
-  version: "2.4.1"
+  version: "2.4.2"
   requires: ">=2.0.0"
   license:
     - name: "GPL-3.0"

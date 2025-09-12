@@ -119,7 +119,7 @@
         <img
           th:src="${post.spec.cover ?: theme.config.post.defaultCoverImg}"
           th:alt="${post.spec.title != null ? post.spec.title : '文章封面'}"
-          class="h-full w-full object-cover transition-transform duration-500 hover:scale-[1.15]"
+          class="absolute h-full w-full object-cover transition-transform duration-500 hover:scale-[1.15]"
         />
       </a>
     </div>
