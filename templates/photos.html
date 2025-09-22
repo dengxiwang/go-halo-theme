@@ -12,7 +12,7 @@
       <div
         id="photos"
         th:if="${photos.total > 0}"
-        class="columns-1 gap-4 rounded-lg border bg-white p-4 sm:columns-2 sm:gap-4 md:columns-3 lg:columns-4 [&>div:not(:first-child)]:mt-4"
+        class="columns-1 gap-4 rounded-lg border bg-white p-4 max-sm:gap-3 max-sm:p-3 sm:columns-2 md:columns-3 lg:columns-4 [&>div:not(:first-child)]:mt-4 [&>div:not(:first-child)]:max-sm:mt-3"
       >
         <div th:each="photo : ${photos.items}" class="photo-container group relative flex h-auto max-w-full">
           <div

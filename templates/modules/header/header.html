@@ -11,7 +11,7 @@
     id="header"
     th:unless="${#lists.isEmpty(menuFinder.getPrimary.menuItems) && theme.config.header.showSearch == false && theme.config.header.showLogo == false && theme.config.header.showTitle == false}"
     th:fragment="header(isHomePage)"
-    class="transition-header-property sticky top-0 z-50 flex h-[68px] w-full border-b p-4 duration-300 max-md:h-14 max-md:px-4 max-md:py-2"
+    class="transition-header-property sticky top-0 z-50 flex h-[68px] w-full border-b p-4 duration-300 max-md:h-14 max-md:px-4 max-md:py-2 max-sm:p-3"
     th:style="${isHomePage == true && theme.config.authorInfo.backgroundHeightType == 'screen'} ? 'background-color:transparent;border-color: transparent; color:' + ${theme.config.authorInfo.fontColor} : 'background-color:white;border-color: #e5e7eb;'"
     x-data="{
         isMobile: window.innerWidth < 768,
@@ -41,7 +41,7 @@
     th:attr="data-header-transparent=${isHomePage}, data-font-color=${theme.config.authorInfo.fontColor}, data-background-height-type=${theme.config.authorInfo.backgroundHeightType}"
   >
     <div
-      class="max-container-width mx-auto flex w-full items-center justify-between gap-4 *:h-9"
+      class="max-container-width mx-auto flex w-full items-center justify-between gap-4 *:h-9 max-sm:gap-3"
       x-bind:style="
              $root.hasAttribute('data-header-transparent') && backgroundHeightType == 'screen'
                  ? (isScrolled ? '': ('color: ' + fontColor + ' !important;'))

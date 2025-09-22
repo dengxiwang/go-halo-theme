@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
   <div
     th:fragment="authorInfo"
-    class="relative flex h-full w-full flex-col items-center justify-center gap-4 overflow-hidden p-10 *:z-10 max-md:gap-3 max-md:p-8"
+    class="relative flex h-full w-full flex-col items-center justify-center gap-4 overflow-hidden p-10 *:z-10 max-md:gap-3 max-md:p-8 max-sm:gap-3"
     th:classappend="(${theme.config.authorInfo.backgroundType != 'disable'} ?
                     '':'pb-6 max-md:pb-4') +
                        (${theme.config.authorInfo.backgroundHeightType == 'screen'} ? (${#lists.isEmpty(menuFinder.getPrimary.menuItems) && theme.config.header.showSearch == false && theme.config.header.showLogo == false && theme.config.header.showTitle == false} ? 'min-full-height !py-20' : 'min-full-height -mt-[68px] max-md:-mt-[56px] !py-20') : '')"

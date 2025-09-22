@@ -19,7 +19,7 @@
       th:classappend="${(theme.config.post.showPostImgs == true and !#lists.isEmpty(theme.config.post.postImgs)) or #strings.contains(post.content.content, '<h') ? 'grid gap-2' : ''}"
       style="grid-template-columns: 1fr 15rem"
     >
-      <div class="h-auto flex-1 overflow-hidden rounded-lg border bg-white p-6 max-md:p-4">
+      <div class="h-auto flex-1 overflow-hidden rounded-lg border bg-white p-6 max-md:p-4 max-sm:p-3">
         <!-- 内容 -->
         <article
           id="content"

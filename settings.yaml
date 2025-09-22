@@ -17,16 +17,6 @@ spec:
       label: 文章
       formSchema:
         - $formkit: select
-          name: column
-          label: 列表显示列数
-          value: 2
-          validation: "required"
-          options:
-            - value: 1
-              label: 一列
-            - value: 2
-              label: 两列
-        - $formkit: select
           name: postListCardStyle
           label: 列表显示样式
           value: default
@@ -38,8 +28,21 @@ spec:
               label: 默认
             - value: left-img
               label: 左图右文
+            - value: top-img
+              label: 上图下文
+        - $formkit: select
+          if: "$get(postListCardStyle).value !== 'top-img'"
+          name: column
+          label: 列表显示列数
+          value: 2
+          validation: "required"
+          options:
+            - value: 1
+              label: 一列
+            - value: 2
+              label: 两列
         - $formkit: attachment
-          if: "$get(postListCardStyle).value === 'left-img'"
+          if: "$get(postListCardStyle).value !== 'default'"
           name: defaultCoverImg
           label: 文章默认封面
           placeholder: 文章默认封面

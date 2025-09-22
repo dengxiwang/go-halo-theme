@@ -41,7 +41,7 @@
   </style>
 
   <div class="mt-4 rounded-lg border bg-white px-4 py-2" th:if="${archives.total > 0}">
-    <div class="flex w-full flex-wrap items-center justify-between gap-4">
+    <div class="flex w-full flex-wrap items-center justify-between gap-4 max-sm:gap-3">
       <!-- 合计数据 -->
       <span th:text="'共 ' + ${archives.total} + ' 篇文章'"></span>
 
