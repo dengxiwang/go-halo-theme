@@ -31,8 +31,10 @@ spec:
             - value: top-img
               label: 上图下文
         - $formkit: select
-          if: "$get(postListCardStyle).value !== 'top-img'"
+          if: "$get(postListCardStyle).value === 'left-img' || $get(postListCardStyle).value === 'default' "
           name: column
+          id: column
+          key: column
           label: 列表显示列数
           value: 2
           validation: "required"
@@ -42,8 +44,10 @@ spec:
             - value: 2
               label: 两列
         - $formkit: attachment
-          if: "$get(postListCardStyle).value !== 'default'"
+          if: "$get(postListCardStyle).value === 'top-img' || $get(postListCardStyle).value === 'left-img'"
           name: defaultCoverImg
+          id: defaultCoverImg
+          key: defaultCoverImg
           label: 文章默认封面
           placeholder: 文章默认封面
           value: ""
@@ -270,6 +274,8 @@ spec:
               value: disable
         - $formkit: text
           if: "$get(backgroundType).value === color"
+          key: background
+          id: background
           name: background
           label: 背景颜色（支持渐变色 css ）
           placeholder: 如：linear-gradient(45deg,#03A9F4,#00ff5042)
