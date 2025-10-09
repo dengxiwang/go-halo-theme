@@ -15,7 +15,7 @@
       th:href="@{${post.status.permalink}}"
       class="group flex h-full flex-1 gap-1 pb-3 transition-all duration-300 hover:text-blue-500"
     >
-      <div class="flex flex-1 flex-col gap-1">
+      <div class="flex min-h-20 flex-1 flex-col gap-1">
         <!-- 标题 -->
         <h1 class="line-clamp-1 font-medium max-sm:line-clamp-2">
           <span
@@ -54,7 +54,7 @@
     </a>
 
     <!-- 底部信息 -->
-    <div class="flex flex-wrap items-center gap-4 gap-y-2 border-t pt-3 text-xs max-sm:gap-3 max-sm:gap-y-1">
+    <div class="flex flex-wrap items-center gap-4 gap-y-2 border-t pt-3 text-xs max-sm:gap-3 max-sm:gap-y-2">
       <!-- 作者 -->
       <span
         class="opacity-60"
@@ -106,7 +106,7 @@
             >
               #<span th:text="${tag.spec.displayName}"></span>
             </a>
-            <span th:if="${!iterStat.last}" class="opacity-60">,</span>
+            <span th:if="${!iterStat.last}" class="opacity-60">,&nbsp;</span>
           </span>
           <!-- 无有效标签时显示默认 -->
           <span th:if="${post.tags == null or #lists.isEmpty(post.tags)}" class="opacity-60">#无标签</span>
@@ -135,7 +135,7 @@
     <div class="flex flex-col justify-between" style="width: 60%; height: 100%">
       <a
         th:href="@{${post.status.permalink}}"
-        class="flex h-full flex-1 flex-col gap-1 pb-3 transition-all duration-300 hover:text-blue-500 max-sm:pb-0"
+        class="flex h-full flex-1 flex-col gap-1 pb-3 transition-all duration-300 hover:text-blue-500 max-sm:min-h-14 max-sm:pb-0"
       >
         <!-- 标题 -->
         <h1 class="line-clamp-2 font-medium">
@@ -152,7 +152,7 @@
 
         <!-- 摘要 -->
         <span
-          class="line-clamp-3 text-sm leading-6 opacity-60 max-sm:line-clamp-2"
+          class="line-clamp-2 min-h-12 text-sm leading-6 opacity-60 max-sm:line-clamp-2 max-sm:hidden"
           th:text="${post.status != null and post.status.excerpt != null ? post.status.excerpt : '暂无摘要信息'}"
         >
         </span>
@@ -160,11 +160,11 @@
 
       <!-- 底部信息 -->
       <div
-        class="flex flex-wrap items-center gap-4 gap-y-2 border-t pt-3 text-xs max-sm:hidden max-sm:gap-3 max-sm:gap-y-1 max-sm:border-none max-sm:pt-0"
+        class="flex max-h-[52px] flex-wrap items-center gap-4 gap-y-2 overflow-hidden border-t pt-3 text-xs max-sm:mt-1 max-sm:max-h-[45px] max-sm:gap-3 max-sm:gap-y-1 max-sm:pt-2"
       >
         <!-- 作者 -->
         <span
-          class="opacity-60"
+          class="opacity-60 max-sm:hidden"
           th:text="${post.owner != null and post.owner.displayName != null ? '作者：' + post.owner.displayName : '作者：匿名用户'}"
         >
         </span>
@@ -244,7 +244,7 @@
         >置顶</span
       >
 
-      <div class="flex flex-col gap-1 p-4 py-3 max-sm:p-3 max-sm:py-2">
+      <div class="flex h-full flex-col gap-1 p-4 py-3 max-sm:p-3 max-sm:py-2">
         <!-- 标题 -->
         <h1 class="line-clamp-2 font-medium">
           <span
@@ -255,7 +255,7 @@
 
         <!-- 摘要 -->
         <span
-          class="line-clamp-3 text-sm leading-6 opacity-60 max-sm:line-clamp-2"
+          class="line-clamp-2 text-sm leading-6 opacity-60"
           th:text="${post.status != null and post.status.excerpt != null ? post.status.excerpt : '暂无摘要信息'}"
         >
         </span>
@@ -264,7 +264,7 @@
 
     <!-- 底部信息 -->
     <div
-      class="mx-4 mb-3 flex flex-wrap items-center gap-4 gap-y-2 border-t pt-3 text-xs max-sm:mx-3 max-sm:mb-[10px] max-sm:gap-3 max-sm:gap-y-1 max-sm:pt-2"
+      class="mx-4 mb-3 flex max-h-[52px] flex-wrap items-center gap-4 gap-y-2 overflow-hidden border-t pt-3 text-xs max-sm:mx-3 max-sm:mb-[10px] max-sm:gap-3 max-sm:gap-y-2 max-sm:pt-2"
     >
       <!-- 作者 -->
       <span

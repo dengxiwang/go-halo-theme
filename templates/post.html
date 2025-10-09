@@ -102,9 +102,8 @@
       th:with="postCursor = ${postFinder.cursor(post.metadata.name)}"
     >
       <!-- 上一篇 -->
-      <div class="flex justify-start">
+      <div class="flex flex-1 justify-start" th:if="${postCursor.hasPrevious()}">
         <a
-          th:if="${postCursor.hasPrevious()}"
           role="navigation"
           class="group inline-flex items-center gap-1 truncate text-sm text-gray-600 hover:text-gray-900"
           th:href="@{${postCursor.previous.status.permalink}}"
@@ -130,9 +129,8 @@
       </div>
 
       <!-- 下一篇 -->
-      <div class="flex justify-end">
+      <div class="flex flex-1 justify-end" th:if="${postCursor.hasNext()}">
         <a
-          th:if="${postCursor.hasNext()}"
           role="navigation"
           class="group inline-flex items-center gap-1 truncate text-sm text-gray-600 hover:text-gray-900"
           th:href="@{${postCursor.next.status.permalink}}"
@@ -159,7 +157,7 @@
     </div>
 
     <!-- 评论组件 -->
-    <div id="comment" th:if="${haloCommentEnabled}" class="mt-4">
+    <div id="comment" th:if="${haloCommentEnabled}">
       <h2 class="mb-2 text-base font-medium">评论</h2>
       <halo:comment group="content.halo.run" kind="Post" th:attr="name=${post.metadata.name}" />
     </div>
