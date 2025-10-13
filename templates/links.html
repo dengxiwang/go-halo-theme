@@ -1,0 +1,128 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(
+          content = ~{::content},
+          contentBefore = ~{::contentBefore},
+          title = '友链' + ' - ' + ${site.title}
+      )}"
+>
+  <th:block th:fragment="content">
+    <div class="container mx-auto">
+      <div class="rounded-lg border bg-white p-6 max-md:p-4 max-sm:p-3">
+        <h1 class="mb-4 border-b pb-6 text-center text-3xl font-bold leading-tight max-md:pb-4">友链</h1>
+        <!-- 无数据 -->
+        <div th:if="${#lists.isEmpty(groups)}" class="m-6 flex flex-col items-center justify-center">
+          <div class="-mr-[34px]">
+            <th:block th:replace="~{modules/components/emptyDataSvg}"></th:block>
+          </div>
+
+          <!-- 提示信息 -->
+          <h2 class="mt-6 text-xl font-semibold text-gray-800">暂无友链</h2>
+          <p class="mt-2 text-gray-500">暂无友链数据~</p>
+
+          <!-- 返回首页按钮 -->
+          <div class="mt-6">
+            <a href="/" class="inline-block rounded-lg border px-4 py-2 text-sm transition hover:bg-gray-100">
+              返回首页
+            </a>
+          </div>
+        </div>
+
+        <!-- 友链列表 -->
+        <div class="flex flex-col gap-y-8" th:if="${!#lists.isEmpty(groups)}">
+          <th:block th:each="group : ${groups}">
+            <div th:if="${!#lists.isEmpty(group.links)}">
+              <h2 class="border-b-solid flex items-center gap-x-1 border-b pb-3">
+                <svg
+                  t="1760367929213"
+                  class="icon h-4 w-4"
+                  viewBox="0 0 1024 1024"
+                  version="1.1"
+                  xmlns="http://www.w3.org/2000/svg"
+                  p-id="2493"
+                >
+                  <path
+                    d="M512 838.656c-22.016 0-41.7792-4.4032-61.5424-15.36L120.5248 651.6736 74.3424 675.84c-30.8224 15.36-30.8224 61.5424 0 77.0048L481.28 966.2464c8.704 4.4032 19.7632 6.5536 30.72 6.5536s22.016-2.1504 30.8224-6.5536l406.9376-213.4016c30.8224-15.36 30.8224-61.5424 0-77.0048l-46.1824-24.1664-330.0352 171.52c-19.7632 11.0592-39.5264 15.4624-61.5424 15.4624z"
+                    fill="#2c2c2c"
+                    p-id="2494"
+                    data-spm-anchor-id="a313x.search_index.0.i2.27ce3a81fj5qga"
+                    class="selected"
+                  ></path>
+                  <path
+                    d="M949.6576 473.4976l-46.1824-24.1664-120.9344 63.7952-72.6016 37.376-136.3968 72.6016c-19.7632 8.8064-39.6288 15.36-61.5424 15.36s-41.7792-4.4032-61.5424-15.36l-136.3968-72.6016-72.6016-37.376-120.9344-63.7952-46.1824 24.1664c-30.8224 15.36-30.8224 61.5424 0 77.0048l46.1824 24.1664 70.3488 37.376 288.1536 151.7568c8.8064 4.4032 19.7632 6.5536 30.8224 6.5536 10.9568 0 22.016-2.1504 30.8224-6.5536l288.1536-151.7568 70.3488-37.376 46.1824-24.1664c35.1232-15.36 35.1232-59.392 4.3008-77.0048z"
+                    fill="#2c2c2c"
+                    p-id="2495"
+                    data-spm-anchor-id="a313x.search_index.0.i1.27ce3a81fj5qga"
+                    class="selected"
+                  ></path>
+                  <path
+                    d="M512 772.608c-10.9568 0-22.016-2.1504-30.8224-6.5536L193.024 614.2976l-70.3488 37.376L452.608 823.1936c19.7632 8.8064 39.6288 15.36 61.5424 15.36s41.7792-4.4032 61.5424-15.36l329.9328-171.52-70.3488-37.376-288.0512 151.7568c-13.2096 4.4032-24.2688 6.5536-35.2256 6.5536z"
+                    fill="#FFFFFF"
+                    p-id="2496"
+                  ></path>
+                  <path
+                    d="M949.6576 273.3056L542.8224 60.0064c-4.4032-2.1504-8.8064-4.4032-15.36-6.5536C522.9568 51.2 516.4032 51.2 512 51.2s-10.9568 0-15.36 2.1504c-4.4032 2.1504-10.9568 2.1504-15.36 6.5536L74.3424 273.3056c-30.8224 15.36-30.8224 61.5424 0 77.0048l46.1824 24.1664 70.3488 37.376 120.9344 63.7952 70.3488 37.376 96.768 50.5856c8.8064 4.4032 19.7632 6.5536 30.8224 6.5536 10.9568 0 22.016-2.1504 30.8224-6.5536l96.768-50.5856 70.3488-37.376 120.9344-63.7952 70.3488-37.376 46.1824-24.1664c35.328-15.36 35.328-61.5424 4.5056-77.0048z"
+                    fill="#2c2c2c"
+                    p-id="2497"
+                    data-spm-anchor-id="a313x.search_index.0.i0.27ce3a81fj5qga"
+                    class="selected"
+                  ></path>
+                  <path
+                    d="M527.36 55.6032c-10.9568-2.1504-22.016-2.1504-30.8224 0 4.4032-2.1504 10.9568-2.1504 15.36-2.1504s11.0592-0.1024 15.4624 2.1504z"
+                    fill="#FFFFFF"
+                    p-id="2498"
+                  ></path>
+                </svg>
+                <span
+                  class="text-lg font-bold"
+                  th:text="|${group.spec.displayName ?: '默认'}（${#arrays.length(group.links)}）|"
+                ></span>
+              </h2>
+              <ul
+                th:if="${!#lists.isEmpty(group.links)}"
+                class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+              >
+                <li class="links-item" th:each="link : ${group.links}" th:key="link">
+                  <a th:href="${link.spec.url}" target="_blank">
+                    <div
+                      class="flex h-full items-center gap-x-4 rounded-md border p-4 transition-all duration-200 hover:border-blue-200 hover:bg-blue-50"
+                    >
+                      <div class="flex flex-shrink-0 items-center justify-center overflow-hidden">
+                        <img
+                          class="h-16 w-16 rounded-full object-cover"
+                          th:src="${link.spec.logo}"
+                          th:alt="${link.spec.displayName}"
+                        />
+                      </div>
+                      <div>
+                        <p
+                          class="line-clamp-1 overflow-hidden text-base font-bold"
+                          th:text="${link.spec.displayName}"
+                          th:title="${link.spec.displayName}"
+                        ></p>
+                        <p
+                          class="mt-2 line-clamp-2 w-full overflow-hidden text-ellipsis text-sm font-normal text-gray-500"
+                          th:text="${link.spec.description}"
+                          th:title="${link.spec.description}"
+                        ></p>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </th:block>
+        </div>
+      </div>
+
+      <!-- 评论插件 -->
+      <th:block th:if="${haloCommentEnabled}">
+        <div class="mt-6">
+          <h2 class="mb-2 text-base font-medium">评论</h2>
+          <halo:comment group="plugin.halo.run" kind="Plugin" th:attr="name=${pluginName}" />
+        </div>
+      </th:block>
+    </div>
+  </th:block>
+</html>
