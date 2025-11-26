@@ -17,7 +17,7 @@
     >
       <div class="flex min-h-20 flex-1 flex-col gap-1">
         <!-- 标题 -->
-        <h1 class="line-clamp-1 font-medium max-sm:line-clamp-2">
+        <h1 class="line-clamp-1 break-all font-medium max-sm:line-clamp-2">
           <span
             th:if="${post.spec.pinned != null and post.spec.pinned}"
             class="mr-1 text-nowrap rounded bg-red-500 px-1.5 py-0.5 text-xs font-medium text-white"
@@ -32,7 +32,7 @@
           <div class="flex-1">
             <!-- 摘要 -->
             <span
-              class="line-clamp-3 text-sm leading-6 opacity-60"
+              class="line-clamp-3 break-all text-sm leading-6 opacity-60"
               th:text="${post.status != null and post.status.excerpt != null ? post.status.excerpt : '暂无摘要信息'}"
             >
             </span>
@@ -138,7 +138,7 @@
         class="flex h-full flex-1 flex-col gap-1 pb-3 transition-all duration-300 hover:text-blue-500 max-sm:min-h-14 max-sm:pb-0"
       >
         <!-- 标题 -->
-        <h1 class="line-clamp-2 font-medium">
+        <h1 class="line-clamp-2 break-all font-medium">
           <span
             th:if="${post.spec.pinned != null and post.spec.pinned}"
             class="mr-1 text-nowrap rounded bg-red-500 px-1.5 py-0.5 text-xs font-medium text-white"
@@ -152,7 +152,7 @@
 
         <!-- 摘要 -->
         <span
-          class="line-clamp-2 min-h-12 text-sm leading-6 opacity-60 max-sm:line-clamp-2 max-sm:hidden"
+          class="line-clamp-2 min-h-12 break-all text-sm leading-6 opacity-60 max-sm:line-clamp-2 max-sm:hidden"
           th:text="${post.status != null and post.status.excerpt != null ? post.status.excerpt : '暂无摘要信息'}"
         >
         </span>
@@ -246,7 +246,7 @@
 
       <div class="flex h-full flex-col gap-1 p-4 py-3 max-sm:p-3 max-sm:py-2">
         <!-- 标题 -->
-        <h1 class="line-clamp-2 font-medium">
+        <h1 class="line-clamp-2 break-all font-medium">
           <span
             class="align-middle text-lg"
             th:text="${post.spec != null and post.spec.title != null ? post.spec.title : '无标题'}"
@@ -255,7 +255,7 @@
 
         <!-- 摘要 -->
         <span
-          class="line-clamp-2 text-sm leading-6 opacity-60"
+          class="line-clamp-2 break-all text-sm leading-6 opacity-60"
           th:text="${post.status != null and post.status.excerpt != null ? post.status.excerpt : '暂无摘要信息'}"
         >
         </span>

@@ -316,7 +316,7 @@ document.addEventListener("DOMContentLoaded", function () {
         headingSelector: "h1, h2, h3, h4",
         extraListClasses: "space-y-1",
         extraLinkClasses:
-          "group rounded px-1.5 py-1 transition-all hover:bg-gray-100 text-sm opacity-80 line-clamp-1 h-[1.68rem]",
+          "group rounded px-1.5 py-1 transition-all hover:bg-gray-100 text-sm opacity-80 line-clamp-1 h-[1.68rem] break-all",
         collapseDepth: 6,
         headingsOffset: 200,
         scrollSmooth: false,

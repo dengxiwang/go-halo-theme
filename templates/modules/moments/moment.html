@@ -80,7 +80,7 @@
             <!-- 遍历瞬间 -->
             <th:block th:each="moment : ${momentFinder.listAll()}" th:with="content=${moment.spec.content}">
               <div class="swiper-slide" th:if="${not #strings.isEmpty(content.raw)}">
-                <div class="line-clamp-1 text-sm" th:utext="${content.raw}"></div>
+                <div class="line-clamp-1 break-all text-sm" th:utext="${content.raw}"></div>
               </div>
             </th:block>
 
