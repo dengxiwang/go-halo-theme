@@ -117,7 +117,7 @@
 
   <!-- 样式二 -->
   <div
-    class="flex flex-1 cursor-pointer gap-4 p-4 max-sm:gap-3 max-sm:p-3"
+    class="flex flex-1 gap-4 p-4 max-sm:gap-3 max-sm:p-3"
     th:if="${theme.config.post.postListCardStyle == 'left-img'}"
   >
     <!-- 左图 -->
@@ -132,7 +132,7 @@
     </div>
 
     <!-- 右文章信息 -->
-    <div class="flex flex-col justify-between" style="width: 60%; height: 100%">
+    <div class="flex flex-col justify-between overflow-hidden" style="width: 60%; height: 100%">
       <a
         th:href="@{${post.status.permalink}}"
         class="flex h-full flex-1 flex-col gap-1 pb-3 transition-all duration-300 hover:text-blue-500 max-sm:min-h-14 max-sm:pb-0"
@@ -225,7 +225,7 @@
 
   <!-- 样式三 -->
   <div
-    class="relative flex flex-1 cursor-pointer flex-col justify-between"
+    class="relative flex flex-1 cursor-pointer flex-col justify-between *:overflow-hidden"
     th:if="${theme.config.post.postListCardStyle == 'top-img'}"
   >
     <a th:href="@{${post.status.permalink}}" class="group transition-all duration-300 hover:text-blue-500">
