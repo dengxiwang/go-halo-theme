@@ -343,3 +343,12 @@ spec:
               value: true
             - label: 关闭
               value: false
+        - $formkit: select
+          name: userInfoPosition
+          label: 用户信息显示位置
+          value: "bottom"
+          options:
+            - label: 底部
+              value: "bottom"
+            - label: 顶部
+              value: "top"
