@@ -14,26 +14,26 @@
     ]
   },
   "dependencies": {
-    "alpinejs": "^3.15.2",
+    "alpinejs": "^3.15.3",
     "github-markdown-css": "^5.8.1",
     "overlayscrollbars": "^2.13.0",
-    "prettier": "^3.6.2",
-    "prettier-plugin-tailwindcss": "^0.7.1",
+    "prettier": "^3.7.4",
+    "prettier-plugin-tailwindcss": "^0.7.2",
     "swiper": "^12.0.3",
     "terser": "^5.44.1",
     "tocbot": "^4.36.4"
   },
   "devDependencies": {
     "@halo-dev/theme-package-cli": "^1.0.0",
-    "@iconify-json/tabler": "^1.2.23",
+    "@iconify-json/tabler": "^1.2.24",
     "@iconify/tailwind": "^1.2.0",
     "@tailwindcss/typography": "^0.5.19",
     "@types/alpinejs": "^3.13.11",
-    "@types/node": "^24.10.1",
-    "@typescript-eslint/eslint-plugin": "^8.48.0",
-    "@typescript-eslint/parser": "^8.48.0",
-    "autoprefixer": "^10.4.22",
-    "eslint": "^9.39.1",
+    "@types/node": "^25.0.3",
+    "@typescript-eslint/eslint-plugin": "^8.50.0",
+    "@typescript-eslint/parser": "^8.50.0",
+    "autoprefixer": "^10.4.23",
+    "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "husky": "^9.1.7",
@@ -41,7 +41,7 @@
     "postcss": "^8.5.6",
     "tailwindcss": "3.4.17",
     "typescript": "^5.9.3",
-    "vite": "^7.2.4"
+    "vite": "^7.3.0"
   },
-  "packageManager": "pnpm@10.23.0"
+  "packageManager": "pnpm@10.26.1"
 }
