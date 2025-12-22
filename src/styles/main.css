@@ -1,102 +1,124 @@
 html {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
 
 body {
-    background-color: #ffffff;
+  background-color: #ffffff;
 }
 
 ul {
-    list-style-type: none;
+  list-style-type: none;
 }
 
 .transition-main {
-    transition: all 0.3s !important;
+  transition: all 0.3s !important;
 }
 
 .mobile-handle-btn {
-    padding: 6px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    background: transparent;
-    transition: all 0.15s;
+  padding: 6px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: transparent;
+  transition: all 0.15s;
 }
 
 .active-menu {
-    color: #3B82F6;
+  color: #3B82F6;
 }
 
 .is-active-li {
-    color: #3B82F6;
-    background-color: #f3f4f6;
-    border-radius: 4px;
+  color: #3B82F6;
+  background-color: #f3f4f6;
+  border-radius: 4px;
 }
 
 .max-container-width {
-    max-width: 1400px;
+  max-width: 1400px;
 }
 
 .markdown-body {
 
-    ol,
-    ul,
-    menu {
-        list-style: disc !important;
-        list-style-type: disc !important;
-    }
+  ol,
+  ul,
+  menu {
+    list-style: disc !important;
+    list-style-type: disc !important;
+  }
 }
 
 /* 修复样式问题 */
 .inline-block:has(pre) {
-    display: block !important;
+  display: block !important;
 }
 
 pre code {
-    padding: 0px !important;
+  padding: 0px !important;
 }
 
 hyperlink-card {
-    margin-top: 0px !important;
-    margin-bottom: 1rem !important;
+  margin-top: 0px !important;
+  margin-bottom: 1rem !important;
 }
 
 * {
-    scrollbar-width: none;
+  scrollbar-width: none;
 }
 
 ::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 
 .transition-header-property {
-    transition-property: background-color, border-color;
+  transition-property: background-color, border-color;
 }
 
-.toc>.toc-list {
-    margin-left: 0px;
+.toc > .toc-list {
+  margin-left: 0px;
 }
 
 .toc-list {
-    margin-left: 1rem;
+  margin-left: 1rem;
 }
 
 .full-height {
-    height: 100vh;
+  height: 100vh;
 }
 
 @supports (height: 100dvh) {
-    .full-height {
-        height: 100dvh;
-    }
+  .full-height {
+    height: 100dvh;
+  }
 }
 
 .min-full-height {
-    min-height: 100vh;
+  min-height: 100vh;
 }
 
 @supports (min-height: 100dvh) {
-    .min-full-height {
-        min-height: 100dvh;
-    }
+  .min-full-height {
+    min-height: 100dvh;
+  }
+}
+
+/* 瞬间 */
+.moment-content {
+  font-size: 14px;
+}
+
+.moment-content .tag {
+  display: inline-flex;
+  border-radius: 9999px;
+  align-items: center;
+  column-gap: .25rem;
+  padding: .2rem .5rem;
+  font-size: .75rem;
+  font-weight: 500;
+  line-height: 1rem;
+  background-color: rgba(59, 130, 246, 0.2);
+  color: rgba(59, 130, 246, 1);
+}
+
+.moment-content .tag::before {
+  content: "#";
 }

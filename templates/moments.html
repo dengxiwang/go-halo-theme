@@ -13,14 +13,46 @@
             th:with="content=${moment.spec.content}"
             class="flex flex-wrap gap-2 rounded-lg border bg-white p-4 max-sm:p-3"
           >
-            <div th:if="${not #strings.isEmpty(content.html)}" th:utext="${content.html}" class="w-full"></div>
+            <div
+              th:if="${theme.config.moments.userInfoPosition=='top'}"
+              class="mb-2 flex w-full flex-wrap items-center gap-2 font-medium"
+            >
+              <div class="size-10 overflow-hidden rounded-full bg-gray-100">
+                <img
+                  class="h-full w-full transition-all hover:scale-105"
+                  width="40"
+                  height="40"
+                  th:src="${moment.owner.avatar}"
+                  th:alt="${moment.owner.displayName}"
+                />
+              </div>
+              <div class="flex flex-col gap-y-0.5">
+                <div th:text="${moment.owner.displayName}"></div>
+                <div
+                  class="text-xs opacity-50"
+                  th:text="${#dates.format(moment.spec.releaseTime, 'yyyy年MM月dd日 HH点mm分ss秒')}"
+                ></div>
+              </div>
+            </div>
+
+            <div
+              th:if="${not #strings.isEmpty(content.html)}"
+              th:utext="${content.html}"
+              class="markdown-body moment-content w-full"
+            ></div>
             <th:block th:if="${not #lists.isEmpty(content.medium)}" th:each="momentItem : ${content.medium}">
               <div
                 th:if="${momentItem.type.name == 'PHOTO'}"
-                class="mb-1 rounded-md border"
-                style="height: 124px; width: auto; overflow: hidden"
+                class="mb-1 w-full overflow-hidden rounded-md border md:h-[124px] md:w-auto"
               >
-                <img th:src="${momentItem.url}" style="height: 124px" />
+                <img
+                  class="w-full md:h-[124px] md:w-auto"
+                  th:src="${momentItem.url}"
+                  th:srcset="|${thumbnail.gen(momentItem.url, 's')} 400w,
+                             ${thumbnail.gen(momentItem.url, 'm')} 800w|"
+                  sizes="(max-width: 800px) 100vw, 800px"
+                  loading="lazy"
+                />
               </div>
               <div
                 style="height: 260px"
@@ -33,7 +65,11 @@
                 <audio th:src="${momentItem.url}" controls="true"></audio>
               </div>
             </th:block>
-            <div class="flex w-full flex-wrap gap-2 text-xs font-medium opacity-50">
+
+            <div
+              th:if="${theme.config.moments.userInfoPosition=='bottom'}"
+              class="flex w-full flex-wrap gap-2 text-xs font-medium opacity-50"
+            >
               <p th:text="'发布人：' + ${moment.spec.owner}"></p>
               <p th:text="'发布时间：' + ${#dates.format(moment.spec.releaseTime, 'yyyy-MM-dd HH:mm:ss')}"></p>
             </div>
@@ -47,5 +83,31 @@
       <!-- 分页 -->
       <th:block th:replace="~{modules/moments/momentsPagination}"></th:block>
     </div>
+
+    <script th:inline="javascript">
+      (function () {
+        "use strict";
+
+        // --------- 开始 优化启用 shiki 插件的 右上角复制按钮样式冲突 ---------
+        function checkFixMarkdownStyle() {
+          const isAvailableShikiPlugin = /*[[${pluginFinder.available('shiki') }]]*/ false;
+          if (isAvailableShikiPlugin) {
+            const shikiCodeTags = document.querySelectorAll("shiki-code");
+            if (shikiCodeTags.length !== 0) {
+              const copyDomSelectors =
+                ".moment-content div[class='absolute top-2 right-2 flex items-center gap-2 z-10']";
+              document.querySelectorAll(copyDomSelectors).forEach(function (el) {
+                el.style.display = "none";
+              });
+            }
+          }
+        }
+        // --------- 结束 优化启用 shiki 插件的 右上角复制按钮样式冲突 ---------
+
+        window.addEventListener("DOMContentLoaded", function () {
+          checkFixMarkdownStyle();
+        });
+      })();
+    </script>
   </th:block>
 </html>
