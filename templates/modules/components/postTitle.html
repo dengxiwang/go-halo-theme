@@ -37,7 +37,10 @@
         class="flex flex-wrap justify-center gap-2 max-sm:justify-start"
       >
         <!-- 分类 -->
-        <div th:if="${not #lists.isEmpty(post.categories)}" class="flex flex-wrap gap-2">
+        <div
+          th:if="${not #lists.isEmpty(post.categories)}"
+          class="flex flex-wrap justify-center gap-2 max-sm:justify-start"
+        >
           <a
             th:each="category : ${post.categories}"
             th:href="@{${category.status.permalink}}"
@@ -49,7 +52,7 @@
         </div>
 
         <!-- 标签 -->
-        <div th:if="${not #lists.isEmpty(post.tags)}" class="flex flex-wrap gap-2">
+        <div th:if="${not #lists.isEmpty(post.tags)}" class="flex flex-wrap justify-center gap-2 max-sm:justify-start">
           <a
             th:each="tag : ${post.tags}"
             th:href="@{${tag.status.permalink}}"

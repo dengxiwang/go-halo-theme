@@ -9,9 +9,15 @@
   <ul
     th:fragment="categories"
     id="filters"
+    th:if="${theme.config.firstPage.categoriesShowNumber != '0'}"
+    th:with="
+      categories=${categoryFinder.listAsTree()},
+      totalCats=${#lists.size(categories)},
+      catLimit=${(theme.config.firstPage.categoriesShowNumber != null) ? T(java.lang.Integer).valueOf(theme.config.firstPage.categoriesShowNumber) : 0}
+    "
     class="flex flex-wrap gap-5 gap-y-3 rounded-lg border bg-white p-4 py-3 text-sm font-medium max-sm:p-3"
   >
-    <!-- 全部分类 -->
+    <!-- 全部分类（完全保留，不动） -->
     <li>
       <a
         href="/"
@@ -22,16 +28,17 @@
       </a>
     </li>
 
-    <!-- 一级分类循环 -->
-    <th:block th:with="categories = ${categoryFinder.listAsTree()}">
+    <!-- 一级分类循环（🔥 核心2：加索引限制显示数量） -->
+    <th:block>
       <li
-        th:each="categoryItem : ${categories}"
+        th:each="categoryItem, stat : ${categories}"
+        th:if="${catLimit <= 0 or stat.index < catLimit}"
         class="relative"
         x-data="{ open: false }"
         @mouseenter="open = true"
         @mouseleave="open = false"
       >
-        <!-- 父级分类链接 -->
+        <!-- 父级分类链接（完全保留，不动） -->
         <a
           th:href="@{${categoryItem.status.permalink}}"
           class="group flex cursor-pointer items-center gap-1 transition-all hover:text-blue-500"
@@ -44,8 +51,6 @@
             th:text="|${categoryItem.spec.displayName} (${categoryItem.postCount ?: 0})|"
             >分类名</span
           >
-
-          <!-- 下拉箭头图标 -->
           <svg
             th:if="${not #lists.isEmpty(categoryItem.children)}"
             class="h-[14px] w-[14px] transition-all duration-200 group-hover:text-blue-500"
@@ -59,7 +64,7 @@
           </svg>
         </a>
 
-        <!-- 子分类下拉菜单 -->
+        <!-- 子分类下拉菜单（完全保留，不动） -->
         <ul
           th:if="${not #lists.isEmpty(categoryItem.children)}"
           x-show="open"
@@ -87,5 +92,12 @@
         </ul>
       </li>
     </th:block>
+
+    <!-- 🔥 核心3：更多按钮 → 跳转到分类总页，超限才显示 -->
+    <li th:if="${catLimit > 0 && totalCats > catLimit}" class="relative">
+      <a href="/categories" class="group flex cursor-pointer items-center gap-1 transition-all hover:text-blue-500">
+        <span class="max-w-32 overflow-hidden text-ellipsis">更多 +</span>
+      </a>
+    </li>
   </ul>
 </html>

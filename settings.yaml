@@ -13,6 +13,23 @@ spec:
           placeholder: 如：#F9F8F7
           value: "#F9F8F7"
           validation: "required"
+    - group: firstPage
+      label: 首页
+      formSchema:
+        - $formkit: number
+          name: tagsShowNumber
+          label: 标签显示数量（不限制请空置，0 则隐藏）
+          placeholder: 如：10
+          value: null
+          step: 1
+          min: 0
+        - $formkit: number
+          name: categoriesShowNumber
+          label: 分类显示数量（不限制请空置，0 则隐藏）
+          placeholder: 如：10
+          value: null
+          step: 1
+          min: 0
     - group: post
       label: 文章
       formSchema:

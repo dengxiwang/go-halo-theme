@@ -35,11 +35,9 @@
             <th:block th:replace="~{modules/components/emptyDataSvg}"></th:block>
           </div>
 
-          <!-- 提示信息 -->
           <h2 class="mt-6 text-xl font-semibold text-gray-800">暂无分类</h2>
           <p class="mt-2 text-gray-500">暂无分类数据，请稍后再来查看或切换其他分类。</p>
 
-          <!-- 返回首页按钮 -->
           <div class="mt-6">
             <a href="/" class="inline-block rounded-lg border px-4 py-2 text-sm transition hover:bg-gray-100">
               返回首页
@@ -47,13 +45,14 @@
           </div>
         </div>
 
-        <!-- 分类列表 -->
+        <!-- 分类列表 → 核心优化：整行可点击 -->
         <div class="space-y-6" th:if="${!#lists.isEmpty(categories)}">
-          <div th:each="category : ${categories}" class="border-l-4 border-blue-500 py-2 pl-4">
-            <!-- 一级分类 -->
+          <!-- 一级分类 -->
+          <div th:each="category : ${categories}" class="border-l-4 border-blue-500 pl-2">
+            <!-- 🔥 优化：a标签铺满整行，超大可点击区域 -->
             <a
               th:href="@{${category.status.permalink}}"
-              class="flex items-center justify-between rounded-lg px-3 py-2 font-semibold transition duration-300 hover:bg-gray-100"
+              class="flex items-center justify-between rounded-lg px-4 py-3 font-semibold transition duration-300 hover:bg-gray-100"
             >
               <span th:text="${category.spec.displayName}"></span>
               <span
@@ -63,12 +62,13 @@
             </a>
 
             <!-- 子分类 -->
-            <div th:if="${not #lists.isEmpty(category.children)}" class="ml-6 mt-2 space-y-2">
-              <div
-                th:each="child : ${category.children}"
-                class="rounded-lg px-3 py-2 transition duration-300 hover:bg-gray-100"
-              >
-                <a th:href="@{${child.status.permalink}}" class="flex items-center justify-between">
+            <div th:if="${not #lists.isEmpty(category.children)}" class="ml-6 space-y-1">
+              <div th:each="child : ${category.children}">
+                <!-- 🔥 优化：子分类也整行可点击 -->
+                <a
+                  th:href="@{${child.status.permalink}}"
+                  class="flex items-center justify-between rounded-lg px-4 py-2.5 transition duration-300 hover:bg-gray-100"
+                >
                   <span th:text="${child.spec.displayName}"></span>
                   <span
                     class="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-xs font-medium"
