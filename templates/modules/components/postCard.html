@@ -195,7 +195,7 @@
         >
           <!-- 分类 -->
           <div th:if="${post.categories != null and #lists.size(post.categories) > 0}">
-            <span class="opacity-60">分类：</span>
+            <span class="-mr-1 opacity-60">分类：</span>
             <span
               th:each="category, iterStat : ${post.categories != null ? post.categories : T(java.util.Collections).emptyList()}"
               th:if="${category.spec.displayName != null and category.status != null and category.status.permalink != null}"
@@ -212,7 +212,7 @@
 
           <!-- 标签 -->
           <div th:if="${post.tags != null and #lists.size(post.tags) > 0}">
-            <span class="opacity-60">标签：</span>
+            <span class="-mr-1 opacity-60">标签：</span>
             <span
               th:each="tag, iterStat : ${post.tags != null ? post.tags : T(java.util.Collections).emptyList()}"
               th:if="${tag.spec.displayName != null and tag.status != null and tag.status.permalink != null}"
@@ -299,7 +299,7 @@
       >
         <!-- 分类 -->
         <div th:if="${post.categories != null and #lists.size(post.categories) > 0}">
-          <span class="opacity-60">分类：</span>
+          <span class="-mr-1 opacity-60">分类：</span>
           <span
             th:each="category, iterStat : ${post.categories != null ? post.categories : T(java.util.Collections).emptyList()}"
             th:if="${category.spec.displayName != null and category.status != null and category.status.permalink != null}"
@@ -316,7 +316,7 @@
 
         <!-- 标签 -->
         <div th:if="${post.tags != null and #lists.size(post.tags) > 0}">
-          <span class="opacity-60">标签：</span>
+          <span class="-mr-1 opacity-60">标签：</span>
           <span
             th:each="tag, iterStat : ${post.tags != null ? post.tags : T(java.util.Collections).emptyList()}"
             th:if="${tag.spec.displayName != null and tag.status != null and tag.status.permalink != null}"
