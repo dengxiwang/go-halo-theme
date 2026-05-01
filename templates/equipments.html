@@ -1,0 +1,267 @@
+<!doctype html>
+<html
+  xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{modules/layout :: html(title = ${title} + ' - ' + ${site.title}, hero = null, content = ~{::content}, head = null, footer = null, sidebar = ~{::sidebar}, contentClass = '')}"
+>
+  <th:block th:fragment="content">
+    <!-- 引入插件样式 -->
+    <th:block th:replace="~{plugin:equipment:modules/style}"></th:block>
+
+    <div class="h-full">
+      <!-- 分组导航 -->
+      <ul
+        id="equipments-filters"
+        class="mb-4 flex flex-wrap gap-5 gap-y-3 rounded-lg border bg-white p-4 py-3 text-sm font-medium max-sm:p-3"
+      >
+        <!-- 全部装备 -->
+        <li>
+          <a
+            href="/equipments"
+            class="flex cursor-pointer items-center gap-1 transition-all hover:text-blue-500"
+            th:classappend="${#lists.isEmpty(param.group)} ? 'active-menu' : ''"
+          >
+            <span class="max-w-32 overflow-hidden text-ellipsis">全部</span>
+          </a>
+        </li>
+
+        <!-- 分组循环 -->
+        <li class="relative" th:each="group : ${groups}">
+          <a
+            th:href="@{|/equipments?group=${group.metadata.name}|}"
+            class="group flex cursor-pointer items-center gap-1 transition-all hover:text-blue-500"
+            th:classappend="${#lists.contains(param.group, group.metadata.name)} ? 'active-menu': ''"
+          >
+            <span
+              class="max-w-48 overflow-hidden text-ellipsis text-nowrap"
+              th:text="|${group.spec.displayName} (${group.status.equipmentCount ?: 0})|"
+              >分组名</span
+            >
+          </a>
+        </li>
+      </ul>
+
+      <!-- 装备列表 -->
+      <div
+        th:if="${equipments.total > 0}"
+        class="columns-1 gap-4 rounded-lg border bg-white p-4 max-sm:gap-3 max-sm:p-3 sm:columns-2 md:columns-3 lg:columns-4 [&>div:not(:first-child)]:mt-4 [&>div:not(:first-child)]:max-sm:mt-3"
+      >
+        <div
+          th:each="equipment : ${equipments.items}"
+          class="equipment-card overflow-hidden rounded-lg border transition-all duration-300 hover:bg-gray-100"
+        >
+          <!-- 装备图片区域 -->
+          <div class="aspect-square w-full overflow-hidden">
+            <a
+              th:if="${equipment.spec.url}"
+              th:href="${equipment.spec.url}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="block h-full w-full"
+            >
+              <img
+                class="h-full w-full object-contain p-8"
+                th:src="${equipment.spec.cover}"
+                th:alt="${equipment.spec.displayName}"
+              />
+            </a>
+            <div th:unless="${equipment.spec.url}" class="flex h-full w-full items-center justify-center">
+              <img
+                class="h-full w-full object-contain p-6"
+                th:src="${equipment.spec.cover}"
+                th:alt="${equipment.spec.displayName}"
+              />
+            </div>
+          </div>
+
+          <!-- 装备信息区域 -->
+          <div class="p-6 pt-0 text-center">
+            <h3 class="text-base font-semibold" th:text="${equipment.spec.displayName}">装备名称</h3>
+            <p
+              class="mt-2 text-sm font-medium opacity-50"
+              th:if="${equipment.spec.specification}"
+              th:text="${equipment.spec.specification}"
+            >
+              规格型号
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 空数据提示 -->
+      <div
+        th:if="${equipments.total == 0}"
+        class="flex flex-col items-center justify-center overflow-hidden rounded-lg border bg-white p-8 py-12 text-center"
+      >
+        <!-- 无数据图标 -->
+        <div class="-mr-[34px]">
+          <th:block th:replace="~{modules/components/emptyDataSvg}"></th:block>
+        </div>
+
+        <!-- 提示信息 -->
+        <h2 class="mt-6 text-xl font-semibold text-gray-800">暂无装备</h2>
+        <p class="mt-2 text-gray-500">当前未发布任何装备，请稍后再来查看或切换其他类目。</p>
+
+        <!-- 返回首页按钮 -->
+        <div class="mt-6">
+          <a href="/" class="inline-block rounded-lg border px-4 py-2 text-sm transition hover:bg-gray-100">
+            返回首页
+          </a>
+        </div>
+      </div>
+
+      <!-- 分页 -->
+      <div
+        class="mt-4 rounded-lg border bg-white px-4 py-2"
+        th:if="${equipments.total > 0 && equipments.totalPages > 0}"
+      >
+        <div class="flex w-full flex-wrap items-center justify-between gap-4 text-sm font-medium max-sm:gap-3">
+          <!-- 合计数据 -->
+          <span th:text="'共 ' + ${equipments.total} + ' 个装备'"></span>
+
+          <div class="flex flex-wrap gap-2" th:if="${equipments.totalPages > 0}">
+            <div class="flex overflow-hidden rounded-lg border">
+              <!-- 上一页 -->
+              <a
+                th:href="@{${equipments.prevUrl}}"
+                th:classappend="${!equipments.hasPrevious} ? 'opacity-30 cursor-not-allowed'"
+                th:attr="onclick=${equipments.hasPrevious} ? null : 'event.preventDefault(); return false;'"
+                class="flex h-[30px] w-[30px] items-center justify-center transition-all hover:bg-gray-100"
+              >
+                <svg
+                  class="arrow-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </a>
+              <div class="border-r"></div>
+              <!-- 下一页 -->
+              <a
+                th:href="@{${equipments.nextUrl}}"
+                th:classappend="${!equipments.hasNext} ? 'opacity-30 cursor-not-allowed'"
+                th:attr="onclick=${equipments.hasNext} ? null : 'event.preventDefault(); return false;'"
+                class="flex h-[30px] w-[30px] items-center justify-center transition-all hover:bg-gray-100"
+              >
+                <svg
+                  class="arrow-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </a>
+            </div>
+
+            <!-- 自定义下拉页码选择器 -->
+            <div class="flex h-8 items-center justify-center gap-2">
+              <div class="custom-select-wrapper relative">
+                <select
+                  id="pageSelector"
+                  class="custom-select h-8 rounded-lg border px-2"
+                  onchange="handlePageSelect(this)"
+                >
+                  <option
+                    th:each="pageNum : ${#numbers.sequence(1, equipments.totalPages)}"
+                    th:text="${pageNum}"
+                    th:selected="${pageNum == equipments.page}"
+                    th:value="${pageNum}"
+                  ></option>
+                </select>
+                <svg
+                  class="custom-select-icon arrow-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </div>
+              <span>页</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style>
+        svg.arrow-icon {
+          width: 1em;
+          height: 1em;
+          vertical-align: middle;
+        }
+
+        .custom-select-wrapper {
+          position: relative;
+          display: inline-block;
+          appearance: none;
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          background-color: transparent;
+          border: none;
+        }
+
+        .custom-select {
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          appearance: none;
+          background-color: white;
+          border: 1px solid #d1d5db;
+          border-radius: 0.5rem;
+          padding: 0.25rem 2rem 0.25rem 1rem;
+          outline: none;
+          cursor: pointer;
+          line-height: 1;
+        }
+
+        .custom-select-icon {
+          position: absolute;
+          right: 0.5rem;
+          top: 50%;
+          transform: translateY(-50%);
+          pointer-events: none;
+          color: #9ca3af;
+        }
+      </style>
+
+      <script th:inline="javascript">
+        function handlePageSelect(select) {
+          const selectedPage = parseInt(select.value, 10);
+          const currentPage = /*[(${equipments.page})]*/ 1;
+
+          if (selectedPage === currentPage) return;
+
+          let currentPath = window.location.pathname;
+          let newUrl;
+
+          // 如果当前页是第一页，去掉 /page/1
+          if (selectedPage === 1) {
+            newUrl = currentPath.replace(/\/page\/\d+\/?$/, "") || "/";
+          } else {
+            // 其他页替换或添加 /page/x
+            const pageRegex = /\/page\/\d+\/?$/;
+            if (pageRegex.test(currentPath)) {
+              newUrl = currentPath.replace(pageRegex, `/page/${selectedPage}`);
+            } else {
+              newUrl = `${currentPath}/page/${selectedPage}`;
+            }
+          }
+
+          // 去掉多余的双斜杠并跳转
+          newUrl = newUrl.replace(/\/\/+/, "/");
+          location.href = newUrl;
+        }
+      </script>
+    </div>
+  </th:block>
+</html>

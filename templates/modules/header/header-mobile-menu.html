@@ -1,23 +1,6 @@
 <!doctype html>
 <html x-data="{ isOpen: false }" xmlns:th="http://www.thymeleaf.org">
   <style>
-    .drawer {
-      position: fixed;
-      top: 0;
-      right: 0;
-      width: 100%;
-      max-width: 280px;
-      height: 100%;
-      background: #f9f9f9;
-      transition: transform 0.3s ease;
-      z-index: 1002;
-      transform: translateX(100%);
-    }
-
-    .drawer.open {
-      transform: translateX(0);
-    }
-
     .close-btn {
       background: transparent;
       border: none;
@@ -30,24 +13,6 @@
       justify-content: center;
       border-radius: 50%;
       transition: all 0.15s;
-    }
-
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(0, 0, 0, 0.5);
-      z-index: 1001;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
-    }
-
-    .overlay.open {
-      opacity: 1;
-      pointer-events: auto;
     }
 
     .menu-link {
@@ -111,13 +76,55 @@
   </button>
 
   <!-- 遮罩层 -->
-  <div class="overlay" :class="{ 'open': isOpen }" @click="isOpen = false; enableScroll(document.body)"></div>
+  <div
+    x-show="isOpen"
+    @click="isOpen = false; setTimeout(() => enableScroll(document.body), 200);"
+    x-transition:enter="transition ease duration-300"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    x-transition:leave="transition ease duration-300"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+    style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1001;
+      overscroll-behavior: none;
+    "
+  ></div>
 
   <!-- 抽屉 -->
-  <div class="drawer relative text-black" :class="{ 'open': isOpen }">
-    <div class="flex items-center justify-between border-b p-2">
+  <div
+    x-show="isOpen"
+    x-transition:enter="transition ease duration-300 transform"
+    x-transition:enter-start="translate-x-full"
+    x-transition:enter-end="translate-x-0"
+    x-transition:leave="transition ease duration-300 transform"
+    x-transition:leave-start="translate-x-0"
+    x-transition:leave-end="translate-x-full"
+    style="
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 100%;
+      max-width: 280px;
+      height: 100%;
+      background: #f9f9f9;
+      z-index: 1002;
+      overscroll-behavior: none;
+    "
+    class="mobile-drawer relative flex flex-col text-black"
+  >
+    <div class="flex flex-shrink-0 items-center justify-between overflow-hidden overscroll-none border-b p-2">
       <!-- <p class="font-medium mx-2">导航菜单</p> -->
-      <button class="close-btn hover:bg-gray-200" @click="isOpen = false; enableScroll(document.body)">
+      <button
+        class="close-btn hover:bg-gray-200"
+        @click="isOpen = false; setTimeout(() => enableScroll(document.body), 200)"
+      >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -125,7 +132,11 @@
     </div>
 
     <!-- 保留原始 Thymeleaf 结构 -->
-    <div th:with="menu = ${menuFinder.getPrimary}" class="os-scroll overflow-scroll" style="height: calc(100% - 49px)">
+    <div
+      th:with="menu = ${menuFinder.getPrimary}"
+      class="os-scroll flex-1 overflow-scroll"
+      style="overscroll-behavior: none"
+    >
       <ul th:with="menuItems = ${menu.menuItems}" class="flex flex-col font-medium">
         <li th:each="menuItem : ${menuItems}" class="menu-item border-b" x-data="{ submenuOpen: false }">
           <!-- 有子菜单 -->

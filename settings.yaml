@@ -148,6 +148,17 @@ spec:
               value: true
             - label: 关闭
               value: false
+        - $formkit: select
+          name: menuPlacement
+          label: 菜单位置（左侧将覆盖标题）
+          value: "right"
+          options:
+            - label: 左侧
+              value: "left"
+            - label: 中间
+              value: "center"
+            - label: 右侧
+              value: "right"
     - group: footer
       label: 页脚
       formSchema:

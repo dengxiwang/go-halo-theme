@@ -41,30 +41,58 @@
     th:attr="data-header-transparent=${isHomePage}, data-font-color=${theme.config.authorInfo.fontColor}, data-background-height-type=${theme.config.authorInfo.backgroundHeightType}"
   >
     <div
-      class="max-container-width mx-auto flex w-full items-center justify-between gap-4 *:h-9 max-sm:gap-3"
+      class="max-container-width mx-auto flex w-full items-center gap-4 *:h-9 max-sm:gap-3"
       x-bind:style="
              $root.hasAttribute('data-header-transparent') && backgroundHeightType == 'screen'
                  ? (isScrolled ? '': ('color: ' + fontColor + ' !important;'))
                  : ''
          "
     >
-      <!-- 左侧logo展示 -->
-      <div class="flex gap-x-6 gap-y-3" style="flex: 1 0 auto">
-        <!-- logo -->
+      <!-- 左侧区域：Logo + 标题 + 搜索（菜单右侧时） -->
+      <div
+        class="flex items-center gap-x-6 gap-y-3"
+        th:classappend="${theme.config.header.menuPlacement == 'right'} ? 'flex-1' : ''"
+      >
+        <!-- logo + 标题 -->
         <th:block th:replace="~{modules/header/header-logo-area}" />
 
-        <!-- 搜索区域（仅桌面端显示） -->
-        <template x-if="!isMobile" th:if="${theme.config.header.showSearch == true}">
-          <th:block th:replace="~{modules/header/header-search}" />
+        <!-- 搜索区域（仅桌面端显示，菜单右侧时） -->
+        <template
+          x-if="!isMobile"
+          th:if="${theme.config.header.showSearch == true && theme.config.header.menuPlacement == 'right'}"
+        >
+          <div class="w-48 flex-shrink-0">
+            <th:block th:replace="~{modules/header/header-search}" />
+          </div>
         </template>
       </div>
 
       <!-- 菜单区域（仅桌面端显示） -->
-      <div x-show="!isMobile" x-cloak th:if="${!#lists.isEmpty(menuFinder.getPrimary.menuItems)}">
+      <div
+        x-show="!isMobile"
+        x-cloak
+        th:if="${!#lists.isEmpty(menuFinder.getPrimary.menuItems)}"
+        class="flex items-center"
+        th:classappend="${theme.config.header.menuPlacement == 'center'} ? 'absolute left-1/2 -translate-x-1/2' : ''"
+      >
         <th:block th:if="${!isMobile}" th:replace="~{modules/header/header-main-menu}" />
       </div>
 
-      <div x-show="isMobile" class="flex gap-2">
+      <!-- 右侧区域：搜索（菜单左侧或居中时） -->
+      <div
+        class="flex items-center gap-2"
+        th:classappend="${theme.config.header.menuPlacement == 'left' || theme.config.header.menuPlacement == 'center'} ? 'ml-auto' : ''"
+      >
+        <!-- 搜索区域（仅桌面端显示，菜单左侧或居中时） -->
+        <template
+          x-if="!isMobile"
+          th:if="${theme.config.header.showSearch == true && (theme.config.header.menuPlacement == 'left' || theme.config.header.menuPlacement == 'center')}"
+        >
+          <div class="w-48 flex-shrink-0">
+            <th:block th:replace="~{modules/header/header-search}" />
+          </div>
+        </template>
+
         <!-- 手机搜索样式（仅移动端显示） -->
         <template x-if="isMobile" th:if="${theme.config.header.showSearch == true}">
           <th:block th:replace="~{modules/header/header-mobile-search}" />

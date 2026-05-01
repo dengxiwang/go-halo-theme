@@ -41,9 +41,9 @@
   </style>
 
   <div class="mt-4 rounded-lg border bg-white px-4 py-2" th:if="${photos.total > 0}">
-    <div class="flex w-full flex-wrap items-center justify-between gap-4 max-sm:gap-3">
+    <div class="flex w-full flex-wrap items-center justify-between gap-4 text-sm font-medium max-sm:gap-3">
       <!-- 合计数据 -->
-      <span th:text="'共 ' + ${photos.total} + ' 条图片'"></span>
+      <span th:text="'共 ' + ${photos.total} + ' 张图片'"></span>
 
       <div class="flex flex-wrap gap-2" th:if="${photos.totalPages > 0}">
         <div class="flex overflow-hidden rounded-lg border">

@@ -10,7 +10,8 @@
   <div
     th:fragment="header-main-menu"
     th:with="menu = ${menuFinder.getPrimary}"
-    class="mr-4 flex items-center text-nowrap font-medium"
+    th:classappend="${theme.config.header.menuPlacement == 'left'} ? 'mr-4' : (${theme.config.header.menuPlacement == 'center'} ? 'mr-4' : '')"
+    class="flex items-center text-nowrap font-medium"
     id="main-menu"
   >
     <ul th:with="menuItems = ${menu.menuItems}" class="flex flex-wrap gap-x-8 gap-y-4">

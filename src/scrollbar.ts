@@ -4,8 +4,9 @@ import "overlayscrollbars/overlayscrollbars.css";
 
 const instanceMap = new WeakMap<HTMLElement, any>();
 
-// 存储备用样式
-const originalOverflow = new WeakMap<HTMLElement, string>();
+// 滚动拦截处理器
+let scrollBlockHandler: ((e: Event) => void) | null = null;
+let keyBlockHandler: ((e: KeyboardEvent) => void) | null = null;
 
 const DEFAULT_OPTIONS: PartialOptions = {
   scrollbars: {
@@ -28,47 +29,52 @@ export function initScrollbars() {
 }
 
 /**
- * ✅ 真正禁用滚动：销毁 + overflow: hidden
+ * ✅ 禁用滚动：拦截抽屉之外的滚动事件（允许 .mobile-drawer 内部滚动）
  */
-export function disableScroll(element: HTMLElement) {
-  const instance = instanceMap.get(element);
+export function disableScroll(_element?: HTMLElement) {
+  if (scrollBlockHandler) return; // 已经拦截中
 
-  // 1. 存原始 overflow
-  if (!originalOverflow.has(element)) {
-    originalOverflow.set(element, element.style.overflow || "");
-  }
+  scrollBlockHandler = (e: Event) => {
+    const target = e.target as HTMLElement | null;
+    // 如果事件来自抽屉内部，允许滚动
+    if (target && target.closest && target.closest(".mobile-drawer")) {
+      return;
+    }
+    // 其他地方的滚动被阻止
+    e.preventDefault();
+    e.stopPropagation();
+  };
 
-  // 2. 销毁实例（移除所有事件）
-  if (instance) {
-    instance.destroy();
-    instanceMap.delete(element);
-  }
+  // 同时拦截键盘导致的滚动（空格、PgUp/PgDn、方向键、Home/End）
+  keyBlockHandler = (e: KeyboardEvent) => {
+    const blockedKeys = [" ", "PageUp", "PageDown", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Home", "End"];
+    const target = e.target as HTMLElement | null;
+    if (target && target.closest && target.closest(".mobile-drawer")) {
+      return;
+    }
+    if (blockedKeys.includes(e.key)) {
+      e.preventDefault();
+    }
+  };
 
-  // 3. 强制禁止滚动
-  element.style.overflow = "hidden";
-  console.log("✅ 滚动已禁用:", element);
+  document.addEventListener("wheel", scrollBlockHandler, { passive: false, capture: true });
+  document.addEventListener("touchmove", scrollBlockHandler, { passive: false, capture: true });
+  document.addEventListener("keydown", keyBlockHandler, { capture: true });
 }
 
 /**
- * ✅ 恢复滚动：恢复样式 + 重新初始化
+ * ✅ 恢复滚动：移除滚动拦截器
  */
-export function enableScroll(element: HTMLElement) {
-  // 1. 先销毁（如果已存在）
-  if (instanceMap.has(element)) {
-    instanceMap.get(element).destroy();
-    instanceMap.delete(element);
+export function enableScroll(_element?: HTMLElement) {
+  if (scrollBlockHandler) {
+    document.removeEventListener("wheel", scrollBlockHandler, { capture: true } as any);
+    document.removeEventListener("touchmove", scrollBlockHandler, { capture: true } as any);
+    scrollBlockHandler = null;
   }
-
-  // 2. 恢复原始 overflow
-  const original = originalOverflow.get(element);
-
-  element.style.overflow = original === "hidden" ? "" : original || "";
-
-  // 3. 重新初始化
-  const osInstance = OverlayScrollbars(element, DEFAULT_OPTIONS);
-  instanceMap.set(element, osInstance);
-
-  console.log("✅ 滚动已恢复:", element);
+  if (keyBlockHandler) {
+    document.removeEventListener("keydown", keyBlockHandler, { capture: true } as any);
+    keyBlockHandler = null;
+  }
 }
 
 /**
@@ -79,7 +85,6 @@ export function destroyScrollbar(element: HTMLElement) {
   if (instance) {
     instance.destroy();
     instanceMap.delete(element);
-    originalOverflow.delete(element);
   }
 }
 
