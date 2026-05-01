@@ -7,9 +7,20 @@ spec:
     - group: global
       label: 全局
       formSchema:
+        - $formkit: select
+          name: themeMode
+          label: 主题模式
+          value: system
+          options:
+            - label: 跟随系统
+              value: system
+            - label: 亮色
+              value: light
+            - label: 暗色
+              value: dark
         - $formkit: text
           name: background
-          label: 全局背景样式（对应 css 的 background 属性）
+          label: 全局背景样式（仅亮色模式生效）
           placeholder: 如：#F9F8F7
           value: "#F9F8F7"
           validation: "required"

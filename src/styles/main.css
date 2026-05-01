@@ -2,8 +2,44 @@ html {
   scroll-behavior: smooth;
 }
 
+/* ============ 主题色板 ============ */
+:root {
+  --bg-page: #ffffff;
+  --bg-surface: #ffffff;
+  --bg-surface-2: #f3f4f6;
+  --bg-muted: rgba(0, 0, 0, 0.05);
+  --border-color: #e5e7eb;
+  --text-main: #0f172a;
+  --text-muted: #6b7280;
+  --link-hover: #2563eb;
+  --accent: #3b82f6;
+}
+
+html.dark {
+  color-scheme: dark;
+  --bg-page: #0f1115;
+  --bg-surface: #1a1d23;
+  --bg-surface-2: #262a32;
+  --bg-muted: rgba(255, 255, 255, 0.08);
+  --border-color: #2b2f38;
+  --text-main: #e5e7eb;
+  --text-muted: #9ca3af;
+  --link-hover: #60a5fa;
+  --accent: #60a5fa;
+}
+
 body {
   background-color: #ffffff;
+  color: var(--text-main);
+}
+
+html.dark body {
+  background-color: var(--bg-page);
+}
+
+/* 全局背景：暗色模式下使用默认暗色色板 */
+html.dark #global-background {
+  background: var(--bg-page) !important;
 }
 
 ul {
@@ -31,6 +67,15 @@ ul {
   color: #3B82F6;
   background-color: #f3f4f6;
   border-radius: 4px;
+}
+
+html.dark .active-menu {
+  color: var(--link-hover);
+}
+
+html.dark .is-active-li {
+  color: var(--link-hover);
+  background-color: rgba(96, 165, 250, 0.15);
 }
 
 .max-container-width {
@@ -122,3 +167,165 @@ hyperlink-card {
 .moment-content .tag::before {
   content: "#";
 }
+
+/* ============ 暗色模式全局覆盖 ============ */
+/* 表面背景（卡片、顶栏、页脚容器等） */
+html.dark .bg-white { background-color: var(--bg-surface) !important; }
+html.dark [class~="\!bg-white"] { background-color: var(--bg-surface) !important; }
+html.dark .bg-gray-50 { background-color: var(--bg-surface) !important; }
+html.dark .bg-gray-100 { background-color: var(--bg-surface-2) !important; }
+html.dark .bg-gray-200 { background-color: var(--bg-surface-2) !important; }
+html.dark .hover\:bg-gray-100:hover { background-color: var(--bg-surface-2) !important; }
+html.dark .hover\:bg-gray-200:hover { background-color: var(--bg-surface-2) !important; }
+html.dark .hover\:bg-gray-50:hover { background-color: var(--bg-surface) !important; }
+html.dark .hover\:bg-blue-100:hover { background-color: rgba(96, 165, 250, 0.18) !important; }
+html.dark .hover\:text-blue-600:hover { color: var(--link-hover) !important; }
+
+/* 半透明背景 */
+html.dark .bg-black\/5 { background-color: rgba(255, 255, 255, 0.08) !important; }
+html.dark .hover\:bg-black\/5:hover { background-color: rgba(255, 255, 255, 0.08) !important; }
+
+/* 边框 */
+html.dark .border,
+html.dark .border-t,
+html.dark .border-b,
+html.dark .border-l,
+html.dark .border-r {
+  border-color: var(--border-color);
+}
+html.dark .border-white { border-color: var(--border-color) !important; }
+html.dark .border-gray-100,
+html.dark .border-gray-200,
+html.dark .border-gray-300 { border-color: var(--border-color) !important; }
+html.dark [class~="\!border-\[\#e5e7eb\]"] { border-color: var(--border-color) !important; }
+html.dark [class~="\!border-transparent"] { border-color: transparent !important; }
+
+/* 文字 */
+html.dark { color: var(--text-main); }
+html.dark .text-black { color: var(--text-main) !important; }
+html.dark [class~="\!text-black"] { color: var(--text-main) !important; }
+html.dark .text-gray-500 { color: var(--text-muted) !important; }
+html.dark .text-gray-600 { color: var(--text-muted) !important; }
+html.dark .text-gray-700 { color: var(--text-muted) !important; }
+html.dark .text-gray-800 { color: var(--text-main) !important; }
+html.dark .text-gray-900 { color: var(--text-main) !important; }
+
+/* 暗色下瞬间 tag */
+html.dark .moment-content .tag {
+  background-color: rgba(96, 165, 250, 0.22);
+  color: rgb(147, 197, 253);
+}
+
+/* 暗色下代码块工具栏里的语言标签（px-2 py-0.5 bg-gray-200）需要更深的背景 */
+html.dark pre code { color: inherit; }
+
+/* 暗色下 header 背景覆盖（header 用了 inline style 设 bg-white / border-color） */
+/* 默认全部覆盖为表面色，首页透明状态（!bg-transparent）优先级更高回滚透明 */
+html.dark #header {
+  background-color: var(--bg-surface) !important;
+  border-color: var(--border-color) !important;
+}
+html.dark #header.\!bg-transparent {
+  background-color: transparent !important;
+  border-color: transparent !important;
+}
+
+/* 暗色下主菜单下拉 */
+html.dark #main-menu ul ul {
+  background-color: var(--bg-surface) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-main);
+}
+
+/* 暗色下移动端抽屉 */
+html.dark .mobile-drawer {
+  background: var(--bg-surface) !important;
+  color: var(--text-main) !important;
+}
+
+/* 暗色下分页 select */
+html.dark .custom-select {
+  background-color: var(--bg-surface) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-main);
+}
+html.dark .custom-select option {
+  background-color: var(--bg-surface);
+  color: var(--text-main);
+}
+
+/* 暗色下红色置顶标签依然醒目，保持 */
+
+/* 暗色下 toc */
+html.dark .toc-list a { color: var(--text-main); }
+html.dark .toc-list a:hover { background-color: var(--bg-surface-2) !important; }
+html.dark .is-active-link { color: var(--link-hover) !important; }
+
+/* markdown-body 暗色调整（github-markdown-light 构建色调，暗色下手动改色） */
+html.dark .markdown-body {
+  color: var(--text-main) !important;
+  background-color: transparent !important;
+}
+html.dark .markdown-body h1,
+html.dark .markdown-body h2,
+html.dark .markdown-body h3,
+html.dark .markdown-body h4,
+html.dark .markdown-body h5,
+html.dark .markdown-body h6 {
+  color: var(--text-main) !important;
+  border-color: var(--border-color) !important;
+}
+html.dark .markdown-body a { color: #60a5fa !important; }
+html.dark .markdown-body code {
+  background-color: rgba(110, 118, 129, 0.4) !important;
+  color: #e5e7eb !important;
+}
+html.dark .markdown-body pre {
+  background-color: #161b22 !important;
+  color: #e5e7eb !important;
+}
+html.dark .markdown-body blockquote {
+  color: var(--text-muted) !important;
+  border-left-color: var(--border-color) !important;
+}
+html.dark .markdown-body hr { background-color: var(--border-color) !important; }
+html.dark .markdown-body table tr {
+  background-color: transparent !important;
+  border-color: var(--border-color) !important;
+}
+html.dark .markdown-body table tr:nth-child(2n) {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+html.dark .markdown-body table th,
+html.dark .markdown-body table td {
+  border-color: var(--border-color) !important;
+}
+
+/* 暗色模式下强制覆盖文章正文里 inline style 设的颜色（富文本编辑器常生成深色字体，暗色下不可读） */
+html.dark .markdown-body [style*="color"],
+html.dark .markdown-body [style*="color"] * {
+  color: var(--text-main) !important;
+}
+html.dark .markdown-body font[color] {
+  color: var(--text-main) !important;
+}
+/* inline 背景色在暗色下统一转为次级表面色，避免白底刺眼 */
+html.dark .markdown-body [style*="background-color"],
+html.dark .markdown-body [style*="background:"] {
+  background-color: var(--bg-surface-2) !important;
+  background-image: none !important;
+}
+/* code / pre 内的高亮子元素允许自己的配色，不受上述强制影响 */
+html.dark .markdown-body pre [style*="color"],
+html.dark .markdown-body pre [style*="color"] *,
+html.dark .markdown-body code [style*="color"],
+html.dark .markdown-body code [style*="color"] * {
+  color: revert !important;
+}
+html.dark .markdown-body pre [style*="background"],
+html.dark .markdown-body code [style*="background"] {
+  background-color: revert !important;
+  background-image: revert !important;
+}
+
+/* 暗色下回顶按钮颜色保持不变，但指针色可略微柔和 */

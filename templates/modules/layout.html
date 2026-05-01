@@ -1,5 +1,10 @@
 <!doctype html>
-<html data-overlayscrollbars-initialize lang="zh" th:fragment="html (content)">
+<html
+  data-overlayscrollbars-initialize
+  lang="zh"
+  th:fragment="html (content)"
+  th:attr="data-theme-mode=${theme.config.global.themeMode ?: 'system'}"
+>
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -11,6 +16,41 @@
     >
       默认标题
     </title>
+
+    <!-- 主题模式引导脚本：一定要在样式加载前预先给 <html> 加 dark 类，避免白闪 -->
+    <script th:inline="javascript">
+      (function () {
+        try {
+          var mode = /*[[${theme.config.global.themeMode}]]*/ "system";
+          var root = document.documentElement;
+          function apply(isDark) {
+            if (isDark) {
+              root.classList.add("dark");
+              root.setAttribute("data-color-mode", "dark");
+            } else {
+              root.classList.remove("dark");
+              root.setAttribute("data-color-mode", "light");
+            }
+          }
+          if (mode === "dark") {
+            apply(true);
+          } else if (mode === "light") {
+            apply(false);
+          } else {
+            var mq = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)");
+            apply(!!(mq && mq.matches));
+            if (mq) {
+              var handler = function (e) {
+                apply(e.matches);
+              };
+              if (mq.addEventListener) mq.addEventListener("change", handler);
+              else if (mq.addListener) mq.addListener(handler);
+            }
+          }
+        } catch (e) {}
+      })();
+    </script>
+
     <link rel="stylesheet" th:href="@{/assets/dist/main.css?v={version}(version=${theme.spec.version})}" />
     <script th:src="@{/assets/dist/main.iife.js?v={version}(version=${theme.spec.version})}" defer></script>
   </head>
