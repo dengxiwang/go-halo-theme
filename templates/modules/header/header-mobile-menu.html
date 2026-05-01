@@ -1,5 +1,9 @@
 <!doctype html>
-<html x-data="{ isOpen: false }" xmlns:th="http://www.thymeleaf.org">
+<html
+  x-data="{ isOpen: false }"
+  @resize.window.debounce.150ms="if (window.innerWidth >= 768 && isOpen) { isOpen = false; setTimeout(() => enableScroll(document.body), 200); }"
+  xmlns:th="http://www.thymeleaf.org"
+>
   <style>
     .close-btn {
       background: transparent;

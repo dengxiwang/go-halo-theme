@@ -258,6 +258,22 @@ html.dark .mobile-drawer {
   color: var(--text-main) !important;
 }
 
+/* 暗色下移动端抽屉内链接/子项悬停（模板 inline <style> 内写死了 #f0f0f0 / #e0e0e0） */
+html.dark .mobile-drawer .menu-link:hover {
+  background-color: var(--bg-surface-2) !important;
+}
+html.dark .mobile-drawer .submenu-item a:hover {
+  background-color: var(--bg-surface-2) !important;
+}
+html.dark .mobile-drawer .close-btn {
+  color: var(--text-main);
+}
+
+/* 暗色下分页器的下拉箭头图标颜色（模板 inline <style> 写死了 #9ca3af） */
+html.dark .custom-select-icon {
+  color: var(--text-muted) !important;
+}
+
 /* 暗色下分页 select */
 html.dark .custom-select {
   background-color: var(--bg-surface) !important;
