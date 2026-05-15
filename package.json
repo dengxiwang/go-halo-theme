@@ -16,32 +16,32 @@
   "dependencies": {
     "alpinejs": "^3.15.12",
     "github-markdown-css": "^5.9.0",
-    "overlayscrollbars": "^2.15.1",
+    "overlayscrollbars": "^2.16.0",
     "prettier": "^3.8.3",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "swiper": "^12.1.4",
-    "terser": "^5.46.2",
-    "tocbot": "^4.36.6"
+    "terser": "^5.47.1",
+    "tocbot": "^4.36.8"
   },
   "devDependencies": {
     "@halo-dev/theme-package-cli": "^1.0.4",
-    "@iconify-json/tabler": "^1.2.33",
+    "@iconify-json/tabler": "^1.2.35",
     "@iconify/tailwind": "^1.2.0",
     "@tailwindcss/typography": "^0.5.19",
     "@types/alpinejs": "^3.13.11",
-    "@types/node": "^25.6.0",
-    "@typescript-eslint/eslint-plugin": "^8.59.1",
-    "@typescript-eslint/parser": "^8.59.1",
+    "@types/node": "^25.8.0",
+    "@typescript-eslint/eslint-plugin": "^8.59.3",
+    "@typescript-eslint/parser": "^8.59.3",
     "autoprefixer": "^10.5.0",
-    "eslint": "^10.3.0",
+    "eslint": "^10.4.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "husky": "^9.1.7",
-    "lint-staged": "^16.4.0",
-    "postcss": "^8.5.13",
+    "lint-staged": "^17.0.4",
+    "postcss": "^8.5.14",
     "tailwindcss": "3.4.17",
     "typescript": "^6.0.3",
-    "vite": "^8.0.10"
+    "vite": "^8.0.13"
   },
-  "packageManager": "pnpm@10.33.2"
+  "packageManager": "pnpm@11.1.2"
 }
