@@ -18,6 +18,24 @@ spec:
               value: light
             - label: 暗色
               value: dark
+        - $formkit: select
+          name: allowThemeSwitch
+          label: 允许前台切换
+          value: true
+          options:
+            - label: 允许
+              value: true
+            - label: 禁止
+              value: false
+        - $formkit: select
+          name: scrollbarAutoHide
+          label: 滚动条自动隐藏
+          value: true
+          options:
+            - label: 开启
+              value: true
+            - label: 关闭
+              value: false
         - $formkit: text
           name: background
           label: 全局背景样式（仅亮色模式生效）

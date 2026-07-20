@@ -2,13 +2,33 @@
 <html xmlns:th="http://www.thymeleaf.org">
   <button
     th:fragment="header-theme-toggle"
+    th:if="${theme.config.global.allowThemeSwitch != false}"
     type="button"
-    class="theme-toggle-button mobile-handle-btn flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 bg-white/95 text-gray-700 shadow-sm backdrop-blur-sm transition-all hover:bg-gray-100"
+    class="theme-toggle-button mobile-handle-btn flex h-9 w-9 items-center justify-center rounded-lg bg-black/5 focus:outline-none"
     data-theme-toggle
     aria-label="切换主题"
     title="切换主题"
-    onclick="window.__haloTheme && window.__haloTheme.cycleMode && window.__haloTheme.cycleMode()"
+    onpointerup="this.blur()"
+    onclick="
+      if (event.detail > 0) this.blur();
+      window.__haloTheme && window.__haloTheme.cycleMode && window.__haloTheme.cycleMode();
+    "
   >
-    <span class="theme-toggle-icon" aria-hidden="true"></span>
+    <span class="theme-toggle-icon" aria-hidden="true">
+      <svg class="theme-toggle-icon-system" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="12" cy="12" r="7.75"></circle>
+        <path d="M12 4.25a7.75 7.75 0 0 0 0 15.5Z" fill="currentColor" stroke="none"></path>
+      </svg>
+      <svg class="theme-toggle-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="12" cy="12" r="3.75"></circle>
+        <path
+          d="M12 2.75v2M12 19.25v2M21.25 12h-2M4.75 12h-2M18.54 5.46l-1.42 1.42M6.88 17.12l-1.42 1.42M18.54 18.54l-1.42-1.42M6.88 6.88 5.46 5.46"
+        ></path>
+      </svg>
+      <svg class="theme-toggle-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M20.3 15.3A8.5 8.5 0 0 1 8.7 3.7 8.5 8.5 0 1 0 20.3 15.3Z"></path>
+        <path d="m17.25 4 .35.95.95.35-.95.35-.35.95-.35-.95-.95-.35.95-.35.35-.95Z"></path>
+      </svg>
+    </span>
   </button>
 </html>

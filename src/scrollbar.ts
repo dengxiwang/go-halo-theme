@@ -4,8 +4,11 @@ import "overlayscrollbars/overlayscrollbars.css";
 
 const LIGHT_MODE_SCROLLBAR_THEME = "os-theme-dark";
 const DARK_MODE_SCROLLBAR_THEME = "os-theme-light";
+const AUTO_HIDE_DELAY = 1300;
+const AUTO_HIDE_HIDDEN_CLASS = "os-scrollbar-auto-hide-hidden";
 
 const instanceMap = new Map<HTMLElement, ReturnType<typeof OverlayScrollbars>>();
+const autoHideCleanupMap = new Map<HTMLElement, () => void>();
 let themeObserver: MutationObserver | null = null;
 
 OverlayScrollbars.plugin(ScrollbarsHidingPlugin);
@@ -20,16 +23,54 @@ function getScrollbarTheme() {
   return isDark ? DARK_MODE_SCROLLBAR_THEME : LIGHT_MODE_SCROLLBAR_THEME;
 }
 
+function shouldAutoHideScrollbars() {
+  return document.documentElement.getAttribute("data-scrollbar-auto-hide") !== "false";
+}
+
 function getScrollbarOptions(theme = getScrollbarTheme()): PartialOptions {
   return {
     scrollbars: {
       theme,
       visibility: "visible",
-      autoHide: "never",
+      autoHide: shouldAutoHideScrollbars() ? "scroll" : "never",
       clickScroll: false,
     },
     showNativeOverlaidScrollbars: false,
   };
+}
+
+function setupScrollbarAutoHide(element: HTMLElement, instance: ReturnType<typeof OverlayScrollbars>) {
+  if (!shouldAutoHideScrollbars()) return;
+
+  const { scrollEventElement, scrollbarHorizontal, scrollbarVertical } = instance.elements();
+  const scrollbars = [scrollbarHorizontal.scrollbar, scrollbarVertical.scrollbar];
+  const scrollEventTargets: EventTarget[] =
+    element === document.body ? [scrollEventElement, window] : [scrollEventElement];
+  let hideTimer: number | undefined;
+
+  const setHidden = (hidden: boolean) => {
+    scrollbars.forEach((scrollbar) => {
+      scrollbar.classList.toggle(AUTO_HIDE_HIDDEN_CLASS, hidden);
+    });
+  };
+
+  const showAndScheduleHide = () => {
+    window.clearTimeout(hideTimer);
+    setHidden(false);
+    hideTimer = window.setTimeout(() => setHidden(true), AUTO_HIDE_DELAY);
+  };
+
+  scrollEventTargets.forEach((target) => {
+    target.addEventListener("scroll", showAndScheduleHide, { passive: true });
+  });
+  showAndScheduleHide();
+
+  autoHideCleanupMap.set(element, () => {
+    window.clearTimeout(hideTimer);
+    scrollEventTargets.forEach((target) => {
+      target.removeEventListener("scroll", showAndScheduleHide);
+    });
+  });
 }
 
 /**
@@ -53,6 +94,7 @@ export function initScrollbars() {
             )
           : OverlayScrollbars(el, getScrollbarOptions(theme));
       instanceMap.set(el, osInstance);
+      setupScrollbarAutoHide(el, osInstance);
     }
   });
 
@@ -135,6 +177,8 @@ export function enableScroll(_element?: HTMLElement) {
 export function destroyScrollbar(element: HTMLElement) {
   const instance = instanceMap.get(element);
   if (instance) {
+    autoHideCleanupMap.get(element)?.();
+    autoHideCleanupMap.delete(element);
     instance.destroy();
     instanceMap.delete(element);
   }

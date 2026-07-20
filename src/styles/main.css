@@ -119,33 +119,52 @@ hyperlink-card {
 
 .theme-toggle-button {
   flex-shrink: 0;
-  background-color: rgba(255, 255, 255, 0.95) !important;
-  border-color: #d1d5db !important;
-  color: #111827 !important;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.theme-toggle-button:focus,
+.theme-toggle-button:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.theme-toggle-button:active {
+  background-color: rgba(0, 0, 0, 0.1) !important;
 }
 
 .theme-toggle-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 18px;
+  height: 18px;
   line-height: 0;
 }
 
-.theme-toggle-button svg {
+.theme-toggle-icon svg {
+  display: none;
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: theme-toggle-icon-in 140ms ease-out;
+}
+
+html[data-theme-preference="system"] .theme-toggle-icon-system,
+html[data-theme-preference="light"] .theme-toggle-icon-light,
+html[data-theme-preference="dark"] .theme-toggle-icon-dark {
   display: block;
 }
 
-#header[data-header-transparent="true"] .theme-toggle-button {
-  background-color: rgba(255, 255, 255, 0.2) !important;
-  border-color: rgba(255, 255, 255, 0.35) !important;
-  color: #ffffff !important;
-}
-
-#header[data-header-transparent="true"].\!bg-white .theme-toggle-button,
-#header[data-header-transparent="true"].\!text-black .theme-toggle-button {
-  background-color: rgba(255, 255, 255, 0.95);
-  border-color: #e5e7eb;
-  color: #374151 !important;
+@keyframes theme-toggle-icon-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .toc > .toc-list {
@@ -214,6 +233,7 @@ html.dark .hover\:text-blue-600:hover { color: var(--link-hover) !important; }
 /* 半透明背景 */
 html.dark .bg-black\/5 { background-color: rgba(255, 255, 255, 0.08) !important; }
 html.dark .hover\:bg-black\/5:hover { background-color: rgba(255, 255, 255, 0.08) !important; }
+html.dark .theme-toggle-button:active { background-color: rgba(255, 255, 255, 0.14) !important; }
 
 /* 边框 */
 html.dark .border,
@@ -299,16 +319,10 @@ html.dark .mobile-drawer .close-btn {
   color: var(--text-main);
 }
 
-html.dark .theme-toggle-button {
-  background-color: rgba(31, 41, 55, 0.92) !important;
-  border-color: rgba(107, 114, 128, 0.55) !important;
-  color: #ffffff !important;
-}
-
-html.dark #header[data-header-transparent="true"] .theme-toggle-button {
-  background-color: rgba(17, 24, 39, 0.7) !important;
-  border-color: rgba(255, 255, 255, 0.18) !important;
-  color: #ffffff !important;
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle-icon svg {
+    animation: none;
+  }
 }
 
 /* 暗色下分页器的下拉箭头图标颜色（模板 inline <style> 写死了 #9ca3af） */
