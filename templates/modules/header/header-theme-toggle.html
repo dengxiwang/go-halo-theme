@@ -1,0 +1,14 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <button
+    th:fragment="header-theme-toggle"
+    type="button"
+    class="theme-toggle-button mobile-handle-btn flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 bg-white/95 text-gray-700 shadow-sm backdrop-blur-sm transition-all hover:bg-gray-100"
+    data-theme-toggle
+    aria-label="切换主题"
+    title="切换主题"
+    onclick="window.__haloTheme && window.__haloTheme.cycleMode && window.__haloTheme.cycleMode()"
+  >
+    <span class="theme-toggle-icon" aria-hidden="true"></span>
+  </button>
+</html>

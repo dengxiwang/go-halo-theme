@@ -1,30 +1,82 @@
 // src/lib/scrollbar.ts
-import { OverlayScrollbars, PartialOptions } from "overlayscrollbars";
+import { OverlayScrollbars, PartialOptions, ScrollbarsHidingPlugin } from "overlayscrollbars";
 import "overlayscrollbars/overlayscrollbars.css";
 
-const instanceMap = new WeakMap<HTMLElement, any>();
+const LIGHT_MODE_SCROLLBAR_THEME = "os-theme-dark";
+const DARK_MODE_SCROLLBAR_THEME = "os-theme-light";
+
+const instanceMap = new Map<HTMLElement, ReturnType<typeof OverlayScrollbars>>();
+let themeObserver: MutationObserver | null = null;
+
+OverlayScrollbars.plugin(ScrollbarsHidingPlugin);
 
 // 滚动拦截处理器
 let scrollBlockHandler: ((e: Event) => void) | null = null;
 let keyBlockHandler: ((e: KeyboardEvent) => void) | null = null;
 
-const DEFAULT_OPTIONS: PartialOptions = {
-  scrollbars: {
-    theme: "os-theme-dark",
-    autoHide: "scroll",
-    clickScroll: true,
-  },
-};
+function getScrollbarTheme() {
+  const root = document.documentElement;
+  const isDark = root.classList.contains("dark") || root.getAttribute("data-color-mode") === "dark";
+  return isDark ? DARK_MODE_SCROLLBAR_THEME : LIGHT_MODE_SCROLLBAR_THEME;
+}
+
+function getScrollbarOptions(theme = getScrollbarTheme()): PartialOptions {
+  return {
+    scrollbars: {
+      theme,
+      visibility: "visible",
+      autoHide: "never",
+      clickScroll: false,
+    },
+    showNativeOverlaidScrollbars: false,
+  };
+}
 
 /**
  * 初始化滚动条
  */
 export function initScrollbars() {
+  const theme = getScrollbarTheme();
   document.querySelectorAll<HTMLElement>(".os-scroll").forEach((el) => {
     if (!instanceMap.has(el)) {
-      const osInstance = OverlayScrollbars(el, DEFAULT_OPTIONS);
+      const osInstance =
+        el === document.body
+          ? OverlayScrollbars(
+              {
+                target: el,
+                cancel: {
+                  nativeScrollbarsOverlaid: false,
+                  body: false,
+                },
+              },
+              getScrollbarOptions(theme),
+            )
+          : OverlayScrollbars(el, getScrollbarOptions(theme));
       instanceMap.set(el, osInstance);
     }
+  });
+
+  if (!themeObserver) {
+    themeObserver = new MutationObserver(() => {
+      syncScrollbarThemes();
+    });
+
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "data-color-mode"],
+    });
+  }
+}
+
+function syncScrollbarThemes() {
+  const theme = getScrollbarTheme();
+  instanceMap.forEach((instance) => {
+    instance.options({
+      scrollbars: {
+        ...instance.options().scrollbars,
+        theme,
+      },
+    });
   });
 }
 

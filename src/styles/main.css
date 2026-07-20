@@ -16,7 +16,6 @@ html {
 }
 
 html.dark {
-  color-scheme: dark;
   --bg-page: #0f1115;
   --bg-surface: #1a1d23;
   --bg-surface-2: #262a32;
@@ -106,16 +105,47 @@ hyperlink-card {
   margin-bottom: 1rem !important;
 }
 
-* {
+[data-overlayscrollbars-viewport] {
   scrollbar-width: none;
 }
 
-::-webkit-scrollbar {
+[data-overlayscrollbars-viewport]::-webkit-scrollbar {
   display: none;
 }
 
 .transition-header-property {
   transition-property: background-color, border-color;
+}
+
+.theme-toggle-button {
+  flex-shrink: 0;
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: #d1d5db !important;
+  color: #111827 !important;
+}
+
+.theme-toggle-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+.theme-toggle-button svg {
+  display: block;
+}
+
+#header[data-header-transparent="true"] .theme-toggle-button {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  color: #ffffff !important;
+}
+
+#header[data-header-transparent="true"].\!bg-white .theme-toggle-button,
+#header[data-header-transparent="true"].\!text-black .theme-toggle-button {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-color: #e5e7eb;
+  color: #374151 !important;
 }
 
 .toc > .toc-list {
@@ -267,6 +297,18 @@ html.dark .mobile-drawer .submenu-item a:hover {
 }
 html.dark .mobile-drawer .close-btn {
   color: var(--text-main);
+}
+
+html.dark .theme-toggle-button {
+  background-color: rgba(31, 41, 55, 0.92) !important;
+  border-color: rgba(107, 114, 128, 0.55) !important;
+  color: #ffffff !important;
+}
+
+html.dark #header[data-header-transparent="true"] .theme-toggle-button {
+  background-color: rgba(17, 24, 39, 0.7) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
 }
 
 /* 暗色下分页器的下拉箭头图标颜色（模板 inline <style> 写死了 #9ca3af） */

@@ -3,7 +3,7 @@
   data-overlayscrollbars-initialize
   lang="zh"
   th:fragment="html (content)"
-  th:attr="data-theme-mode=${theme.config.global.themeMode ?: 'system'}"
+  th:attr="data-theme-default=${theme.config.global.themeMode ?: 'system'},data-theme-preference=${theme.config.global.themeMode ?: 'system'}"
 >
   <head>
     <meta charset="UTF-8" />
@@ -21,31 +21,92 @@
     <script th:inline="javascript">
       (function () {
         try {
-          var mode = /*[[${theme.config.global.themeMode}]]*/ "system";
           var root = document.documentElement;
-          function apply(isDark) {
+          var defaultMode = root.getAttribute("data-theme-default") || "system";
+          var storageKey = "go-halo-theme-mode";
+          var modes = ["system", "light", "dark"];
+          var mq = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)");
+          var labels = {
+            system: "跟随系统",
+            light: "白色",
+            dark: "黑色",
+          };
+          var icons = {
+            system:
+              '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4a8 8 0 1 0 8 8" opacity="0.4"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>',
+            light:
+              '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="4" stroke-width="2"></circle><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77"></path></svg>',
+            dark: '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.742 13.045a8.088 8.088 0 0 1-9.787-9.787 1 1 0 0 0-1.258-1.258A10.002 10.002 0 1 0 22 14.303a1 1 0 0 0-1.258-1.258Z"></path></svg>',
+          };
+          function isValidMode(mode) {
+            return mode === "system" || mode === "light" || mode === "dark";
+          }
+          function resolveMode() {
+            try {
+              var savedMode = window.localStorage.getItem(storageKey);
+              if (isValidMode(savedMode)) {
+                return savedMode;
+              }
+            } catch (e) {}
+            return isValidMode(defaultMode) ? defaultMode : "system";
+          }
+          function apply(mode) {
+            var isDark = mode === "dark" || (mode === "system" && !!(mq && mq.matches));
+            root.setAttribute("data-theme-preference", mode);
+            root.setAttribute("data-color-mode", isDark ? "dark" : "light");
             if (isDark) {
               root.classList.add("dark");
-              root.setAttribute("data-color-mode", "dark");
             } else {
               root.classList.remove("dark");
-              root.setAttribute("data-color-mode", "light");
             }
           }
-          if (mode === "dark") {
-            apply(true);
-          } else if (mode === "light") {
-            apply(false);
-          } else {
-            var mq = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)");
-            apply(!!(mq && mq.matches));
-            if (mq) {
-              var handler = function (e) {
-                apply(e.matches);
-              };
-              if (mq.addEventListener) mq.addEventListener("change", handler);
-              else if (mq.addListener) mq.addListener(handler);
-            }
+          function updateButtons(mode) {
+            var buttons = document.querySelectorAll("[data-theme-toggle]");
+            buttons.forEach(function (button) {
+              button.setAttribute("data-theme-mode", mode);
+              button.setAttribute("aria-label", "切换主题，当前：" + labels[mode]);
+              button.setAttribute("title", "切换主题，当前：" + labels[mode]);
+              var icon = button.querySelector(".theme-toggle-icon");
+              if (icon) {
+                icon.innerHTML = icons[mode];
+              }
+            });
+          }
+          function setMode(mode) {
+            if (!isValidMode(mode)) mode = "system";
+            try {
+              window.localStorage.setItem(storageKey, mode);
+            } catch (e) {}
+            apply(mode);
+            updateButtons(mode);
+          }
+          function cycleMode() {
+            var currentMode = root.getAttribute("data-theme-preference") || resolveMode();
+            var currentIndex = modes.indexOf(currentMode);
+            var nextMode = modes[(currentIndex + 1) % modes.length];
+            setMode(nextMode);
+          }
+          window.__haloTheme = {
+            setMode: setMode,
+            cycleMode: cycleMode,
+            syncButtons: function () {
+              updateButtons(root.getAttribute("data-theme-preference") || resolveMode());
+            },
+          };
+          var initialMode = resolveMode();
+          apply(initialMode);
+          document.addEventListener("DOMContentLoaded", function () {
+            updateButtons(root.getAttribute("data-theme-preference") || initialMode);
+          });
+          if (mq) {
+            var handler = function () {
+              if ((root.getAttribute("data-theme-preference") || initialMode) === "system") {
+                apply("system");
+                updateButtons("system");
+              }
+            };
+            if (mq.addEventListener) mq.addEventListener("change", handler);
+            else if (mq.addListener) mq.addListener(handler);
           }
         } catch (e) {}
       })();

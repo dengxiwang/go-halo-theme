@@ -83,6 +83,8 @@
         class="flex items-center gap-2"
         th:classappend="${theme.config.header.menuPlacement == 'left' || theme.config.header.menuPlacement == 'center'} ? 'ml-auto' : ''"
       >
+        <th:block th:replace="~{modules/header/header-theme-toggle :: header-theme-toggle}" />
+
         <!-- 搜索区域（仅桌面端显示，菜单左侧或居中时） -->
         <template
           x-if="!isMobile"
