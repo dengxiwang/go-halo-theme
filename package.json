@@ -17,9 +17,9 @@
     "alpinejs": "^3.15.12",
     "github-markdown-css": "^5.9.0",
     "overlayscrollbars": "^2.16.0",
-    "prettier": "^3.9.5",
+    "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
-    "swiper": "^14.0.5",
+    "swiper": "^14.0.6",
     "terser": "^5.49.0",
     "tocbot": "^4.36.8"
   },
@@ -30,18 +30,18 @@
     "@tailwindcss/typography": "^0.5.20",
     "@types/alpinejs": "^3.13.11",
     "@types/node": "^26.1.1",
-    "@typescript-eslint/eslint-plugin": "^8.64.0",
-    "@typescript-eslint/parser": "^8.64.0",
+    "@typescript-eslint/eslint-plugin": "^8.65.0",
+    "@typescript-eslint/parser": "^8.65.0",
     "autoprefixer": "^10.5.4",
-    "eslint": "^10.7.0",
+    "eslint": "^10.8.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.6",
     "husky": "^9.1.7",
-    "lint-staged": "^17.1.0",
-    "postcss": "^8.5.20",
+    "lint-staged": "^17.2.0",
+    "postcss": "^8.5.23",
     "tailwindcss": "3.4.17",
     "typescript": "^7.0.2",
     "vite": "^8.1.5"
   },
-  "packageManager": "pnpm@11.15.1"
+  "packageManager": "pnpm@11.17.0"
 }

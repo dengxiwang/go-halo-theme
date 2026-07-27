@@ -200,27 +200,94 @@ export function watchModalAndControlBodyScroll() {
     return;
   }
 
-  const modalWrapper = shadowRoot.querySelector(".modal__wrapper");
+  const modalWrapper = shadowRoot.querySelector<HTMLElement>(".modal__wrapper");
   if (!modalWrapper) {
     console.warn("⚠️ 未找到 .modal__wrapper 元素");
     return;
   }
 
-  // 初始状态检查
-  const initialDisplay = getComputedStyle(modalWrapper).display;
-  if (initialDisplay !== "none") {
-    disableScroll(document.body);
+  // 页面滚动后，body 上的 OverlayScrollbars 会让 sticky 顶栏离开视口。
+  // 搜索打开时将顶栏平移回视口顶部，但仍让它处于全屏遮罩下方：
+  // 顶栏保持可见但不可交互，搜索内容则避开顶栏显示。
+  const header = document.getElementById("header");
+  const originalHeaderTranslate = header
+    ? {
+        value: header.style.getPropertyValue("translate"),
+        priority: header.style.getPropertyPriority("translate"),
+      }
+    : null;
+  let isHeaderPinned = false;
+  let headerTranslateY = 0;
+
+  const restoreHeaderTranslate = () => {
+    if (!header) return;
+    if (originalHeaderTranslate?.value) {
+      header.style.setProperty("translate", originalHeaderTranslate.value, originalHeaderTranslate.priority);
+    } else {
+      header.style.removeProperty("translate");
+    }
+  };
+
+  const keepHeaderInViewport = () => {
+    if (!header || !isHeaderPinned) return;
+
+    const currentTop = header.getBoundingClientRect().top;
+    if (Math.abs(currentTop) < 0.5) return;
+
+    headerTranslateY -= currentTop;
+    header.style.setProperty("translate", `0 ${headerTranslateY}px`);
+  };
+
+  const setHeaderPinned = (pinned: boolean) => {
+    if (!header || pinned === isHeaderPinned) return;
+
+    isHeaderPinned = pinned;
+    if (pinned) {
+      headerTranslateY = -header.getBoundingClientRect().top;
+      header.style.setProperty("translate", `0 ${headerTranslateY}px`);
+      return;
+    }
+
+    headerTranslateY = 0;
+    restoreHeaderTranslate();
+  };
+
+  const syncModalLayout = () => {
+    const headerHeight = header ? Math.max(0, Math.round(header.getBoundingClientRect().height)) : 0;
+    modalWrapper.style.top = "0px";
+    modalWrapper.style.height = "100%";
+    modalWrapper.style.paddingTop = `calc(3em + ${headerHeight}px)`;
+  };
+  syncModalLayout();
+
+  let headerResizeObserver: ResizeObserver | null = null;
+  if (header && typeof ResizeObserver !== "undefined") {
+    headerResizeObserver = new ResizeObserver(() => {
+      keepHeaderInViewport();
+      syncModalLayout();
+    });
+    headerResizeObserver.observe(header);
   }
+
+  const updateModalState = () => {
+    const isOpen = getComputedStyle(modalWrapper).display !== "none";
+    setHeaderPinned(isOpen);
+    if (isOpen) {
+      keepHeaderInViewport();
+      syncModalLayout();
+      disableScroll(document.body);
+    } else {
+      enableScroll(document.body);
+    }
+  };
+
+  // 初始状态检查
+  updateModalState();
 
   const observer = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
       if (mutation.type === "attributes" && mutation.attributeName === "style") {
-        const display = getComputedStyle(modalWrapper).display;
-        if (display === "none") {
-          enableScroll(document.body);
-        } else {
-          disableScroll(document.body);
-        }
+        updateModalState();
       }
     }
   });
@@ -231,6 +298,13 @@ export function watchModalAndControlBodyScroll() {
     attributeFilter: ["style"],
   });
 
+  window.addEventListener("scroll", keepHeaderInViewport, { passive: true });
+
   // 返回一个清理函数（可选）
-  return () => observer.disconnect();
+  return () => {
+    observer.disconnect();
+    headerResizeObserver?.disconnect();
+    window.removeEventListener("scroll", keepHeaderInViewport);
+    setHeaderPinned(false);
+  };
 }

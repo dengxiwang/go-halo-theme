@@ -235,6 +235,31 @@ html.dark .bg-black\/5 { background-color: rgba(255, 255, 255, 0.08) !important;
 html.dark .hover\:bg-black\/5:hover { background-color: rgba(255, 255, 255, 0.08) !important; }
 html.dark .theme-toggle-button:active { background-color: rgba(255, 255, 255, 0.14) !important; }
 
+@media (max-width: 767px) {
+  .theme-toggle-button,
+  html.dark .theme-toggle-button {
+    background-color: transparent !important;
+  }
+
+  .theme-toggle-button:active {
+    background-color: rgba(0, 0, 0, 0.08) !important;
+  }
+
+  html.dark .theme-toggle-button:active {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+  }
+}
+
+@media (max-width: 767px) and (hover: hover) and (pointer: fine) {
+  .theme-toggle-button:hover {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+  }
+
+  html.dark .theme-toggle-button:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+  }
+}
+
 /* 边框 */
 html.dark .border,
 html.dark .border-t,
