@@ -11,6 +11,7 @@
           <li
             th:each="moment : ${moments.items}"
             th:with="content=${moment.spec.content}"
+            data-image-gallery="explicit"
             class="flex flex-wrap gap-2 rounded-lg border bg-white p-4 max-sm:p-3"
           >
             <div
@@ -46,8 +47,10 @@
                 class="mb-1 w-full overflow-hidden rounded-md border md:h-[124px] md:w-auto"
               >
                 <img
+                  data-image-preview
                   class="w-full md:h-[124px] md:w-auto"
                   th:src="${momentItem.url}"
+                  th:attr="data-fullsize=${momentItem.url}"
                   th:srcset="|${thumbnail.gen(momentItem.url, 's')} 400w,
                              ${thumbnail.gen(momentItem.url, 'm')} 800w|"
                   sizes="(max-width: 800px) 100vw, 800px"

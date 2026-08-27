@@ -5,6 +5,7 @@ import "swiper/css";
 import "swiper/css/autoplay";
 import { Autoplay } from "swiper/modules";
 import * as tocbot from "tocbot";
+import { initImageLightbox } from "./image-lightbox";
 import { disableScroll, enableScroll, initScrollbars, watchModalAndControlBodyScroll } from "./scrollbar";
 import "./styles/main.css";
 import "./styles/tailwind.css";
@@ -13,6 +14,7 @@ import "./styles/tailwind.css";
 document.addEventListener("DOMContentLoaded", () => {
   initScrollbars();
   watchModalAndControlBodyScroll();
+  initImageLightbox();
 });
 
 (window as any).disableScroll = disableScroll;

@@ -123,16 +123,17 @@ function syncScrollbarThemes() {
 }
 
 /**
- * ✅ 禁用滚动：拦截抽屉之外的滚动事件（允许 .mobile-drawer 内部滚动）
+ * ✅ 禁用滚动：拦截遮罩之外的滚动事件（允许抽屉和图片查看器处理自身手势）
  */
 export function disableScroll(_element?: HTMLElement) {
   if (scrollBlockHandler) return; // 已经拦截中
 
   scrollBlockHandler = (e: Event) => {
     const target = e.target as HTMLElement | null;
-    // 如果事件来自抽屉内部，允许滚动
-    if (target && target.closest && target.closest(".mobile-drawer")) {
-      return;
+    if (target && target.closest) {
+      // 抽屉允许自身滚动；图片查看器自行处理触摸与滚轮缩放并阻止页面穿透。
+      if (target.closest(".mobile-drawer")) return;
+      if (target.closest(".image-lightbox")) return;
     }
     // 其他地方的滚动被阻止
     e.preventDefault();
@@ -143,7 +144,7 @@ export function disableScroll(_element?: HTMLElement) {
   keyBlockHandler = (e: KeyboardEvent) => {
     const blockedKeys = [" ", "PageUp", "PageDown", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Home", "End"];
     const target = e.target as HTMLElement | null;
-    if (target && target.closest && target.closest(".mobile-drawer")) {
+    if (target && target.closest && target.closest(".mobile-drawer, .image-lightbox")) {
       return;
     }
     if (blockedKeys.includes(e.key)) {
