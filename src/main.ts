@@ -92,14 +92,14 @@ function fallbackCopyText(text: string) {
   document.body.removeChild(textarea);
 }
 
-// 添加复制按钮
-document.addEventListener("DOMContentLoaded", () => {
-  const codeBlocks = document.querySelectorAll("pre > code");
+// 添加复制按钮。工具栏直接放进 pre，避免脚本加载后再包裹代码块造成布局跳动。
+function enhanceCodeBlocks() {
+  const codeBlocks = document.querySelectorAll(".markdown-body pre > code");
 
   codeBlocks.forEach((codeEl) => {
-    const preEl = codeEl.parentElement as HTMLDivElement;
-    const wrapper = document.createElement("div");
-    wrapper.className = "relative inline-block w-full";
+    const preEl = codeEl.parentElement as HTMLPreElement;
+    if (preEl.dataset.codeBlockEnhanced === "true") return;
+    preEl.dataset.codeBlockEnhanced = "true";
 
     // 提取语言名
     let lang = "";
@@ -109,18 +109,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 创建工具栏容器（flex 布局，水平排列）
-    const toolbar = document.createElement("div");
-    toolbar.className = "absolute top-2 right-2 flex items-center gap-2 z-10";
+    const toolbar = document.createElement("span");
+    toolbar.className = "code-block-toolbar";
 
     // 创建语言标签
     const langTag = document.createElement("span");
-    langTag.className = "px-2 py-0.5 text-xs font-medium bg-gray-200 rounded";
+    langTag.className = "code-block-language";
     langTag.textContent = lang || "CODE";
 
     // 创建复制按钮
     const copyBtn = document.createElement("button");
     copyBtn.type = "button";
-    copyBtn.className = "p-1.5 text-gray-600 hover:text-gray-900 focus:outline-none transition-colors";
+    copyBtn.className = "code-block-copy";
+    copyBtn.setAttribute("aria-label", "复制代码");
+    copyBtn.title = "复制代码";
     copyBtn.innerHTML = `
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="9" y="9" width="13" height="13" rx="2"></rect>
@@ -132,10 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
     toolbar.appendChild(langTag);
     toolbar.appendChild(copyBtn);
 
-    // 包裹代码块并插入 DOM
-    preEl.parentNode?.replaceChild(wrapper, preEl);
-    wrapper.appendChild(preEl);
-    wrapper.appendChild(toolbar);
+    preEl.appendChild(toolbar);
 
     // 绑定复制事件
     copyBtn.addEventListener("click", async () => {
@@ -150,7 +149,13 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
-});
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", enhanceCodeBlocks);
+} else {
+  enhanceCodeBlocks();
+}
 
 function showCopyTooltip(text: string, isError = false) {
   let tooltip = document.getElementById("global-copy-tooltip");

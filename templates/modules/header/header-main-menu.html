@@ -1,12 +1,5 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
-  <style>
-    /* 避免页面加载时下拉菜单短暂显示 */
-    [x-cloak] {
-      display: none !important;
-    }
-  </style>
-
   <div
     th:fragment="header-main-menu"
     th:with="menu = ${menuFinder.getPrimary}"

@@ -12,6 +12,25 @@ const MAX_ZOOM_RATIO = 4;
 const DEFAULT_ZOOM_RATIO = 2.5;
 const ZOOM_STEP = 0.5;
 const WHEEL_ZOOM_SENSITIVITY = 0.002;
+const ZOOM_TRANSITION_DURATION = 240;
+const BOUNCE_RETURN_DURATION = 360;
+const BOUNCE_AXIS_THRESHOLD = 6;
+const BACKDROP_CLICK_SUPPRESSION_DURATION = 400;
+
+type BounceGesture = {
+  pointerId: number;
+  startX: number;
+  startY: number;
+  axis: "pending" | "horizontal" | "vertical";
+  layer: HTMLElement;
+};
+
+type ViewerPointerGesture = {
+  pointerId: number;
+  startX: number;
+  startY: number;
+  moved: boolean;
+};
 
 type ViewerElements = {
   dialog: HTMLDialogElement;
@@ -42,6 +61,10 @@ let activeIndex = -1;
 let lastTrigger: HTMLElement | null = null;
 let scrollLocked = false;
 let gestureStartZoomRatio = MIN_ZOOM_RATIO;
+let bounceGesture: BounceGesture | null = null;
+let bounceCleanupTimer: number | undefined;
+let viewerPointerGesture: ViewerPointerGesture | null = null;
+let backdropClickSuppressedUntil = 0;
 
 function getRequiredElement<T extends Element>(root: ParentNode, selector: string): T {
   const element = root.querySelector<T>(selector);
@@ -155,7 +178,119 @@ function getElementTranslate(element: HTMLElement) {
   }
 }
 
-function setZoomRatio(scale: number, origin?: { clientX: number; clientY: number }, transitionDuration = 180) {
+function getRubberBandDistance(distance: number, viewportSize: number) {
+  const absoluteDistance = Math.abs(distance);
+  const maxDistance = Math.min(96, viewportSize * 0.12);
+  const resistedDistance = (absoluteDistance * 0.38 * viewportSize) / (viewportSize + absoluteDistance * 0.38);
+  return Math.sign(distance) * Math.min(maxDistance, resistedDistance);
+}
+
+function resetBounceLayer(layer: HTMLElement, animate = true) {
+  window.clearTimeout(bounceCleanupTimer);
+  layer.style.transitionDuration = animate ? `${BOUNCE_RETURN_DURATION}ms` : "0ms";
+  layer.style.transform = "translate3d(0, 0, 0)";
+  layer.classList.toggle("is-rebounding", animate);
+
+  if (animate) {
+    bounceCleanupTimer = window.setTimeout(() => {
+      layer.classList.remove("is-rebounding");
+      layer.style.removeProperty("transition-duration");
+    }, BOUNCE_RETURN_DURATION);
+  }
+}
+
+function cancelBounceGesture(animate = true) {
+  if (!bounceGesture) return;
+  resetBounceLayer(bounceGesture.layer, animate && bounceGesture.axis === "vertical");
+  bounceGesture = null;
+}
+
+function handleBouncePointerDown(event: PointerEvent) {
+  if (!imageSwiper || !event.isPrimary || (event.pointerType === "mouse" && event.button !== 0)) return;
+
+  // 放大状态由 Swiper Zoom 自己处理四向拖拽与越界阻尼；这里补足原始尺寸下缺失的纵向回弹。
+  if (imageSwiper.zoom.scale > 1.01) {
+    cancelBounceGesture(false);
+    return;
+  }
+
+  const target = event.target as Element | null;
+  const slide = target?.closest<HTMLElement>(".image-lightbox__slide.swiper-slide-active");
+  const layer = slide?.querySelector<HTMLElement>(".image-lightbox__bounce-layer");
+  if (!slide || !layer) return;
+
+  resetBounceLayer(layer, false);
+  bounceGesture = {
+    pointerId: event.pointerId,
+    startX: event.clientX,
+    startY: event.clientY,
+    axis: "pending",
+    layer,
+  };
+}
+
+function handleBouncePointerMove(event: PointerEvent) {
+  if (!imageSwiper || !bounceGesture || bounceGesture.pointerId !== event.pointerId) return;
+
+  const deltaX = event.clientX - bounceGesture.startX;
+  const deltaY = event.clientY - bounceGesture.startY;
+
+  if (bounceGesture.axis === "pending") {
+    if (Math.max(Math.abs(deltaX), Math.abs(deltaY)) < BOUNCE_AXIS_THRESHOLD) return;
+    bounceGesture.axis = Math.abs(deltaY) > Math.abs(deltaX) ? "vertical" : "horizontal";
+  }
+
+  // 横向继续交给相册本身处理切图与首尾回弹，纵向移动独立的弹性层。
+  if (bounceGesture.axis !== "vertical") return;
+
+  event.preventDefault();
+  imageSwiper.allowClick = false;
+  const viewportHeight = bounceGesture.layer.parentElement?.clientHeight || window.innerHeight;
+  const translateY = getRubberBandDistance(deltaY, viewportHeight);
+  bounceGesture.layer.style.transitionDuration = "0ms";
+  bounceGesture.layer.style.transform = `translate3d(0, ${translateY}px, 0)`;
+}
+
+function handleBouncePointerEnd(event: PointerEvent) {
+  if (!bounceGesture || bounceGesture.pointerId !== event.pointerId) return;
+  cancelBounceGesture(true);
+}
+
+function handleViewerPointerDown(event: PointerEvent) {
+  if (!event.isPrimary || (event.pointerType === "mouse" && event.button !== 0)) return;
+
+  viewerPointerGesture = {
+    pointerId: event.pointerId,
+    startX: event.clientX,
+    startY: event.clientY,
+    moved: false,
+  };
+}
+
+function handleViewerPointerMove(event: PointerEvent) {
+  if (!viewerPointerGesture || viewerPointerGesture.pointerId !== event.pointerId) return;
+
+  const distance = Math.hypot(event.clientX - viewerPointerGesture.startX, event.clientY - viewerPointerGesture.startY);
+  if (distance < BOUNCE_AXIS_THRESHOLD) return;
+
+  viewerPointerGesture.moved = true;
+  backdropClickSuppressedUntil = performance.now() + BACKDROP_CLICK_SUPPRESSION_DURATION;
+}
+
+function handleViewerPointerEnd(event: PointerEvent) {
+  if (!viewerPointerGesture || viewerPointerGesture.pointerId !== event.pointerId) return;
+
+  if (viewerPointerGesture.moved) {
+    backdropClickSuppressedUntil = performance.now() + BACKDROP_CLICK_SUPPRESSION_DURATION;
+  }
+  viewerPointerGesture = null;
+}
+
+function setZoomRatio(
+  scale: number,
+  origin?: { clientX: number; clientY: number },
+  transitionDuration = ZOOM_TRANSITION_DURATION,
+) {
   if (!imageSwiper) return;
 
   const previousScale = imageSwiper.zoom.scale || MIN_ZOOM_RATIO;
@@ -201,13 +336,22 @@ function changeZoomRatio(step: number, origin?: { clientX: number; clientY: numb
   setZoomRatio(imageSwiper.zoom.scale + step, origin);
 }
 
-function toggleZoom() {
+function getInteractionOrigin(event: MouseEvent | TouchEvent | PointerEvent) {
+  if ("clientX" in event) {
+    return { clientX: event.clientX, clientY: event.clientY };
+  }
+
+  const touch = event.changedTouches[0] || event.touches[0];
+  return touch ? { clientX: touch.clientX, clientY: touch.clientY } : undefined;
+}
+
+function toggleZoom(origin?: { clientX: number; clientY: number }) {
   if (!imageSwiper) return;
 
   if (imageSwiper.zoom.scale > 1.01) {
-    imageSwiper.zoom.out();
+    setZoomRatio(MIN_ZOOM_RATIO, origin);
   } else {
-    setZoomRatio(DEFAULT_ZOOM_RATIO);
+    setZoomRatio(DEFAULT_ZOOM_RATIO, origin);
   }
 }
 
@@ -342,16 +486,24 @@ function createViewer() {
   dialog.addEventListener("wheel", handleViewerWheel, { passive: false });
   dialog.addEventListener("gesturestart", handleTrackpadGestureStart, { passive: false });
   dialog.addEventListener("gesturechange", handleTrackpadGestureChange, { passive: false });
+  dialog.addEventListener("pointerdown", handleViewerPointerDown);
+  dialog.addEventListener("pointerdown", handleBouncePointerDown);
+  dialog.addEventListener("pointermove", handleViewerPointerMove);
+  dialog.addEventListener("pointermove", handleBouncePointerMove, { passive: false });
+  dialog.addEventListener("pointerup", handleViewerPointerEnd);
+  dialog.addEventListener("pointerup", handleBouncePointerEnd);
+  dialog.addEventListener("pointercancel", handleViewerPointerEnd);
+  dialog.addEventListener("pointercancel", handleBouncePointerEnd);
 
   dialog.addEventListener("click", (event) => {
-    const target = event.target as HTMLElement;
-    if (
-      target === dialog ||
-      target.classList.contains("swiper-slide") ||
-      target.classList.contains("swiper-zoom-container")
-    ) {
-      closeViewer();
-    }
+    if (event.defaultPrevented || performance.now() < backdropClickSuppressedUntil) return;
+
+    const target = event.target as Element | null;
+    if (!target) return;
+
+    // 图片与交互控件保持可操作；其余区域（包括缩放容器中的黑色留白）都视为关闭区域。
+    if (target.closest(".image-lightbox__image.is-ready, .image-lightbox__button, .image-lightbox__caption")) return;
+    closeViewer();
   });
 
   dialog.addEventListener("cancel", (event) => {
@@ -378,7 +530,7 @@ function createViewer() {
       changeZoomRatio(-ZOOM_STEP);
     } else if (event.key === "0" || event.code === "Numpad0") {
       event.preventDefault();
-      imageSwiper?.zoom.out();
+      setZoomRatio(MIN_ZOOM_RATIO);
     }
   });
 
@@ -426,10 +578,12 @@ function createSlides(images: HTMLImageElement[], initialIndex: number) {
   images.forEach((sourceImage, index) => {
     const details = getImageDetails(sourceImage);
     const slide = document.createElement("div");
+    const bounceLayer = document.createElement("div");
     const zoomContainer = document.createElement("div");
     const previewImage = new Image();
 
     slide.className = "swiper-slide image-lightbox__slide";
+    bounceLayer.className = "image-lightbox__bounce-layer";
     zoomContainer.className = "swiper-zoom-container image-lightbox__zoom-container";
     zoomContainer.dataset.swiperZoom = "4";
     previewImage.className = "image-lightbox__image";
@@ -449,7 +603,8 @@ function createSlides(images: HTMLImageElement[], initialIndex: number) {
     previewImage.src = details.src;
 
     zoomContainer.appendChild(previewImage);
-    slide.appendChild(zoomContainer);
+    bounceLayer.appendChild(zoomContainer);
+    slide.appendChild(bounceLayer);
     fragment.appendChild(slide);
   });
 
@@ -457,6 +612,7 @@ function createSlides(images: HTMLImageElement[], initialIndex: number) {
 }
 
 function syncViewerState(swiper: Swiper) {
+  cancelBounceGesture(false);
   const elements = getViewer();
   const sourceImage = activeImages[swiper.activeIndex];
   if (!sourceImage) return;
@@ -497,6 +653,8 @@ function finishPreviousZoomReset(swiper: Swiper) {
 }
 
 function destroySwiper() {
+  cancelBounceGesture(false);
+  window.clearTimeout(bounceCleanupTimer);
   if (imageSwiper && !imageSwiper.destroyed) {
     imageSwiper.destroy(true, true);
   }
@@ -530,7 +688,10 @@ function openViewer(images: HTMLImageElement[], index: number, trigger: HTMLElem
     spaceBetween: 0,
     speed: 260,
     threshold: 8,
-    resistanceRatio: 0.65,
+    resistance: true,
+    resistanceRatio: 0.82,
+    touchReleaseOnEdges: false,
+    watchOverflow: false,
     grabCursor: true,
     preventClicks: true,
     preventClicksPropagation: true,
@@ -538,13 +699,22 @@ function openViewer(images: HTMLImageElement[], index: number, trigger: HTMLElem
     zoom: {
       minRatio: MIN_ZOOM_RATIO,
       maxRatio: MAX_ZOOM_RATIO,
-      toggle: true,
+      // 自己接管双击，保证移动端放大、还原走同一套比例和过渡逻辑。
+      toggle: false,
     },
     on: {
       init: syncViewerState,
       slideChange: syncViewerState,
       transitionEnd: finishPreviousZoomReset,
-      zoomChange: (_swiper, scale) => updateZoomButton(scale),
+      zoomChange: (_swiper, scale) => {
+        updateZoomButton(scale);
+        if (scale > 1.01) cancelBounceGesture(false);
+      },
+      doubleTap: (_swiper, event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        toggleZoom(getInteractionOrigin(event));
+      },
     },
   });
 
@@ -583,6 +753,8 @@ function resetViewer() {
   activeImages = [];
   activeIndex = -1;
   gestureStartZoomRatio = MIN_ZOOM_RATIO;
+  viewerPointerGesture = null;
+  backdropClickSuppressedUntil = 0;
 
   const trigger = lastTrigger;
   lastTrigger = null;

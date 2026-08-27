@@ -81,6 +81,7 @@
 
   <!-- 遮罩层 -->
   <div
+    x-cloak
     x-show="isOpen"
     @click="isOpen = false; setTimeout(() => enableScroll(document.body), 200);"
     x-transition:enter="transition ease duration-300"
@@ -103,6 +104,7 @@
 
   <!-- 抽屉 -->
   <div
+    x-cloak
     x-show="isOpen"
     x-transition:enter="transition ease duration-300 transform"
     x-transition:enter-start="translate-x-full"

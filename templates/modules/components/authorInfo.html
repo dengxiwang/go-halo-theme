@@ -47,62 +47,101 @@
       </div>
     </div>
 
-    <!-- 头像 -->
+    <!-- 仅全屏模式等待整体布局完成后再显示；普通模式直接展示。 -->
     <div
-      th:if="${!#strings.isEmpty(theme.config.authorInfo.avatar)}"
-      class="relative mb-1 h-[88px] w-[88px] max-md:mb-[2px] max-md:h-20 max-md:w-20"
-    >
-      <img
-        th:src="@{${theme.config.authorInfo.avatar}}"
-        alt="Author Avatar"
-        class="h-[88px] w-[88px] rounded-full border-[3px] border-white object-cover max-md:h-20 max-md:w-20"
-      />
-      <div
-        class="absolute bottom-[2px] right-[2px] h-6 w-6 rounded-full border-[3px] border-white bg-green-500 max-md:h-5 max-md:w-5"
-      ></div>
-    </div>
-
-    <!-- 昵称 -->
-    <h3
-      th:if="${!#strings.isEmpty(theme.config.authorInfo.name)}"
-      th:text="${theme.config.authorInfo.name}"
-      class="font-semibold"
-      th:classappend="${theme.config.authorInfo.backgroundHeightType == 'screen' ? 'text-4xl max-md:text-3xl': 'text-2xl'}"
-    ></h3>
-
-    <!-- 三方平台链接 -->
-    <div
-      th:if="${!#lists.isEmpty(theme.config.authorInfo.links) and theme.config.authorInfo.backgroundHeightType == 'screen'}"
-      th:with="links = ${theme.config.authorInfo.links}"
-      class="mt-2 flex flex-wrap justify-center gap-5"
-    >
-      <th:block th:each="link : ${links}">
-        <a
-          th:if="${!#strings.isEmpty(link.label) or !#strings.isEmpty(link.icon)}"
-          th:href="@{${link.url.startsWith('http') ? link.url : 'https://' + link.url}}"
-          target="_blank"
-          class="flex items-center gap-[6px] text-lg font-medium transition-all hover:scale-110 max-md:text-base"
-        >
-          <img th:if="${!#strings.isEmpty(link.icon)}" th:src="@{${link.icon}}" class="h-5 w-5" />
-          <span th:if="${!#strings.isEmpty(link.label)}" th:text="${link.label}"></span>
-        </a>
-      </th:block>
-    </div>
-
-    <!-- 简介：打字机版本 -->
-    <div
-      x-data="typewriter()"
+      x-data="authorInfoLayout($el.dataset.waitForLayout === 'true')"
       x-init="init()"
-      th:attr="data-text=${hitokotoContent}"
-      th:if="${theme.config.authorInfo.backgroundHeightType == 'screen'}"
-      class="relative w-full max-w-md whitespace-pre-line text-center text-lg font-medium max-md:text-base"
-      style="line-height: 1.5; opacity: 0.9"
+      x-bind:style="{ visibility: layoutReady ? 'visible' : 'hidden', opacity: layoutReady ? 1 : 0 }"
+      th:attr="data-wait-for-layout=${theme.config.authorInfo.backgroundHeightType == 'screen'}"
+      th:style="${theme.config.authorInfo.backgroundHeightType == 'screen'} ? 'visibility: hidden; opacity: 0' : null"
+      class="author-info-layout relative flex w-full flex-col items-center justify-center gap-4 max-md:gap-3"
     >
+      <!-- 头像 -->
+      <div
+        th:if="${!#strings.isEmpty(theme.config.authorInfo.avatar)}"
+        class="relative mb-1 h-[88px] w-[88px] max-md:mb-[2px] max-md:h-20 max-md:w-20"
+      >
+        <img
+          th:src="@{${theme.config.authorInfo.avatar}}"
+          alt="Author Avatar"
+          class="h-[88px] w-[88px] rounded-full border-[3px] border-white object-cover max-md:h-20 max-md:w-20"
+        />
+        <div
+          class="absolute bottom-[2px] right-[2px] h-6 w-6 rounded-full border-[3px] border-white bg-green-500 max-md:h-5 max-md:w-5"
+        ></div>
+      </div>
+
+      <!-- 昵称 -->
+      <h3
+        th:if="${!#strings.isEmpty(theme.config.authorInfo.name)}"
+        th:text="${theme.config.authorInfo.name}"
+        class="font-semibold"
+        th:classappend="${theme.config.authorInfo.backgroundHeightType == 'screen' ? 'text-4xl max-md:text-3xl': 'text-2xl'}"
+      ></h3>
+
+      <!-- 三方平台链接 -->
+      <div
+        th:if="${!#lists.isEmpty(theme.config.authorInfo.links) and theme.config.authorInfo.backgroundHeightType == 'screen'}"
+        th:with="links = ${theme.config.authorInfo.links}"
+        class="mt-2 flex flex-wrap justify-center gap-5"
+      >
+        <th:block th:each="link : ${links}">
+          <a
+            th:if="${!#strings.isEmpty(link.label) or !#strings.isEmpty(link.icon)}"
+            th:href="@{${link.url.startsWith('http') ? link.url : 'https://' + link.url}}"
+            target="_blank"
+            class="flex items-center gap-[6px] text-lg font-medium transition-all hover:scale-110 max-md:text-base"
+          >
+            <img th:if="${!#strings.isEmpty(link.icon)}" th:src="@{${link.icon}}" class="h-5 w-5" />
+            <span th:if="${!#strings.isEmpty(link.label)}" th:text="${link.label}"></span>
+          </a>
+        </th:block>
+      </div>
+
+      <!-- 简介：完整文案预留最终高度，打字内容覆盖显示，整体位置始终一致。 -->
+      <div
+        x-data="typewriter()"
+        x-init="init()"
+        th:attr="data-text=${hitokotoContent}"
+        th:if="${theme.config.authorInfo.backgroundHeightType == 'screen' and !#strings.isEmpty(hitokotoContent)}"
+        class="relative w-full max-w-md whitespace-pre-line text-center text-lg font-medium max-md:text-base"
+        style="line-height: 1.5; opacity: 0.9"
+      >
+        <p aria-hidden="true" class="invisible leading-relaxed" th:text="${hitokotoContent}"></p>
+        <p
+          x-cloak
+          x-show="displayedText.length > 0"
+          x-text="displayedText"
+          class="typewriter absolute inset-x-0 top-0 w-full leading-relaxed"
+        ></p>
+      </div>
+
+      <!-- 简介标准版 -->
       <p
-        x-show="displayedText.length > 0"
-        x-text="displayedText"
-        class="typewriter absolute left-1/2 top-0 w-full -translate-x-1/2 leading-relaxed"
+        th:if="${theme.config.authorInfo.backgroundHeightType != 'screen'}"
+        th:text="${hitokotoContent}"
+        class="max-w-md whitespace-pre-line text-center text-sm font-medium"
+        th:style="|opacity:| + ${theme.config.authorInfo.descriptionOpacity} / 100.0 + |; line-height: 1.5;|"
       ></p>
+
+      <!-- 三方平台链接（标准高度） -->
+      <div
+        th:if="${!#lists.isEmpty(theme.config.authorInfo.links) and theme.config.authorInfo.backgroundHeightType != 'screen'}"
+        th:with="links = ${theme.config.authorInfo.links}"
+        class="mt-2 flex flex-wrap justify-center gap-5"
+      >
+        <th:block th:each="link : ${links}">
+          <a
+            th:if="${!#strings.isEmpty(link.label) or !#strings.isEmpty(link.icon)}"
+            th:href="@{${link.url.startsWith('http') ? link.url : 'https://' + link.url}}"
+            target="_blank"
+            class="flex items-center gap-[6px] text-sm font-medium transition-all hover:scale-110"
+          >
+            <img th:if="${!#strings.isEmpty(link.icon)}" th:src="@{${link.icon}}" class="h-5 w-5" />
+            <span th:if="${!#strings.isEmpty(link.label)}" th:text="${link.label}"></span>
+          </a>
+        </th:block>
+      </div>
     </div>
 
     <style>
@@ -129,6 +168,30 @@
 
     <script>
       const initializedElements = new WeakSet();
+
+      function authorInfoLayout(waitForLayout) {
+        return {
+          layoutReady: !waitForLayout,
+
+          init() {
+            if (!waitForLayout) return;
+
+            const reveal = () => {
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                  this.layoutReady = true;
+                });
+              });
+            };
+
+            if (document.fonts && document.fonts.ready) {
+              document.fonts.ready.then(reveal, reveal);
+            } else {
+              reveal();
+            }
+          },
+        };
+      }
 
       function typewriter() {
         return {
@@ -202,33 +265,6 @@
         };
       }
     </script>
-
-    <!-- 简介标准版 -->
-    <p
-      th:if="${theme.config.authorInfo.backgroundHeightType != 'screen'}"
-      th:text="${hitokotoContent}"
-      class="max-w-md whitespace-pre-line text-center text-sm font-medium"
-      th:style="|opacity:| + ${theme.config.authorInfo.descriptionOpacity} / 100.0 + |; line-height: 1.5;|"
-    ></p>
-
-    <!-- 三方平台链接 -->
-    <div
-      th:if="${!#lists.isEmpty(theme.config.authorInfo.links) and theme.config.authorInfo.backgroundHeightType != 'screen'}"
-      th:with="links = ${theme.config.authorInfo.links}"
-      class="mt-2 flex flex-wrap justify-center gap-5"
-    >
-      <th:block th:each="link : ${links}">
-        <a
-          th:if="${!#strings.isEmpty(link.label) or !#strings.isEmpty(link.icon)}"
-          th:href="@{${link.url.startsWith('http') ? link.url : 'https://' + link.url}}"
-          target="_blank"
-          class="flex items-center gap-[6px] text-sm font-medium transition-all hover:scale-110"
-        >
-          <img th:if="${!#strings.isEmpty(link.icon)}" th:src="@{${link.icon}}" class="h-5 w-5" />
-          <span th:if="${!#strings.isEmpty(link.label)}" th:text="${link.label}"></span>
-        </a>
-      </th:block>
-    </div>
 
     <!-- 向下滚动的箭头 -->
     <div

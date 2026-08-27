@@ -1,11 +1,5 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
-  <style>
-    [x-cloak] {
-      display: none !important;
-    }
-  </style>
-
   <ul
     th:fragment="categories"
     id="filters"
@@ -33,27 +27,45 @@
       <li
         th:each="categoryItem, stat : ${categories}"
         th:if="${catLimit <= 0 or stat.index < catLimit}"
-        class="relative"
-        x-data="{ open: false }"
-        @mouseenter="open = true"
-        @mouseleave="open = false"
+        class="relative flex items-center"
+        x-data="{ open: false, canHover: window.matchMedia('(hover: hover) and (pointer: fine)').matches, pointerType: '', touchInput: false }"
+        x-id="['category-submenu']"
+        @mouseenter="if (canHover) open = true"
+        @mouseleave="if (canHover) open = false"
+        @click.outside="open = false"
+        @keydown.escape.window="open = false"
       >
-        <!-- 父级分类链接（完全保留，不动） -->
+        <!-- 分类名称只负责跳转，带子分类时由旁边的独立按钮负责展开。 -->
         <a
           th:href="@{${categoryItem.status.permalink}}"
           class="group flex cursor-pointer items-center gap-1 transition-all hover:text-blue-500"
           th:attr="data-has-children=${not #lists.isEmpty(categoryItem.children)}"
           th:classappend="${categoryItem.metadata.name == category.metadata.name} ? 'active-menu'"
-          @click.prevent="window.location.href = $el.getAttribute('href');"
         >
           <span
             class="max-w-48 overflow-hidden text-ellipsis text-nowrap"
             th:text="|${categoryItem.spec.displayName} (${categoryItem.postCount ?: 0})|"
             >分类名</span
           >
+        </a>
+
+        <button
+          th:if="${not #lists.isEmpty(categoryItem.children)}"
+          type="button"
+          class="category-submenu-toggle ml-0.5 inline-flex h-8 w-8 shrink-0 touch-manipulation items-center justify-center rounded-md transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 sm:h-6 sm:w-6"
+          th:attr="aria-label=|展开或收起 ${categoryItem.spec.displayName} 的子分类|"
+          aria-haspopup="true"
+          :aria-controls="$id('category-submenu')"
+          :aria-expanded="open"
+          :class="{ 'is-open': open, 'is-touch-input': touchInput }"
+          @pointerenter="if ($event.pointerType === 'mouse') touchInput = false"
+          @pointerdown="pointerType = $event.pointerType; touchInput = pointerType !== 'mouse'"
+          @pointercancel="pointerType = ''"
+          @click="open = canHover && pointerType === 'mouse' && $event.detail > 0 ? true : !open; pointerType = ''"
+        >
           <svg
-            th:if="${not #lists.isEmpty(categoryItem.children)}"
-            class="h-[14px] w-[14px] transition-all duration-200 group-hover:text-blue-500"
+            aria-hidden="true"
+            class="h-[14px] w-[14px] transition-transform duration-200"
             :class="{ 'rotate-180': open }"
             fill="none"
             stroke="currentColor"
@@ -62,11 +74,12 @@
           >
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
           </svg>
-        </a>
+        </button>
 
-        <!-- 子分类下拉菜单（完全保留，不动） -->
+        <!-- 子分类下拉菜单 -->
         <ul
           th:if="${not #lists.isEmpty(categoryItem.children)}"
+          :id="$id('category-submenu')"
           x-show="open"
           x-cloak
           x-transition:enter="transition ease-out duration-200"
@@ -75,7 +88,7 @@
           x-transition:leave="transition ease-in duration-100"
           x-transition:leave-start="opacity-100 scale-100"
           x-transition:leave-end="opacity-0 scale-95"
-          class="absolute left-1/2 z-10 mt-0 w-max min-w-[80px] -translate-x-1/2 rounded-lg border border-gray-300 bg-white px-1 py-1 shadow-sm"
+          class="absolute left-1/2 top-full z-10 mt-1 w-max min-w-[80px] -translate-x-1/2 rounded-lg border border-gray-300 bg-white px-1 py-1 shadow-sm"
         >
           <li
             th:each="childCategory : ${categoryItem.children}"
