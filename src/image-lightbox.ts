@@ -15,6 +15,8 @@ const WHEEL_ZOOM_SENSITIVITY = 0.002;
 const ZOOM_TRANSITION_DURATION = 240;
 const BOUNCE_RETURN_DURATION = 360;
 const BOUNCE_AXIS_THRESHOLD = 6;
+const SWIPE_GESTURE_THRESHOLD = 8;
+const SWIPER_SETTLE_EPSILON = 1;
 const BACKDROP_CLICK_SUPPRESSION_DURATION = 400;
 
 type BounceGesture = {
@@ -31,6 +33,15 @@ type ViewerPointerGesture = {
   startY: number;
   moved: boolean;
 };
+
+type SwiperTouchLock = {
+  swiper: Swiper;
+  allowTouchMove: boolean;
+  allowSlidePrevious: boolean;
+  allowSlideNext: boolean;
+};
+
+type TouchGestureMode = "idle" | "swiper" | "pinch";
 
 type ViewerElements = {
   dialog: HTMLDialogElement;
@@ -65,6 +76,13 @@ let bounceGesture: BounceGesture | null = null;
 let bounceCleanupTimer: number | undefined;
 let viewerPointerGesture: ViewerPointerGesture | null = null;
 let backdropClickSuppressedUntil = 0;
+const activeTouchPointers = new Set<number>();
+const blockedTouchPointers = new Set<number>();
+let swiperTouchLock: SwiperTouchLock | null = null;
+let touchGestureMode: TouchGestureMode = "idle";
+let swiperSlideDragging = false;
+let swiperSlideTransitioning = false;
+let blockAllTouchMovesUntilRelease = false;
 
 function getRequiredElement<T extends Element>(root: ParentNode, selector: string): T {
   const element = root.querySelector<T>(selector);
@@ -157,25 +175,14 @@ function updateZoomButton(scale: number) {
   if (!viewer) return;
 
   const isZoomed = scale > 1.01;
+  viewer.dialog.classList.toggle("is-image-zoomed", isZoomed);
   viewer.zoomButton.setAttribute("aria-pressed", String(isZoomed));
   viewer.zoomButton.setAttribute("aria-label", isZoomed ? "还原图片大小" : "放大图片");
-  viewer.zoomButton.title = `${isZoomed ? "还原图片大小" : "放大图片"}（Alt + 滚轮缩放）`;
+  viewer.zoomButton.title = isZoomed ? "还原图片大小（也可双击图片）" : "放大图片（也可双击图片，或按 Alt + 滚轮缩放）";
 }
 
 function clampZoomRatio(scale: number) {
   return Math.min(MAX_ZOOM_RATIO, Math.max(MIN_ZOOM_RATIO, scale));
-}
-
-function getElementTranslate(element: HTMLElement) {
-  const transform = window.getComputedStyle(element).transform;
-  if (!transform || transform === "none") return { x: 0, y: 0 };
-
-  try {
-    const matrix = new DOMMatrixReadOnly(transform);
-    return { x: matrix.m41, y: matrix.m42 };
-  } catch {
-    return { x: 0, y: 0 };
-  }
 }
 
 function getRubberBandDistance(distance: number, viewportSize: number) {
@@ -256,6 +263,171 @@ function handleBouncePointerEnd(event: PointerEvent) {
   cancelBounceGesture(true);
 }
 
+function releaseSwiperTouchLock() {
+  if (!swiperTouchLock) return;
+
+  const lock = swiperTouchLock;
+  if (!lock.swiper.destroyed) {
+    lock.swiper.allowTouchMove = lock.allowTouchMove;
+    lock.swiper.allowSlidePrev = lock.allowSlidePrevious;
+    lock.swiper.allowSlideNext = lock.allowSlideNext;
+  }
+  swiperTouchLock = null;
+}
+
+function resetTouchGestureWhenReleased() {
+  if (activeTouchPointers.size > 0 || blockAllTouchMovesUntilRelease) return;
+
+  releaseSwiperTouchLock();
+  blockedTouchPointers.clear();
+  touchGestureMode = "idle";
+  swiperSlideDragging = false;
+}
+
+function isSwiperBetweenSlides(swiper: Swiper) {
+  const currentTranslate = Math.abs(swiper.getTranslate());
+  if (!Number.isFinite(currentTranslate)) return false;
+
+  return !swiper.snapGrid.some(
+    (snapPoint) => Math.abs(currentTranslate - Math.abs(snapPoint)) <= SWIPER_SETTLE_EPSILON,
+  );
+}
+
+function isSwiperGestureInProgress(swiper: Swiper) {
+  return (
+    touchGestureMode === "swiper" ||
+    swiperSlideDragging ||
+    swiperSlideTransitioning ||
+    swiper.animating ||
+    isSwiperBetweenSlides(swiper)
+  );
+}
+
+function lockSwiperForPinch(swiper: Swiper) {
+  if (swiperTouchLock) return;
+
+  swiperTouchLock = {
+    swiper,
+    allowTouchMove: swiper.allowTouchMove,
+    allowSlidePrevious: swiper.allowSlidePrev,
+    allowSlideNext: swiper.allowSlideNext,
+  };
+  swiper.allowTouchMove = false;
+  swiper.allowSlidePrev = false;
+  swiper.allowSlideNext = false;
+  cancelBounceGesture(false);
+}
+
+function blockTouchPointer(event: PointerEvent) {
+  blockedTouchPointers.add(event.pointerId);
+  if (event.cancelable) event.preventDefault();
+  event.stopPropagation();
+}
+
+function handleTouchPointerDownCapture(event: PointerEvent) {
+  if (event.pointerType !== "touch" || !imageSwiper) return;
+
+  const target = event.target as Element | null;
+  if (!target?.closest(".image-lightbox__swiper")) return;
+
+  const isAdditionalTouch = activeTouchPointers.size > 0;
+  activeTouchPointers.add(event.pointerId);
+  if (!isAdditionalTouch) return;
+
+  // Swiper 已经开始横向位移后，不允许第二根手指中途把当前手势
+  // 转换成 Zoom 捏合；否则 Zoom 会在两张正错位的 slide 上建立缩放状态。
+  if (isSwiperGestureInProgress(imageSwiper)) {
+    touchGestureMode = "swiper";
+    blockTouchPointer(event);
+    return;
+  }
+
+  // Zoom 只需要两根手指。第三根及后续手指也隔离到本轮触摸结束，
+  // 避免改变 Swiper Zoom 内部缓存的两点组合。
+  if (touchGestureMode === "pinch" || activeTouchPointers.size > 2) {
+    blockTouchPointer(event);
+    return;
+  }
+
+  touchGestureMode = "pinch";
+  lockSwiperForPinch(imageSwiper);
+}
+
+function handleTouchPointerMoveCapture(event: PointerEvent) {
+  if (event.pointerType !== "touch") return;
+
+  if (blockAllTouchMovesUntilRelease || blockedTouchPointers.has(event.pointerId)) {
+    if (event.cancelable) event.preventDefault();
+    event.stopPropagation();
+    return;
+  }
+
+  // 不再只等 Swiper 的 sliderFirstMove。真机上 Pointer Events 与 Touch
+  // Events 的组合顺序可能不同，因此在查看器捕获阶段先自行确认横向意图。
+  if (
+    imageSwiper &&
+    touchGestureMode === "idle" &&
+    activeTouchPointers.size === 1 &&
+    imageSwiper.zoom.scale <= 1.01 &&
+    viewerPointerGesture?.pointerId === event.pointerId
+  ) {
+    const deltaX = event.clientX - viewerPointerGesture.startX;
+    const deltaY = event.clientY - viewerPointerGesture.startY;
+    if (Math.abs(deltaX) >= SWIPE_GESTURE_THRESHOLD && Math.abs(deltaX) > Math.abs(deltaY)) {
+      touchGestureMode = "swiper";
+      swiperSlideDragging = true;
+    }
+  }
+}
+
+function handleTouchPointerEndCapture(event: PointerEvent) {
+  if (event.pointerType !== "touch" || !blockedTouchPointers.has(event.pointerId)) return;
+
+  blockedTouchPointers.delete(event.pointerId);
+  activeTouchPointers.delete(event.pointerId);
+  if (event.cancelable) event.preventDefault();
+  event.stopPropagation();
+  resetTouchGestureWhenReleased();
+}
+
+function handleTouchStartCapture(event: TouchEvent) {
+  if (!imageSwiper || event.touches.length < 2) return;
+
+  const target = event.target as Element | null;
+  if (!target?.closest(".image-lightbox__swiper")) return;
+
+  // Pointer 捕获已经拦住第二指时，这里只补充阻止浏览器原生捏合。
+  if (blockedTouchPointers.size > 0) {
+    if (event.cancelable) event.preventDefault();
+    event.stopPropagation();
+    return;
+  }
+
+  // 某些移动端 WebView 会先让 Touch Events 推动 Swiper，再补齐多指
+  // Pointer Events。直接检查 wrapper 的实时位移，堵住这个时序缺口。
+  if (!isSwiperGestureInProgress(imageSwiper)) return;
+
+  touchGestureMode = "swiper";
+  blockAllTouchMovesUntilRelease = true;
+  if (event.cancelable) event.preventDefault();
+  event.stopPropagation();
+}
+
+function handleTouchMoveCapture(event: TouchEvent) {
+  if (!blockAllTouchMovesUntilRelease) return;
+  if (event.cancelable) event.preventDefault();
+  event.stopPropagation();
+}
+
+function handleTouchEndCapture(event: TouchEvent) {
+  if (event.touches.length > 0) return;
+
+  blockAllTouchMovesUntilRelease = false;
+  activeTouchPointers.clear();
+  blockedTouchPointers.clear();
+  resetTouchGestureWhenReleased();
+}
+
 function handleViewerPointerDown(event: PointerEvent) {
   if (!event.isPrimary || (event.pointerType === "mouse" && event.button !== 0)) return;
 
@@ -278,6 +450,13 @@ function handleViewerPointerMove(event: PointerEvent) {
 }
 
 function handleViewerPointerEnd(event: PointerEvent) {
+  if (event.pointerType === "touch") {
+    activeTouchPointers.delete(event.pointerId);
+    // 一次捏合开始后保持切图锁，直到所有手指都抬起，避免剩下的一根
+    // 手指继续移动时又被 Swiper 当成新的横向滑动。
+    resetTouchGestureWhenReleased();
+  }
+
   if (!viewerPointerGesture || viewerPointerGesture.pointerId !== event.pointerId) return;
 
   if (viewerPointerGesture.moved) {
@@ -288,7 +467,7 @@ function handleViewerPointerEnd(event: PointerEvent) {
 
 function setZoomRatio(
   scale: number,
-  origin?: { clientX: number; clientY: number },
+  origin?: MouseEvent | TouchEvent | PointerEvent,
   transitionDuration = ZOOM_TRANSITION_DURATION,
 ) {
   if (!imageSwiper) return;
@@ -309,43 +488,27 @@ function setZoomRatio(
     return;
   }
 
-  const slideRect = activeSlide.getBoundingClientRect();
-  const currentTranslate = getElementTranslate(zoomContainer);
-  const scaleChange = nextScale / previousScale;
-  const originX = origin ? origin.clientX - (slideRect.left + slideRect.width / 2) : 0;
-  const originY = origin ? origin.clientY - (slideRect.top + slideRect.height / 2) : 0;
-  const maxTranslateX = Math.max((previewImage.offsetWidth * nextScale - activeSlide.clientWidth) / 2, 0);
-  const maxTranslateY = Math.max((previewImage.offsetHeight * nextScale - activeSlide.clientHeight) / 2, 0);
-  const translateX = Math.max(
-    -maxTranslateX,
-    Math.min(maxTranslateX, currentTranslate.x * scaleChange + originX * (1 - scaleChange)),
-  );
-  const translateY = Math.max(
-    -maxTranslateY,
-    Math.min(maxTranslateY, currentTranslate.y * scaleChange + originY * (1 - scaleChange)),
-  );
-
-  imageSwiper.zoom.in(nextScale);
+  // 缩放比例与位移都交给 Swiper Zoom 维护。外部再写 zoomContainer.transform
+  // 会让 DOM 位移与 Swiper 的 currentX/currentY 脱节，第二次捏合时就容易跳位。
+  if (previousScale <= MIN_ZOOM_RATIO) {
+    // Swiper 14 从 1 倍直接调用 zoom.in(指定倍率) 时，会把缺失的触点
+    // 坐标当成左上角并产生极限位移。先用真实交互位置建立完整的 4 倍
+    // 内部状态，再收敛到目标倍率，位移和 currentX/currentY 会保持一致。
+    imageSwiper.zoom.toggle(origin);
+  }
+  if (Math.abs(imageSwiper.zoom.scale - nextScale) >= 0.0001) {
+    imageSwiper.zoom.in(nextScale);
+  }
   zoomContainer.style.transitionDuration = `${transitionDuration}ms`;
-  zoomContainer.style.transform = `translate3d(${translateX}px, ${translateY}px, 0)`;
   previewImage.style.transitionDuration = `${transitionDuration}ms`;
 }
 
-function changeZoomRatio(step: number, origin?: { clientX: number; clientY: number }) {
+function changeZoomRatio(step: number) {
   if (!imageSwiper) return;
-  setZoomRatio(imageSwiper.zoom.scale + step, origin);
+  setZoomRatio(imageSwiper.zoom.scale + step);
 }
 
-function getInteractionOrigin(event: MouseEvent | TouchEvent | PointerEvent) {
-  if ("clientX" in event) {
-    return { clientX: event.clientX, clientY: event.clientY };
-  }
-
-  const touch = event.changedTouches[0] || event.touches[0];
-  return touch ? { clientX: touch.clientX, clientY: touch.clientY } : undefined;
-}
-
-function toggleZoom(origin?: { clientX: number; clientY: number }) {
+function toggleZoom(origin?: MouseEvent | TouchEvent | PointerEvent) {
   if (!imageSwiper) return;
 
   if (imageSwiper.zoom.scale > 1.01) {
@@ -381,30 +544,25 @@ function handleViewerWheel(event: WheelEvent) {
 
 type TrackpadGestureEvent = Event & {
   scale?: number;
-  clientX?: number;
-  clientY?: number;
 };
 
 function handleTrackpadGestureStart(event: Event) {
+  // iOS 同时派发旧式 gesture* 与 Pointer Events；后者已由 Swiper Zoom
+  // 完整接管。两套处理器同时更新比例会造成第二次捏合时位移状态错乱。
   if (!viewer?.dialog.open || !imageSwiper) return;
   event.preventDefault();
+  if (navigator.maxTouchPoints > 0) return;
   gestureStartZoomRatio = imageSwiper.zoom.scale;
 }
 
 function handleTrackpadGestureChange(event: Event) {
   if (!viewer?.dialog.open || !imageSwiper) return;
+  event.preventDefault();
+  if (navigator.maxTouchPoints > 0) return;
 
   const gestureEvent = event as TrackpadGestureEvent;
   if (typeof gestureEvent.scale !== "number") return;
-  event.preventDefault();
-  setZoomRatio(
-    gestureStartZoomRatio * gestureEvent.scale,
-    {
-      clientX: gestureEvent.clientX ?? window.innerWidth / 2,
-      clientY: gestureEvent.clientY ?? window.innerHeight / 2,
-    },
-    0,
-  );
+  setZoomRatio(gestureStartZoomRatio * gestureEvent.scale, undefined, 0);
 }
 
 function createViewer() {
@@ -419,17 +577,11 @@ function createViewer() {
     </button>
     <button class="image-lightbox__button image-lightbox__zoom" type="button" aria-label="放大图片" aria-pressed="false">
       <svg viewBox="0 0 24 24" aria-hidden="true">
-        <g class="image-lightbox__zoom-in-symbol">
-          <path d="M9 4H6a2 2 0 0 0-2 2v3"></path>
-          <path d="M15 4h3a2 2 0 0 1 2 2v3"></path>
-          <path d="M20 15v3a2 2 0 0 1-2 2h-3"></path>
-          <path d="M9 20H6a2 2 0 0 1-2-2v-3"></path>
-        </g>
-        <g class="image-lightbox__zoom-out-symbol">
-          <path d="M9 4v3a2 2 0 0 1-2 2H4"></path>
-          <path d="M20 9h-3a2 2 0 0 1-2-2V4"></path>
-          <path d="M15 20v-3a2 2 0 0 1 2-2h3"></path>
-          <path d="M4 15h3a2 2 0 0 1 2 2v3"></path>
+        <g transform="translate(1.125 1.125)">
+          <circle cx="10.5" cy="10.5" r="7"></circle>
+          <path d="m15.5 15.5 2.75 2.75"></path>
+          <path class="image-lightbox__zoom-in-symbol" d="M7.5 10.5h6M10.5 7.5v6"></path>
+          <path class="image-lightbox__zoom-out-symbol" d="M7.5 10.5h6"></path>
         </g>
       </svg>
     </button>
@@ -486,6 +638,16 @@ function createViewer() {
   dialog.addEventListener("wheel", handleViewerWheel, { passive: false });
   dialog.addEventListener("gesturestart", handleTrackpadGestureStart, { passive: false });
   dialog.addEventListener("gesturechange", handleTrackpadGestureChange, { passive: false });
+  dialog.addEventListener("touchstart", handleTouchStartCapture, { capture: true, passive: false });
+  dialog.addEventListener("touchmove", handleTouchMoveCapture, { capture: true, passive: false });
+  dialog.addEventListener("touchend", handleTouchEndCapture, { capture: true });
+  dialog.addEventListener("touchcancel", handleTouchEndCapture, { capture: true });
+  // 必须先于 Swiper wrapper 上的 Zoom 监听器执行，才能让“切图中落下的
+  // 第二根手指”完全不进入 Zoom 的指针缓存。
+  dialog.addEventListener("pointerdown", handleTouchPointerDownCapture, { capture: true });
+  dialog.addEventListener("pointermove", handleTouchPointerMoveCapture, { capture: true, passive: false });
+  dialog.addEventListener("pointerup", handleTouchPointerEndCapture, { capture: true });
+  dialog.addEventListener("pointercancel", handleTouchPointerEndCapture, { capture: true });
   dialog.addEventListener("pointerdown", handleViewerPointerDown);
   dialog.addEventListener("pointerdown", handleBouncePointerDown);
   dialog.addEventListener("pointermove", handleViewerPointerMove);
@@ -638,6 +800,45 @@ function syncViewerState(swiper: Swiper) {
   syncLoadingState();
 }
 
+function handleSlideChange(swiper: Swiper) {
+  cancelBounceGesture(false);
+
+  if (swiper.previousIndex !== swiper.activeIndex && swiper.zoom.enabled) {
+    // Swiper Zoom 默认到 transitionEnd 才释放上一张图片。切图时立即清理，
+    // 让新激活的 slide 无需等待动画结束即可重新接收双指缩放。
+    swiper.zoom.out();
+
+    const previousSlide = swiper.slides[swiper.previousIndex];
+    const zoomContainer = previousSlide?.querySelector<HTMLElement>(".image-lightbox__zoom-container");
+    const previewImage = previousSlide?.querySelector<HTMLElement>(".image-lightbox__image");
+    if (zoomContainer) zoomContainer.style.transitionDuration = "0ms";
+    if (previewImage) previewImage.style.transitionDuration = "0ms";
+  }
+
+  syncViewerState(swiper);
+}
+
+function handleSwiperSliderFirstMove() {
+  if (swiperTouchLock) return;
+
+  swiperSlideDragging = true;
+  touchGestureMode = "swiper";
+}
+
+function handleSwiperTouchEnd() {
+  swiperSlideDragging = false;
+  resetTouchGestureWhenReleased();
+}
+
+function handleSwiperTransitionStart() {
+  swiperSlideTransitioning = true;
+}
+
+function handleSwiperTransitionEnd(swiper: Swiper) {
+  swiperSlideTransitioning = false;
+  finishPreviousZoomReset(swiper);
+}
+
 function finishPreviousZoomReset(swiper: Swiper) {
   if (swiper.previousIndex === swiper.activeIndex) return;
 
@@ -655,6 +856,13 @@ function finishPreviousZoomReset(swiper: Swiper) {
 function destroySwiper() {
   cancelBounceGesture(false);
   window.clearTimeout(bounceCleanupTimer);
+  activeTouchPointers.clear();
+  blockedTouchPointers.clear();
+  releaseSwiperTouchLock();
+  touchGestureMode = "idle";
+  swiperSlideDragging = false;
+  swiperSlideTransitioning = false;
+  blockAllTouchMovesUntilRelease = false;
   if (imageSwiper && !imageSwiper.destroyed) {
     imageSwiper.destroy(true, true);
   }
@@ -704,8 +912,11 @@ function openViewer(images: HTMLImageElement[], index: number, trigger: HTMLElem
     },
     on: {
       init: syncViewerState,
-      slideChange: syncViewerState,
-      transitionEnd: finishPreviousZoomReset,
+      slideChange: handleSlideChange,
+      sliderFirstMove: handleSwiperSliderFirstMove,
+      touchEnd: handleSwiperTouchEnd,
+      transitionStart: handleSwiperTransitionStart,
+      transitionEnd: handleSwiperTransitionEnd,
       zoomChange: (_swiper, scale) => {
         updateZoomButton(scale);
         if (scale > 1.01) cancelBounceGesture(false);
@@ -713,7 +924,8 @@ function openViewer(images: HTMLImageElement[], index: number, trigger: HTMLElem
       doubleTap: (_swiper, event) => {
         event.preventDefault();
         event.stopPropagation();
-        toggleZoom(getInteractionOrigin(event));
+        // 双击采用居中放大，避免不同浏览器对事件坐标换算不一致而产生上偏。
+        toggleZoom();
       },
     },
   });

@@ -123,7 +123,7 @@ function syncScrollbarThemes() {
 }
 
 /**
- * ✅ 禁用滚动：拦截遮罩之外的滚动事件（允许抽屉和图片查看器处理自身手势）
+ * ✅ 禁用滚动：拦截遮罩之外的滚动事件（允许抽屉处理自身滚动）
  */
 export function disableScroll(_element?: HTMLElement) {
   if (scrollBlockHandler) return; // 已经拦截中
@@ -131,9 +131,15 @@ export function disableScroll(_element?: HTMLElement) {
   scrollBlockHandler = (e: Event) => {
     const target = e.target as HTMLElement | null;
     if (target && target.closest) {
-      // 抽屉允许自身滚动；图片查看器自行处理触摸与滚轮缩放并阻止页面穿透。
+      // 抽屉允许自身滚动。
       if (target.closest(".mobile-drawer")) return;
-      if (target.closest(".image-lightbox")) return;
+
+      // 图片查看器仍需收到事件来处理缩放和回弹，但必须先取消浏览器的
+      // 默认滚动，否则 iOS 会继续推动底层文章。
+      if (target.closest(".image-lightbox")) {
+        if (e.cancelable) e.preventDefault();
+        return;
+      }
     }
     // 其他地方的滚动被阻止
     e.preventDefault();
@@ -144,9 +150,7 @@ export function disableScroll(_element?: HTMLElement) {
   keyBlockHandler = (e: KeyboardEvent) => {
     const blockedKeys = [" ", "PageUp", "PageDown", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Home", "End"];
     const target = e.target as HTMLElement | null;
-    if (target && target.closest && target.closest(".mobile-drawer, .image-lightbox")) {
-      return;
-    }
+    if (target?.closest?.(".mobile-drawer")) return;
     if (blockedKeys.includes(e.key)) {
       e.preventDefault();
     }

@@ -20,7 +20,7 @@
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "swiper": "^14.2.0",
-    "terser": "^5.51.1",
+    "terser": "^5.51.2",
     "tocbot": "^4.36.8"
   },
   "devDependencies": {
@@ -37,7 +37,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.6",
     "husky": "^9.1.7",
-    "lint-staged": "^17.3.0",
+    "lint-staged": "^17.4.1",
     "postcss": "^8.5.26",
     "tailwindcss": "3.4.17",
     "typescript": "^7.0.2",

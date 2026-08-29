@@ -564,6 +564,10 @@ html.dark .markdown-body code [style*="background"] {
   cursor: zoom-in;
 }
 
+html.image-lightbox-open body > .os-scrollbar {
+  display: none !important;
+}
+
 .image-preview-trigger:focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 3px;
@@ -581,8 +585,9 @@ html.dark .markdown-body code [style*="background"] {
   padding: 0;
   overflow: hidden;
   overscroll-behavior: none;
+  touch-action: none;
   color: #fff;
-  background: rgba(0, 0, 0, 0.88);
+  background: transparent;
   border: 0;
 }
 
@@ -603,7 +608,7 @@ html.dark .markdown-body code [style*="background"] {
 }
 
 .image-lightbox::backdrop {
-  background: rgba(0, 0, 0, 0.88);
+  background: rgba(0, 0, 0, 0.82);
 }
 
 .image-lightbox__swiper {
@@ -617,7 +622,8 @@ html.dark .markdown-body code [style*="background"] {
 
 .image-lightbox__slide {
   box-sizing: border-box;
-  padding: calc(4rem + env(safe-area-inset-top)) clamp(1rem, 6vw, 5rem) 1rem;
+  padding-block: calc(4rem + max(env(safe-area-inset-top), env(safe-area-inset-bottom)));
+  padding-inline: clamp(1rem, 6vw, 5rem);
   overflow: hidden;
 }
 
@@ -633,7 +639,7 @@ html.dark .markdown-body code [style*="background"] {
 }
 
 .image-lightbox__zoom-container {
-  cursor: zoom-in;
+  cursor: default;
   transition-property: transform;
   transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
@@ -701,9 +707,18 @@ html.dark .markdown-body code [style*="background"] {
   -webkit-tap-highlight-color: transparent;
 }
 
-.image-lightbox__button:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.5);
-  opacity: 1;
+@media (hover: hover) and (pointer: fine) {
+  .image-lightbox__button:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 1;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .image-lightbox__button:active:not(:disabled) {
+    background: rgba(255, 255, 255, 0.38);
+    opacity: 0.9;
+  }
 }
 
 .image-lightbox__button:focus-visible {
@@ -743,7 +758,7 @@ html.dark .markdown-body code [style*="background"] {
 .image-lightbox__zoom svg {
   width: 20px;
   height: 20px;
-  stroke-width: 2;
+  stroke-width: 2.65;
 }
 
 .image-lightbox__zoom-out-symbol,
@@ -774,14 +789,23 @@ html.dark .markdown-body code [style*="background"] {
 }
 
 .image-lightbox__caption {
-  position: relative;
+  position: absolute;
+  bottom: max(0.75rem, env(safe-area-inset-bottom));
+  left: 50%;
   z-index: 3;
-  flex: 0 0 auto;
-  max-width: min(48rem, calc(100vw - 2rem));
-  margin: 0 auto;
-  padding: 0.5rem 1rem max(1.25rem, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  width: min(48rem, calc(100vw - 2rem));
+  margin: 0;
+  padding: 0.25rem 1rem;
   text-align: center;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  transform: translateX(-50%);
+  transition: opacity 160ms ease;
+}
+
+.image-lightbox.is-image-zoomed .image-lightbox__caption {
+  opacity: 0;
 }
 
 .image-lightbox__title {
@@ -813,6 +837,10 @@ html.dark .markdown-body code [style*="background"] {
 }
 
 @media (max-width: 639px) {
+  .image-lightbox__zoom {
+    display: none;
+  }
+
   .image-lightbox__slide {
     padding-right: 0.75rem;
     padding-left: 0.75rem;
