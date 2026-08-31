@@ -5,3 +5,4 @@ minimumReleaseAgeExclude:
   - "@types/node@26.4.0"
   - swiper@14.2.0
   - terser@5.51.1
+  - alpinejs@3.17.0

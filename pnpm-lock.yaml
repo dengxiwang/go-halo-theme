@@ -8,8 +8,8 @@ importers:
   .:
     dependencies:
       alpinejs:
-        specifier: ^3.16.3
-        version: 3.16.3
+        specifier: ^3.17.0
+        version: 3.17.0
       github-markdown-css:
         specifier: ^5.9.0
         version: 5.9.0
@@ -629,9 +629,9 @@ packages:
     resolution:
       { integrity: sha512-IWrosm/yrn43eiKqkfkHis7QioDleaXQHdDVPKg0FSwwd/DuvyX79TZnFOnYpB7dcsFAMmtFztZuXPDvSePkFw== }
 
-  alpinejs@3.16.3:
+  alpinejs@3.17.0:
     resolution:
-      { integrity: sha512-kLIO2JOPs5ZY3mHPH+CHHPzp89Y6Gb2luLRy+RDIb1oG9y6N5Vfc75kkEoaSOPhJqvakuPiAsnd9paNPNSZyVg== }
+      { integrity: sha512-LDLcfqFsiQrdFCNqK7zWyfjx2QE2sjPw0bIPThLVHMIQATAp1dNRKga1xPSqC+71UYFiosIYblLszzzo9r9k6A== }
 
   ansi-regex@5.0.1:
     resolution:
@@ -2365,7 +2365,7 @@ snapshots:
       json-schema-traverse: 0.4.1
       uri-js: 4.4.1
 
-  alpinejs@3.16.3:
+  alpinejs@3.17.0:
     dependencies:
       "@vue/reactivity": 3.5.41
 

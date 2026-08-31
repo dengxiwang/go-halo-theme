@@ -18,6 +18,7 @@ const BOUNCE_AXIS_THRESHOLD = 6;
 const SWIPE_GESTURE_THRESHOLD = 8;
 const SWIPER_SETTLE_EPSILON = 1;
 const BACKDROP_CLICK_SUPPRESSION_DURATION = 400;
+const RENDERED_SLIDE_RADIUS = 1;
 
 type BounceGesture = {
   pointerId: number;
@@ -83,6 +84,10 @@ let touchGestureMode: TouchGestureMode = "idle";
 let swiperSlideDragging = false;
 let swiperSlideTransitioning = false;
 let blockAllTouchMovesUntilRelease = false;
+let observedVisualViewport: VisualViewport | null = null;
+let viewportSyncFrame: number | undefined;
+let zoomTransitionSnapshot: HTMLElement | null = null;
+let zoomTransitionSnapshotFrame: number | undefined;
 
 function getRequiredElement<T extends Element>(root: ParentNode, selector: string): T {
   const element = root.querySelector<T>(selector);
@@ -565,44 +570,109 @@ function handleTrackpadGestureChange(event: Event) {
   setZoomRatio(gestureStartZoomRatio * gestureEvent.scale, undefined, 0);
 }
 
+function setViewerViewportProperty(name: string, value: number) {
+  viewer?.dialog.style.setProperty(name, `${Math.round(value * 100) / 100}px`);
+}
+
+function syncViewerViewport() {
+  if (!viewer?.dialog.open) return;
+
+  const visualViewport = window.visualViewport;
+  setViewerViewportProperty("--image-lightbox-viewport-width", Math.max(1, visualViewport?.width ?? window.innerWidth));
+  setViewerViewportProperty(
+    "--image-lightbox-viewport-height",
+    Math.max(1, visualViewport?.height ?? window.innerHeight),
+  );
+  setViewerViewportProperty("--image-lightbox-viewport-left", visualViewport?.offsetLeft ?? 0);
+  setViewerViewportProperty("--image-lightbox-viewport-top", visualViewport?.offsetTop ?? 0);
+
+  if (imageSwiper && !imageSwiper.destroyed) {
+    imageSwiper.update();
+  }
+}
+
+function scheduleViewerViewportSync() {
+  if (viewportSyncFrame !== undefined) return;
+
+  viewportSyncFrame = window.requestAnimationFrame(() => {
+    viewportSyncFrame = undefined;
+    syncViewerViewport();
+  });
+}
+
+function stopViewerViewportSync() {
+  if (viewportSyncFrame !== undefined) {
+    window.cancelAnimationFrame(viewportSyncFrame);
+    viewportSyncFrame = undefined;
+  }
+
+  window.removeEventListener("resize", scheduleViewerViewportSync);
+  window.removeEventListener("orientationchange", scheduleViewerViewportSync);
+  observedVisualViewport?.removeEventListener("resize", scheduleViewerViewportSync);
+  observedVisualViewport?.removeEventListener("scroll", scheduleViewerViewportSync);
+  observedVisualViewport = null;
+
+  if (!viewer) return;
+  viewer.dialog.style.removeProperty("--image-lightbox-viewport-width");
+  viewer.dialog.style.removeProperty("--image-lightbox-viewport-height");
+  viewer.dialog.style.removeProperty("--image-lightbox-viewport-left");
+  viewer.dialog.style.removeProperty("--image-lightbox-viewport-top");
+}
+
+function startViewerViewportSync() {
+  stopViewerViewportSync();
+  observedVisualViewport = window.visualViewport;
+
+  window.addEventListener("resize", scheduleViewerViewportSync, { passive: true });
+  window.addEventListener("orientationchange", scheduleViewerViewportSync, { passive: true });
+  observedVisualViewport?.addEventListener("resize", scheduleViewerViewportSync, { passive: true });
+  observedVisualViewport?.addEventListener("scroll", scheduleViewerViewportSync, { passive: true });
+
+  syncViewerViewport();
+  scheduleViewerViewportSync();
+}
+
 function createViewer() {
   const dialog = document.createElement("dialog");
   dialog.className = "image-lightbox";
+  dialog.tabIndex = -1;
   dialog.setAttribute("aria-label", "图片预览");
   dialog.innerHTML = `
-    <button class="image-lightbox__button image-lightbox__close" type="button" aria-label="关闭图片预览">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M6 6l12 12M18 6 6 18"></path>
-      </svg>
-    </button>
-    <button class="image-lightbox__button image-lightbox__zoom" type="button" aria-label="放大图片" aria-pressed="false">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <g transform="translate(1.125 1.125)">
-          <circle cx="10.5" cy="10.5" r="7"></circle>
-          <path d="m15.5 15.5 2.75 2.75"></path>
-          <path class="image-lightbox__zoom-in-symbol" d="M7.5 10.5h6M10.5 7.5v6"></path>
-          <path class="image-lightbox__zoom-out-symbol" d="M7.5 10.5h6"></path>
-        </g>
-      </svg>
-    </button>
-    <button class="image-lightbox__button image-lightbox__previous" type="button" aria-label="查看上一张图片">
-      <svg viewBox="0 0 1024 1024" aria-hidden="true">
-        <path d="M684.29 799.276 393.929 513.019 684.29 226.762c37.685-37.153 38.003-97.625.707-134.384-37.297-36.758-98.646-36.435-136.331.718l-357.43 352.378-.451.468-.256.239c-18.357 18.092-27.581 41.929-27.743 65.902l-.018.934.018.948c.165 23.97 9.389 47.803 27.743 65.892l.255.239.452.468 357.43 352.378c37.685 37.153 99.034 37.476 136.331.718 37.297-36.758 36.979-97.231-.707-134.384Z"></path>
-      </svg>
-    </button>
-    <div class="swiper image-lightbox__swiper">
-      <div class="swiper-wrapper image-lightbox__wrapper"></div>
-    </div>
-    <div class="image-lightbox__status" role="status" aria-live="polite" hidden></div>
-    <button class="image-lightbox__button image-lightbox__next" type="button" aria-label="查看下一张图片">
-      <svg viewBox="0 0 1024 1024" aria-hidden="true">
-        <path d="m803.758 514.017-.018-.933c-.162-23.974-9.386-47.811-27.743-65.903l-.256-.239-.451-.468L417.861 94.096c-37.685-37.153-99.034-37.476-136.331-.718-37.297 36.758-36.979 97.231.707 134.384l290.361 286.257-290.362 286.257c-37.685 37.153-38.004 97.625-.707 134.383 37.297 36.758 98.646 36.435 136.331-.718l357.43-352.378.451-.468.256-.239c18.354-18.089 27.578-41.922 27.743-65.892l.018-.947Z"></path>
-      </svg>
-    </button>
-    <div class="image-lightbox__caption">
-      <div class="image-lightbox__title"></div>
-      <div class="image-lightbox__description"></div>
-      <div class="image-lightbox__counter" aria-live="polite"></div>
+    <div class="image-lightbox__viewport">
+      <button class="image-lightbox__button image-lightbox__close" type="button" aria-label="关闭图片预览">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18"></path>
+        </svg>
+      </button>
+      <button class="image-lightbox__button image-lightbox__zoom" type="button" aria-label="放大图片" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <g transform="translate(1.125 1.125)">
+            <circle cx="10.5" cy="10.5" r="7"></circle>
+            <path d="m15.5 15.5 2.75 2.75"></path>
+            <path class="image-lightbox__zoom-in-symbol" d="M7.5 10.5h6M10.5 7.5v6"></path>
+            <path class="image-lightbox__zoom-out-symbol" d="M7.5 10.5h6"></path>
+          </g>
+        </svg>
+      </button>
+      <button class="image-lightbox__button image-lightbox__previous" type="button" aria-label="查看上一张图片">
+        <svg viewBox="0 0 1024 1024" aria-hidden="true">
+          <path d="M684.29 799.276 393.929 513.019 684.29 226.762c37.685-37.153 38.003-97.625.707-134.384-37.297-36.758-98.646-36.435-136.331.718l-357.43 352.378-.451.468-.256.239c-18.357 18.092-27.581 41.929-27.743 65.902l-.018.934.018.948c.165 23.97 9.389 47.803 27.743 65.892l.255.239.452.468 357.43 352.378c37.685 37.153 99.034 37.476 136.331.718 37.297-36.758 36.979-97.231-.707-134.384Z"></path>
+        </svg>
+      </button>
+      <div class="swiper image-lightbox__swiper">
+        <div class="swiper-wrapper image-lightbox__wrapper"></div>
+      </div>
+      <div class="image-lightbox__status" role="status" aria-live="polite" hidden></div>
+      <button class="image-lightbox__button image-lightbox__next" type="button" aria-label="查看下一张图片">
+        <svg viewBox="0 0 1024 1024" aria-hidden="true">
+          <path d="m803.758 514.017-.018-.933c-.162-23.974-9.386-47.811-27.743-65.903l-.256-.239-.451-.468L417.861 94.096c-37.685-37.153-99.034-37.476-136.331-.718-37.297 36.758-36.979 97.231.707 134.384l290.361 286.257-290.362 286.257c-37.685 37.153-38.004 97.625-.707 134.383 37.297 36.758 98.646 36.435 136.331-.718l357.43-352.378.451-.468.256-.239c18.354-18.089 27.578-41.922 27.743-65.892l.018-.947Z"></path>
+        </svg>
+      </button>
+      <div class="image-lightbox__caption">
+        <div class="image-lightbox__title"></div>
+        <div class="image-lightbox__description"></div>
+        <div class="image-lightbox__counter" aria-live="polite"></div>
+      </div>
     </div>
   `;
   document.body.appendChild(dialog);
@@ -704,8 +774,93 @@ function getViewer() {
   return viewer;
 }
 
+function getSlide(index: number) {
+  return viewer?.wrapper.children.item(index) as HTMLElement | null;
+}
+
 function getPreviewImage(index: number) {
-  return viewer?.wrapper.children.item(index)?.querySelector<HTMLImageElement>(".image-lightbox__image") || null;
+  return getSlide(index)?.querySelector<HTMLImageElement>(".image-lightbox__image") || null;
+}
+
+function hydrateSlide(index: number, centerIndex: number) {
+  const sourceImage = activeImages[index];
+  const slide = getSlide(index);
+  if (!sourceImage || !slide) return;
+
+  const existingImage = slide.querySelector<HTMLImageElement>(".image-lightbox__image");
+  if (existingImage) {
+    existingImage.loading = index === centerIndex ? "eager" : "lazy";
+    if (index === centerIndex) {
+      existingImage.setAttribute("fetchpriority", "high");
+    } else {
+      existingImage.removeAttribute("fetchpriority");
+    }
+    return;
+  }
+
+  const details = getImageDetails(sourceImage);
+  const bounceLayer = document.createElement("div");
+  const zoomContainer = document.createElement("div");
+  const previewImage = new Image();
+
+  bounceLayer.className = "image-lightbox__bounce-layer";
+  zoomContainer.className = "swiper-zoom-container image-lightbox__zoom-container";
+  zoomContainer.dataset.swiperZoom = String(MAX_ZOOM_RATIO);
+  previewImage.className = "image-lightbox__image";
+  previewImage.alt = details.alt;
+  previewImage.decoding = "async";
+  previewImage.draggable = false;
+  previewImage.loading = index === centerIndex ? "eager" : "lazy";
+  if (index === centerIndex) previewImage.setAttribute("fetchpriority", "high");
+
+  previewImage.addEventListener(
+    "load",
+    () => {
+      previewImage.classList.add("is-ready");
+      if (index === activeIndex) syncLoadingState();
+    },
+    { once: true },
+  );
+  previewImage.addEventListener(
+    "error",
+    () => {
+      previewImage.classList.remove("is-ready");
+      if (index === activeIndex) syncLoadingState();
+    },
+    { once: true },
+  );
+  previewImage.src = details.src;
+
+  zoomContainer.appendChild(previewImage);
+  bounceLayer.appendChild(zoomContainer);
+  slide.appendChild(bounceLayer);
+}
+
+function hydrateSlidesAround(centerIndex: number) {
+  const firstIndex = Math.max(0, centerIndex - RENDERED_SLIDE_RADIUS);
+  const lastIndex = Math.min(activeImages.length - 1, centerIndex + RENDERED_SLIDE_RADIUS);
+  for (let index = firstIndex; index <= lastIndex; index += 1) {
+    hydrateSlide(index, centerIndex);
+  }
+}
+
+function pruneSlidesAround(centerIndex: number, preservedIndexes: number[] = []) {
+  if (!viewer) return;
+
+  const retainedIndexes = new Set(preservedIndexes);
+  const firstIndex = Math.max(0, centerIndex - RENDERED_SLIDE_RADIUS);
+  const lastIndex = Math.min(activeImages.length - 1, centerIndex + RENDERED_SLIDE_RADIUS);
+  for (let index = firstIndex; index <= lastIndex; index += 1) {
+    retainedIndexes.add(index);
+  }
+
+  Array.from(viewer.wrapper.children).forEach((slide, index) => {
+    if (retainedIndexes.has(index) || slide.childElementCount === 0) return;
+
+    const previewImage = slide.querySelector<HTMLImageElement>(".image-lightbox__image");
+    previewImage?.removeAttribute("src");
+    slide.replaceChildren();
+  });
 }
 
 function syncLoadingState() {
@@ -737,40 +892,16 @@ function createSlides(images: HTMLImageElement[], initialIndex: number) {
   const elements = getViewer();
   const fragment = document.createDocumentFragment();
 
-  images.forEach((sourceImage, index) => {
-    const details = getImageDetails(sourceImage);
+  images.forEach((_sourceImage, index) => {
     const slide = document.createElement("div");
-    const bounceLayer = document.createElement("div");
-    const zoomContainer = document.createElement("div");
-    const previewImage = new Image();
 
     slide.className = "swiper-slide image-lightbox__slide";
-    bounceLayer.className = "image-lightbox__bounce-layer";
-    zoomContainer.className = "swiper-zoom-container image-lightbox__zoom-container";
-    zoomContainer.dataset.swiperZoom = "4";
-    previewImage.className = "image-lightbox__image";
-    previewImage.alt = details.alt;
-    previewImage.decoding = "async";
-    previewImage.draggable = false;
-    previewImage.loading = Math.abs(index - initialIndex) <= 1 ? "eager" : "lazy";
-
-    previewImage.addEventListener("load", () => {
-      previewImage.classList.add("is-ready");
-      if (index === activeIndex) syncLoadingState();
-    });
-    previewImage.addEventListener("error", () => {
-      previewImage.classList.remove("is-ready");
-      if (index === activeIndex) syncLoadingState();
-    });
-    previewImage.src = details.src;
-
-    zoomContainer.appendChild(previewImage);
-    bounceLayer.appendChild(zoomContainer);
-    slide.appendChild(bounceLayer);
+    slide.dataset.imageIndex = String(index);
     fragment.appendChild(slide);
   });
 
   elements.wrapper.replaceChildren(fragment);
+  hydrateSlidesAround(initialIndex);
 }
 
 function syncViewerState(swiper: Swiper) {
@@ -802,18 +933,7 @@ function syncViewerState(swiper: Swiper) {
 
 function handleSlideChange(swiper: Swiper) {
   cancelBounceGesture(false);
-
-  if (swiper.previousIndex !== swiper.activeIndex && swiper.zoom.enabled) {
-    // Swiper Zoom 默认到 transitionEnd 才释放上一张图片。切图时立即清理，
-    // 让新激活的 slide 无需等待动画结束即可重新接收双指缩放。
-    swiper.zoom.out();
-
-    const previousSlide = swiper.slides[swiper.previousIndex];
-    const zoomContainer = previousSlide?.querySelector<HTMLElement>(".image-lightbox__zoom-container");
-    const previewImage = previousSlide?.querySelector<HTMLElement>(".image-lightbox__image");
-    if (zoomContainer) zoomContainer.style.transitionDuration = "0ms";
-    if (previewImage) previewImage.style.transitionDuration = "0ms";
-  }
+  hydrateSlidesAround(swiper.activeIndex);
 
   syncViewerState(swiper);
 }
@@ -830,13 +950,60 @@ function handleSwiperTouchEnd() {
   resetTouchGestureWhenReleased();
 }
 
-function handleSwiperTransitionStart() {
+function removeZoomTransitionSnapshot() {
+  if (zoomTransitionSnapshotFrame !== undefined) {
+    window.cancelAnimationFrame(zoomTransitionSnapshotFrame);
+    zoomTransitionSnapshotFrame = undefined;
+  }
+
+  zoomTransitionSnapshot?.remove();
+  zoomTransitionSnapshot = null;
+}
+
+function preservePreviousZoomDuringTransition(swiper: Swiper) {
+  removeZoomTransitionSnapshot();
+  if (swiper.previousIndex === swiper.activeIndex) return;
+
+  const previousSlide = swiper.slides[swiper.previousIndex];
+  const bounceLayer = previousSlide?.querySelector<HTMLElement>(".image-lightbox__bounce-layer");
+  if (!previousSlide?.classList.contains("swiper-slide-zoomed") || !bounceLayer) return;
+
+  const snapshot = bounceLayer.cloneNode(true) as HTMLElement;
+  snapshot.classList.add("image-lightbox__transition-snapshot");
+  snapshot.setAttribute("aria-hidden", "true");
+  snapshot.style.top = `${bounceLayer.offsetTop}px`;
+  snapshot.style.left = `${bounceLayer.offsetLeft}px`;
+  snapshot.style.width = `${bounceLayer.offsetWidth}px`;
+  snapshot.style.height = `${bounceLayer.offsetHeight}px`;
+  snapshot.querySelectorAll("[id]").forEach((element) => element.removeAttribute("id"));
+  snapshot.querySelectorAll("img").forEach((image) => {
+    image.alt = "";
+  });
+
+  previousSlide.appendChild(snapshot);
+  zoomTransitionSnapshot = snapshot;
+}
+
+function finishZoomTransitionSnapshot() {
+  if (!zoomTransitionSnapshot) return;
+
+  // transitionEnd 触发后再等两帧，确保新页的最终位置已经提交到合成层，
+  // 然后才移除保持旧缩放状态的快照。
+  zoomTransitionSnapshotFrame = window.requestAnimationFrame(() => {
+    zoomTransitionSnapshotFrame = window.requestAnimationFrame(removeZoomTransitionSnapshot);
+  });
+}
+
+function handleSwiperTransitionStart(swiper: Swiper) {
   swiperSlideTransitioning = true;
+  preservePreviousZoomDuringTransition(swiper);
 }
 
 function handleSwiperTransitionEnd(swiper: Swiper) {
   swiperSlideTransitioning = false;
   finishPreviousZoomReset(swiper);
+  pruneSlidesAround(swiper.activeIndex);
+  finishZoomTransitionSnapshot();
 }
 
 function finishPreviousZoomReset(swiper: Swiper) {
@@ -846,15 +1013,15 @@ function finishPreviousZoomReset(swiper: Swiper) {
   const zoomContainer = previousSlide?.querySelector<HTMLElement>(".image-lightbox__zoom-container");
   const previewImage = previousSlide?.querySelector<HTMLElement>(".image-lightbox__image");
 
-  // Swiper resets the previous zoomed image after the slide transition. Its
-  // default 300ms reset can otherwise remain visible when the image overflows
-  // into the active slide, so complete that already-hidden reset immediately.
+  // Swiper 会在 transitionEnd 复位上一张图。此时旧页已经离开视口，
+  // 再移除 transform 过渡，既能保留完整的切图动画，也不会看到旧图缩小。
   if (zoomContainer) zoomContainer.style.transitionDuration = "0ms";
   if (previewImage) previewImage.style.transitionDuration = "0ms";
 }
 
 function destroySwiper() {
   cancelBounceGesture(false);
+  removeZoomTransitionSnapshot();
   window.clearTimeout(bounceCleanupTimer);
   activeTouchPointers.clear();
   blockedTouchPointers.clear();
@@ -869,7 +1036,7 @@ function destroySwiper() {
   imageSwiper = null;
 }
 
-function openViewer(images: HTMLImageElement[], index: number, trigger: HTMLElement) {
+function openViewer(images: HTMLImageElement[], index: number, trigger: HTMLElement, focusCloseButton = false) {
   if (!images[index]) return;
 
   activeImages = images;
@@ -888,6 +1055,7 @@ function openViewer(images: HTMLImageElement[], index: number, trigger: HTMLElem
     disableScroll(document.body);
     scrollLocked = true;
   }
+  startViewerViewportSync();
 
   imageSwiper = new Swiper(elements.swiperContainer, {
     modules: [Zoom],
@@ -931,7 +1099,8 @@ function openViewer(images: HTMLImageElement[], index: number, trigger: HTMLElem
   });
 
   syncViewerState(imageSwiper);
-  requestAnimationFrame(() => elements.closeButton.focus({ preventScroll: true }));
+  scheduleViewerViewportSync();
+  (focusCloseButton ? elements.closeButton : elements.dialog).focus({ preventScroll: true });
 }
 
 function showPreviousImage() {
@@ -950,6 +1119,7 @@ function closeViewer() {
 
 function resetViewer() {
   document.documentElement.classList.remove("image-lightbox-open");
+  stopViewerViewportSync();
   if (scrollLocked) {
     enableScroll(document.body);
     scrollLocked = false;
@@ -998,14 +1168,14 @@ function registerGallery(gallery: HTMLElement) {
     trigger.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
-      openViewer(images, index, trigger);
+      openViewer(images, index, trigger, event instanceof MouseEvent && event.detail === 0);
     });
 
     if (!anchor) {
       image.addEventListener("keydown", (event) => {
         if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault();
-        openViewer(images, index, image);
+        openViewer(images, index, image, true);
       });
     }
   });
