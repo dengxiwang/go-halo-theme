@@ -38,6 +38,7 @@
         <!-- 分类名称只负责跳转，带子分类时由旁边的独立按钮负责展开。 -->
         <a
           th:href="@{${categoryItem.status.permalink}}"
+          th:title="|${categoryItem.spec.displayName} (${categoryItem.postCount ?: 0})|"
           class="group flex cursor-pointer items-center gap-1 transition-all hover:text-blue-500"
           th:attr="data-has-children=${not #lists.isEmpty(categoryItem.children)}"
           th:classappend="${categoryItem.metadata.name == category.metadata.name} ? 'active-menu'"
@@ -88,7 +89,7 @@
           x-transition:leave="transition ease-in duration-100"
           x-transition:leave-start="opacity-100 scale-100"
           x-transition:leave-end="opacity-0 scale-95"
-          class="absolute left-1/2 top-full z-10 mt-1 w-max min-w-[80px] -translate-x-1/2 rounded-lg border border-gray-300 bg-white px-1 py-1 shadow-sm"
+          class="category-submenu absolute left-1/2 top-full z-10 mt-1 w-max min-w-28 max-w-full -translate-x-1/2 rounded-lg border border-gray-300 bg-white px-1 py-1 shadow-sm"
         >
           <li
             th:each="childCategory : ${categoryItem.children}"
@@ -96,8 +97,9 @@
           >
             <a
               th:href="@{${childCategory.status.permalink}}"
+              th:title="|${childCategory.spec.displayName} (${childCategory.postCount ?: 0})|"
               th:text="|${childCategory.spec.displayName} (${childCategory.postCount ?: 0})|"
-              class="block max-w-28 overflow-hidden text-ellipsis px-2 py-1 transition-all hover:text-blue-500"
+              class="block overflow-hidden text-ellipsis px-2 py-1 transition-all hover:text-blue-500"
               th:classappend="${category != null and category.metadata.name == childCategory.metadata.name} ? 'active-menu'"
             >
             </a>

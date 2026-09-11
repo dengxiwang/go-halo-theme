@@ -6,3 +6,6 @@ minimumReleaseAgeExclude:
   - swiper@14.2.0
   - terser@5.51.1
   - alpinejs@3.17.0
+  - autoprefixer@10.5.6
+  - lint-staged@17.5.1
+  - vite@8.3.0

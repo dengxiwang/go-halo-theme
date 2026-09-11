@@ -82,6 +82,16 @@ html.dark .is-active-li {
   background-color: rgba(96, 165, 250, 0.15);
 }
 
+/* 连接父分类与下拉菜单的悬停区域，覆盖外边距、边框及展开动画的位移。 */
+.category-submenu::before {
+  content: "";
+  position: absolute;
+  right: -1px;
+  bottom: 100%;
+  left: -1px;
+  height: 0.5rem;
+}
+
 /* 触屏设备不会残留粘滞 hover；展开态只高亮箭头本身。 */
 .category-submenu-toggle.is-open {
   color: var(--accent);
